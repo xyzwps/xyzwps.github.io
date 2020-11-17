@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import fse from 'fs-extra';
 import adoc from '../lib/adoc';
 import { join } from 'path';
@@ -31,14 +32,21 @@ export async function doGetAllPost() {
     const pageInfoList = await doGetVolume(path);
     paths.push(...pageInfoList);
   }
-
   return { paths, fallback: true };
 }
 
 export async function doPostByPath(path) {
-  const file = await fse.readFile(POST_DIR + '/' + path);
-  const text = file.toString();
-  const adocInfo = adoc(text);
-  console.log(JSON.stringify(adocInfo, null, '    '));
-  return adocInfo;
+  const filePath = POST_DIR + '/' + path;
+  if (_.endsWith(path, '.adoc')) {
+    const file = await fse.readFile(filePath);
+    const text = file.toString();
+    const adocInfo = adoc(text);
+    return { type: 'adoc', doc: adocInfo };
+  } else if (_.endsWith(path, '/index')) {
+    const indexFilePath = filePath.substring(0, filePath.length - 5) + 'meta.json';
+    const file = await fse.readFile(indexFilePath);
+    const text = file.toString();
+    return { type: 'index', doc: JSON.parse(text) };
+  }
+  throw new Error('暂不支持的类型');
 }

@@ -1,10 +1,24 @@
 import { doGetAllPost, doPostByPath } from '../../posts';
+import Adoc from '../../components/adoc';
+import Toc from '../../components/toc';
 
-export default function PostPage({ id, docInfo }) {
+export default function PostPage({ id, postInfo }) {
   return (
     <div>
       {id}
-      {JSON.stringify(docInfo) || '[]'}
+      <pre>
+        {(() => {
+          if (postInfo) {
+            const { type, doc } = postInfo;
+            switch (type) {
+              case 'adoc':
+                return <Adoc adocInfo={doc.adocInfo} content={doc.content} />;
+              case 'index':
+                return <Toc doc={doc} />;
+            }
+          }
+        })()}
+      </pre>
     </div>
   );
 }
@@ -14,13 +28,6 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  console.log('props: ' + JSON.stringify(params, null, '   '));
-  const adocInfo = await doPostByPath(params.id.join('/'));
-  console.log(JSON.stringify(adocInfo, null, '----'));
-  return {
-    props: {
-      id: params.id,
-      docInfo: adocInfo,
-    },
-  };
+  const postInfo = await doPostByPath(params.id.join('/'));
+  return { props: { id: params.id, postInfo } };
 }

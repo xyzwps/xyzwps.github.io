@@ -12,6 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "@asciidoctor/core": "^2.2.0",
+    "asciidoctor-highlight.js": "^0.2.1",
+    "asciidoctor-katex": "^0.3.2",
     "dayjs": "^1.9.6",
     "fs-extra": "^9.0.1",
     "lodash": "^4.17.20",
