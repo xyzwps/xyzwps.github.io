@@ -1,4 +1,5 @@
 import fse from 'fs-extra';
+import adoc from '../lib/adoc';
 import { join } from 'path';
 
 const POST_DIR = join(process.cwd(), 'posts');
@@ -25,7 +26,6 @@ async function doGetVolume(path) {
 }
 
 export async function doGetAllPost() {
-  console.log(POST_DIR);
   const paths = [];
   for (const path of VOLUME) {
     const pageInfoList = await doGetVolume(path);
@@ -33,4 +33,12 @@ export async function doGetAllPost() {
   }
 
   return { paths, fallback: true };
+}
+
+export async function doPostByPath(path) {
+  const file = await fse.readFile(POST_DIR + '/' + path);
+  const text = file.toString();
+  const adocInfo = adoc(text);
+  console.log(JSON.stringify(adocInfo, null, '    '));
+  return adocInfo;
 }
