@@ -1,0 +1,24 @@
+@import "./vars";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: $default-font;
+}
+
+div {
+  display: block;
+}
+
+.adoc {
+  margin-top: 1rem;
+  @import "./asciidoc";
+}
+
+.katex {
+  font-size: 1rem;
+}
