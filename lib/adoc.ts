@@ -7,13 +7,15 @@ import S from "string"
 import { AdocInfo } from "../types"
 
 const asciidoctor = Asciidoctor()
-hljsExt.register(asciidoctor.Extensions) // Register the extension into global registry.
+const registry = asciidoctor.Extensions.create()
+hljsExt.register(registry) // Register the extension into global registry.
 katexExt.register(asciidoctor.Extensions, {
   katexOptions: { macros: { "\\RR": "\\mathbb{R}" } },
 })
 
 export default function parse(adocText: string): AdocInfo {
   const doc = asciidoctor.load(adocText, {
+    extension_registry: registry,
     attributes: {
       icons: "font",
       "source-highlighter": "highlightjs-ext",
