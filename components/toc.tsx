@@ -1,4 +1,4 @@
-import { PostInfo } from "../posts"
+import { PostInfo } from "../types"
 
 const Toc: React.FC<{ doc: PostInfo }> = ({ doc }) => {
   return (

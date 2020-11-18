@@ -9,10 +9,18 @@ export interface AdocInfo {
 export interface AdocPostInfo {
   type: "adoc"
   doc: AdocInfo
+  toc: PostToc
 }
 export interface IndexPostInfo {
   type: "index"
-  doc: Record<string, unknown>
+  doc: PostToc
+  toc: PostToc
 }
 
 export type PostInfo = AdocPostInfo | IndexPostInfo
+
+export interface PostToc {
+  type: "simple"
+  title: string
+  toc: { title: string; path: string }[]
+}
