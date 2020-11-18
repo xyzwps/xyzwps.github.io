@@ -22,7 +22,6 @@ async function doGetVolume(path) {
       result.push({ path: `${path}/${file}` });
     }
   }
-  console.log('all post path' + JSON.stringify(result, null, '    '));
   return result.map(({ path }) => ({ params: { id: path.split('\\') } }));
 }
 
