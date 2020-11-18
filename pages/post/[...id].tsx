@@ -3,6 +3,7 @@ import { doGetAllPost, doPostByPath } from "../../posts"
 import { AdocInfo, PostInfo } from "../../types"
 import Adoc from "../../components/adoc"
 import Toc from "../../components/toc"
+import PageLayout from "../../segments/PageLayout"
 import PostTocList from "../../segments/PostTocList"
 
 const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ id, postInfo }) => {
@@ -12,20 +13,23 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ id, postInfo }) => {
 
   const { type, doc, toc } = postInfo
   return (
-    <div>
-      {id}
-      <PostTocList postToc={toc} />
-      <pre>
-        {(() => {
-          switch (type) {
-            case "adoc":
-              return <Adoc adocInfo={doc as AdocInfo} />
-            case "index":
-              return <Toc doc={postInfo} />
-          }
-        })()}
-      </pre>
-    </div>
+    <PageLayout>
+      <div style={{ width: "100%", display: "flex" }}>
+        <div style={{ flexBasis: "15rem", borderRight: "1px solid lightgray" }}>
+          <PostTocList postToc={toc} />
+        </div>
+        <div style={{ flexBasis: 0, flexGrow: 1, padding: "2rem" }}>
+          {(() => {
+            switch (type) {
+              case "adoc":
+                return <Adoc adocInfo={doc as AdocInfo} />
+              case "index":
+                return <Toc doc={postInfo} />
+            }
+          })()}
+        </div>
+      </div>
+    </PageLayout>
   )
 }
 

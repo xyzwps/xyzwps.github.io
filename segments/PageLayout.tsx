@@ -4,7 +4,7 @@ const PageLayout: React.FC<{ children: unknown }> = ({ children }) => {
   return (
     <>
       <Header />
-      {children}
+      <div style={{ maxWidth: 1366, margin: "0px auto" }}>{children}</div>
     </>
   )
 }

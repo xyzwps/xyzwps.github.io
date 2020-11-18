@@ -2,7 +2,7 @@ import Link from "next/link"
 
 const Header: React.FC<Record<string, unknown>> = () => {
   return (
-    <div>
+    <div style={{ display: "flex", borderBottom: "1px solid lightgray" }}>
       <Link href="/">
         <a>Home</a>
       </Link>
