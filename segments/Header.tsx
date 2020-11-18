@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import Link from "next/link"
 
-function Header() {
+const Header: React.FC<Record<string, unknown>> = () => {
   return (
     <div>
       <Link href="/">
@@ -17,7 +17,7 @@ function Header() {
         <a>Post list</a>
       </Link>
     </div>
-  );
+  )
 }
 
-export default Header;
+export default Header
