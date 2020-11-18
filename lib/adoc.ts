@@ -8,7 +8,7 @@ import { AdocInfo } from "../types"
 
 const asciidoctor = Asciidoctor()
 const registry = asciidoctor.Extensions.create()
-hljsExt.register(registry) // Register the extension into global registry.
+hljsExt.register(registry)
 katexExt.register(asciidoctor.Extensions, {
   katexOptions: { macros: { "\\RR": "\\mathbb{R}" } },
 })
