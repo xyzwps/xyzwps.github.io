@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
-import { doGetAllPost, doPostByPath, PostInfo } from "../../posts"
-import { AdocInfo } from "../../lib/adoc"
+import { doGetAllPost, doPostByPath } from "../../posts"
+import { AdocInfo, PostInfo } from "../../types"
 import Adoc from "../../components/adoc"
 import Toc from "../../components/toc"
 

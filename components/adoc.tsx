@@ -1,4 +1,4 @@
-import { AdocInfo } from "../lib/adoc"
+import { AdocInfo } from "../types"
 
 const Adoc: React.FC<{ adocInfo: AdocInfo }> = ({ adocInfo }) => {
   return (

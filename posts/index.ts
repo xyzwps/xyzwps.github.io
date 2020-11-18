@@ -1,6 +1,7 @@
 import _ from "lodash"
 import fse from "fs-extra"
-import adoc, { AdocInfo } from "../lib/adoc"
+import adoc from "../lib/adoc"
+import { PostInfo } from "../types"
 import { join } from "path"
 
 const POST_DIR = join(process.cwd(), "posts")
@@ -33,18 +34,6 @@ export async function doGetAllPost(): Promise<{ paths: PathInfo[]; fallback: boo
   }
   return { paths, fallback: true }
 }
-
-export interface AdocPostInfo {
-  type: "adoc"
-  doc: AdocInfo
-}
-
-export interface IndexPostInfo {
-  type: "index"
-  doc: Record<string, unknown>
-}
-
-export type PostInfo = AdocPostInfo | IndexPostInfo
 
 export async function doPostByPath(path: string): Promise<PostInfo> {
   const filePath = POST_DIR + "/" + path
