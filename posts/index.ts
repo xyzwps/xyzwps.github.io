@@ -7,7 +7,7 @@ import { join } from "path"
 
 const POST_DIR = join(process.cwd(), "posts")
 
-const VOLUME = ["java/concurrency", "go/basic"]
+const VOLUME = ["java/concurrency", "java/basic", "go/basic"]
 
 export interface PathInfo {
   params: { id: string }

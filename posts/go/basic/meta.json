@@ -1,6 +1,6 @@
 {
   "type": "simple",
-  "title": "Java 并发",
+  "title": "Go 语言基础",
   "toc": [
     { "title": "基础", "path": "basic.adoc" },
     { "title": "函数", "path": "func.adoc" },

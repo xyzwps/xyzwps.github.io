@@ -1,0 +1,9 @@
+{
+  "type": "simple",
+  "title": "Java 语言基础",
+  "toc": [
+    { "title": "类加载器", "path": "classloader.adoc" },
+    { "title": "volatile", "path": "volatile.adoc" },
+    { "title": "数组", "path": "array.adoc" }
+  ]
+}
