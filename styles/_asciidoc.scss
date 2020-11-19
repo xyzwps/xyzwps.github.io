@@ -1081,7 +1081,7 @@ h6 {
   font-family: $title-font;
   font-weight: 300;
   font-style: normal;
-  color: #ba3c23;
+  color: $font-color-pink;
   text-rendering: optimizeLegibility;
   margin-top: 1em;
   margin-bottom: .5em;
@@ -3103,7 +3103,7 @@ td.content strong {
 
 .container h1 > a:hover,
 .container h1 > a:active {
-  color: #ba3c23;
+  color: $font-color-pink;
 }
 
 #toc {
@@ -3410,7 +3410,7 @@ h3 > a.link,
 h4 > a.link,
 h5 > a.link,
 h6 > a.link {
-  color: #ba3c23;
+  color: $font-color-pink;
   text-decoration: none;
 }
 
