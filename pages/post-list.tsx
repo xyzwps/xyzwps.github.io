@@ -1,5 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from "next"
 import Link from "next/link"
+import Head from "next/head"
 import PageLayout from "../segments/PageLayout"
 
 import { doGetAllPost, PathInfo } from "../posts"
@@ -7,12 +8,14 @@ import { doGetAllPost, PathInfo } from "../posts"
 const PostListPage: React.FC<{ paths: PathInfo[] }> = ({ paths }) => {
   return (
     <PageLayout>
-      <pre>{JSON.stringify(paths, null, "   ")}</pre>
+      <Head>
+        <title>全部文章列表</title>
+      </Head>
       <ul>
         {paths.map((it) => (
           <li key={it.params.id[0]}>
             <Link href={"/post/" + it.params.id[0]}>
-              <a>{it.params.id[0]}</a>
+              <a>/post/{it.params.id[0]}</a>
             </Link>
           </li>
         ))}
