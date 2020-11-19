@@ -6,7 +6,7 @@ const Adoc: React.FC<{ adocInfo: AdocInfo }> = ({ adocInfo }) => {
     <>
       <h1>{adocInfo.title}</h1>
       <small>
-        {adocInfo.author} | {adocInfo.version} | {dayjs(adocInfo.date).format("YYYY年M月D日")}
+        {adocInfo.author} | v{adocInfo.version} | {dayjs(adocInfo.date).format("YYYY年M月D日")}
       </small>
       <div className="adoc" dangerouslySetInnerHTML={{ __html: adocInfo.content }} />
     </>

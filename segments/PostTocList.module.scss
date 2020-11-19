@@ -1,9 +1,21 @@
+@import "../styles/vars";
+
 .post-toc-list {
   padding: 1rem;
-  &.item {
+
+  :global .title {
+    font-weight: 800;
+    font-size: 1.25rem;
     a {
       text-decoration: none;
-      color: darkgray;
+      color: $font-color-black;
+    }
+  }
+
+  :global .item {
+    a {
+      text-decoration: none;
+      color: $font-color-black;
     }
   }
 }

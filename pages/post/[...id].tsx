@@ -1,4 +1,5 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
+import Image from "next/image"
 import { doGetAllPost, doPostByPath } from "../../posts"
 import { AdocInfo, PostInfo } from "../../types"
 import Adoc from "../../components/adoc"
@@ -6,9 +7,15 @@ import Toc from "../../components/toc"
 import PageLayout from "../../segments/PageLayout"
 import PostTocList from "../../segments/PostTocList"
 
-const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ id, postInfo }) => {
+const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
   if (!postInfo) {
-    return <div>加载中......</div>
+    return (
+      <div style={{ textAlign: "center", paddingTop: "10rem" }}>
+        <Image src="/loading.svg" alt="me" width="120" height="120" />
+        <br />
+        <span style={{ color: "gray" }}>◎ 电波发射中 ◎</span>
+      </div>
+    )
   }
 
   const { type, doc, toc } = postInfo
@@ -18,7 +25,7 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ id, postInfo }) => {
         <div style={{ flexBasis: "15rem", borderRight: "1px solid lightgray" }}>
           <PostTocList postToc={toc} />
         </div>
-        <div style={{ flexBasis: 0, flexGrow: 1, padding: "2rem" }}>
+        <div style={{ flexBasis: 0, flexGrow: 1, padding: "1rem 2rem" }}>
           {(() => {
             switch (type) {
               case "adoc":

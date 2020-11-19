@@ -5,10 +5,8 @@ const PostTocList: React.FC<{ postToc: PostToc }> = ({ postToc }) => {
   const { toc, title } = postToc
   return (
     <div className={styles["post-toc-list"]}>
-      <div>
-        <a href="./index" style={{ textDecoration: "none", color: "darkgray" }}>
-          {title}
-        </a>
+      <div className="title">
+        <a href="./index">{title}</a>
       </div>
       <ol>
         {toc.map((it) => (
