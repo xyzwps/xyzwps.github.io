@@ -2,10 +2,10 @@ import Header from "./Header"
 
 const PageLayout: React.FC<{ children: unknown }> = ({ children }) => {
   return (
-    <>
+    <div style={{ maxWidth: 1366, margin: "0px auto" }}>
       <Header />
-      <div style={{ maxWidth: 1366, margin: "0px auto" }}>{children}</div>
-    </>
+      <div>{children}</div>
+    </div>
   )
 }
 
