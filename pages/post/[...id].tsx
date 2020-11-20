@@ -1,7 +1,7 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
 import Image from "next/image"
 import { doGetAllPost, doPostByPath } from "../../posts"
-import { AdocInfo, PostInfo } from "../../types"
+import { AdocInfo, PostInfo, IndexPostInfo } from "../../types"
 import Adoc from "../../components/adoc"
 import Toc from "../../components/toc"
 import PageLayout from "../../segments/PageLayout"
@@ -31,7 +31,7 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
               case "adoc":
                 return <Adoc adocInfo={doc as AdocInfo} />
               case "index":
-                return <Toc doc={postInfo} />
+                return <Toc indexPostInfo={postInfo as IndexPostInfo} />
             }
           })()}
         </div>

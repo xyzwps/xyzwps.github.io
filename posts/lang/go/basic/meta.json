@@ -1,6 +1,7 @@
 {
   "type": "simple",
   "title": "Go 语言基础",
+  "description": "这里是 Go 语言 XXXXXX",
   "toc": [
     { "title": "基础", "path": "basic.adoc" },
     { "title": "函数", "path": "func.adoc" },

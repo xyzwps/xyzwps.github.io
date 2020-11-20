@@ -1,9 +1,10 @@
 import Link from "next/link"
+import styles from "./Header.module.scss"
 
 const HeaderItem: React.FC<{ children: unknown; href: string }> = ({ children, href }) => {
   return (
     <Link href={href}>
-      <a style={{ margin: "0rem 0.5rem" }}>{children}</a>
+      <a className={styles["header-item"]}>{children}</a>
     </Link>
   )
 }

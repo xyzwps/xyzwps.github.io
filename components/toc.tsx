@@ -1,9 +1,15 @@
-import { PostInfo } from "../types"
+import { IndexPostInfo } from "../types"
+import Head from "next/head"
 
-const Toc: React.FC<{ doc: PostInfo }> = ({ doc }) => {
+const Toc: React.FC<{ indexPostInfo: IndexPostInfo }> = ({ indexPostInfo }) => {
+  const { doc } = indexPostInfo
   return (
     <>
-      <pre>{JSON.stringify(doc, null, "    ")}</pre>
+      <Head>
+        <title>{doc.title}</title>
+      </Head>
+      <h1>{doc.title}</h1>
+      <p>{doc.description}</p>
     </>
   )
 }

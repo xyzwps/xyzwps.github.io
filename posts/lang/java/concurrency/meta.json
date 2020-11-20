@@ -1,6 +1,7 @@
 {
   "type": "simple",
   "title": "Java 并发",
+  "description": "这里是 Java 并发 XXXXXX",
   "toc": [
     { "path": "thread.adoc", "title": "线程基础" },
     { "path": "count-down-latch.adoc", "title": "CountDownLatch" },

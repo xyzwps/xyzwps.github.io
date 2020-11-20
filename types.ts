@@ -22,5 +22,6 @@ export type PostInfo = AdocPostInfo | IndexPostInfo
 export interface PostToc {
   type: "simple"
   title: string
+  description: string
   toc: { title: string; path: string }[]
 }
