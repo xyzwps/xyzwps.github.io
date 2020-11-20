@@ -1,5 +1,5 @@
 import PageLayout from "../segments/PageLayout"
-import Link from "next/link"
+import TopicEntry from "../segments/TopicEntry"
 import Head from "next/head"
 
 const HomePage: React.FC<Record<string, unknown>> = () => {
@@ -8,15 +8,10 @@ const HomePage: React.FC<Record<string, unknown>> = () => {
       <Head>
         <title>主页</title>
       </Head>
-      <Link href="/post/lang/java/basic/index">
-        <a>Java 基础</a>
-      </Link>
-      <Link href="/post/lang/java/concurrency/index">
-        <a>Java 并发</a>
-      </Link>
-      <Link href="/post/lang/go/basic/index">
-        <a>Go 基础</a>
-      </Link>
+      <TopicEntry title="Java 基础" url="/post/lang/java/basic/index" />
+      <TopicEntry title="Java 并发" url="/post/lang/java/concurrency/index" />
+      <TopicEntry title="Go 基础" url="/post/lang/go/basic/index" />
+      <TopicEntry title="DjbP" url="/post/algorithm/djbp/index" />
     </PageLayout>
   )
 }
