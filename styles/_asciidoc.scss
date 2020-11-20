@@ -1003,6 +1003,10 @@ p.lead,
   line-height: 1.6;
 }
 
+.paragraph > p {
+  text-indent: 2rem;
+}
+
 .subheader,
 .admonitionblock td.content > .title,
 .audioblock > .title,
@@ -3203,13 +3207,8 @@ pre {
   background-color: #f7f7f8;
   -webkit-border-radius: 4px;
   border-radius: 4px;
-  line-height: 1.45;
   padding: 0.1em 0.5ex;
   word-spacing: -.15em;
-}
-
-pre {
-  line-height: 1.45;
 }
 
 em em {
@@ -3557,6 +3556,7 @@ table.tableblock.fit-content > caption.title {
 .listingblock pre[class^="highlight "],
 .listingblock pre.CodeRay {
   background-color: #f7f7f8;
+  line-height: 1.8;
 }
 
 .sidebarblock .literalblock pre,
@@ -3770,7 +3770,6 @@ div.secondary .quoteblock blockquote {
 .quoteblock .attribution,
 .verseblock .attribution {
   font-size: .9375em;
-  line-height: 1.45;
   font-style: italic;
 }
 
