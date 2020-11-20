@@ -8,13 +8,13 @@ const HomePage: React.FC<Record<string, unknown>> = () => {
       <Head>
         <title>主页</title>
       </Head>
-      <Link href="/post/java/basic/index">
+      <Link href="/post/lang/java/basic/index">
         <a>Java 基础</a>
       </Link>
-      <Link href="/post/java/concurrency/index">
+      <Link href="/post/lang/java/concurrency/index">
         <a>Java 并发</a>
       </Link>
-      <Link href="/post/go/basic/index">
+      <Link href="/post/lang/go/basic/index">
         <a>Go 基础</a>
       </Link>
     </PageLayout>
