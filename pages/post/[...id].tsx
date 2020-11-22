@@ -43,8 +43,9 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
 export default PostPage
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  const pathInfoList = await doGetAllPostPathInfo()
   return {
-    paths: await doGetAllPostPathInfo(),
+    paths: pathInfoList.map((it) => ({ params: { id: it.params.id[0].split("/") } })),
     fallback: false,
   }
 }
