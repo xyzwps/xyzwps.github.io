@@ -1,9 +1,9 @@
-import { GetStaticProps, GetStaticPaths } from "next"
+import { GetStaticProps } from "next"
 import Link from "next/link"
 import Head from "next/head"
 import PageLayout from "../segments/PageLayout"
 
-import { doGetAllPost, PathInfo } from "../posts"
+import { doGetAllPostPathInfo, PathInfo } from "../posts"
 
 const PostListPage: React.FC<{ paths: PathInfo[] }> = ({ paths }) => {
   return (
@@ -26,11 +26,7 @@ const PostListPage: React.FC<{ paths: PathInfo[] }> = ({ paths }) => {
 
 export default PostListPage
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return await doGetAllPost()
-}
-
 export const getStaticProps: GetStaticProps = async () => {
-  const { paths } = await doGetAllPost()
+  const paths = await doGetAllPostPathInfo()
   return { props: { paths } }
 }

@@ -27,13 +27,13 @@ async function doGetVolume(path: string): Promise<PathInfo[]> {
   return result.map(({ path }) => ({ params: { id: path.split("\\") } }))
 }
 
-export async function doGetAllPost(): Promise<{ paths: PathInfo[]; fallback: boolean }> {
-  const paths = []
+export async function doGetAllPostPathInfo(): Promise<PathInfo[]> {
+  const paths: PathInfo[] = []
   for (const path of VOLUME) {
     const pageInfoList = await doGetVolume(path)
     paths.push(...pageInfoList)
   }
-  return { paths, fallback: true }
+  return paths
 }
 
 async function readTocOf(filePath: string): Promise<PostToc> {

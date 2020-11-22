@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
 import Image from "next/image"
-import { doGetAllPost, doPostByPath } from "../../posts"
+import { doGetAllPostPathInfo, doPostByPath } from "../../posts"
 import { AdocInfo, PostInfo, IndexPostInfo } from "../../types"
 import Adoc from "../../components/adoc"
 import Toc from "../../components/toc"
@@ -43,7 +43,10 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
 export default PostPage
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return await doGetAllPost()
+  return {
+    paths: await doGetAllPostPathInfo(),
+    fallback: false,
+  }
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }: GetStaticPropsContext) => {
