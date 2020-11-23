@@ -1,0 +1,6 @@
+{
+  "type": "simple",
+  "title": "Javascript",
+  "description": "这里是 Javascript XXXXXX",
+  "toc": [{ "path": "module-vm.adoc", "title": "Nodejs vm 模块" }]
+}
