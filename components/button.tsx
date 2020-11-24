@@ -1,3 +1,5 @@
+import styles from "./button.module.scss"
+
 const Button: React.FC<{
   children: unknown
   onClick: (event: MouseEvent) => void
@@ -5,7 +7,11 @@ const Button: React.FC<{
   const handleClick = (e) => {
     if (onClick) onClick(e)
   }
-  return <button onClick={handleClick}>{children}</button>
+  return (
+    <button className={styles.button} onClick={handleClick}>
+      {children}
+    </button>
+  )
 }
 
 export default Button
