@@ -1,5 +1,6 @@
 import dayjs from "dayjs"
 import { useState } from "react"
+import Head from "next/head"
 import Button from "../../components/button"
 import Input from "../../components/input"
 import PageLayout from "../../segments/PageLayout"
@@ -9,7 +10,7 @@ const pattern = "YYYY-MM-DD HH:mm:ss.SSS"
 const Row: React.FC<{ children: unknown[] }> = ({ children }) => (
   <p>
     <div style={{ width: 80, display: "inline-block" }}>{children[0]}</div>
-    <div style={{ width: 240, display: "inline-block", margin: "0 1rem" }}>{children[1]}</div>
+    <div style={{ width: 260, display: "inline-block", margin: "0 1rem" }}>{children[1]}</div>
     <div style={{ width: 80, display: "inline-block" }}>{children[2]}</div>
   </p>
 )
@@ -27,6 +28,9 @@ const DateTimeToolPage: React.FC<Record<string, unknown>> = () => {
 
   return (
     <PageLayout>
+      <Head>
+        <title>时间戳工具</title>
+      </Head>
       <div>
         <Row>
           时间戳：
