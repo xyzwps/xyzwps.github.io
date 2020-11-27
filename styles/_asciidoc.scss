@@ -1,5 +1,12 @@
 @import "./vars";
 
+.mathblock {
+  text-align: center;
+  .katex {
+    font-size: 120%;
+  }
+}
+
 article,
 aside,
 details,
@@ -43,6 +50,12 @@ html {
 
 body {
   margin: 0;
+}
+
+.sectionbody {
+  > .ulist {
+    margin-left: 2rem;
+  }
 }
 
 a {
@@ -100,7 +113,7 @@ kbd,
 pre,
 samp {
   font-family: $mono-font;
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 pre {
@@ -108,7 +121,7 @@ pre {
 }
 
 q {
-  quotes: "\201C" "\201D" "\2018" "\2019";
+  quotes: "\201C""\201D""\2018""\2019";
 }
 
 small {
@@ -397,8 +410,8 @@ select {
 .column,
 .columns {
   position: relative;
-  padding-left: .9375em;
-  padding-right: .9375em;
+  padding-left: 0.9375em;
+  padding-right: 0.9375em;
   width: 100%;
   float: left;
 }
@@ -407,8 +420,8 @@ select {
   .column,
   .columns {
     position: relative;
-    padding-left: .9375em;
-    padding-right: .9375em;
+    padding-left: 0.9375em;
+    padding-right: 0.9375em;
     float: left;
   }
 
@@ -822,7 +835,7 @@ select {
   [class*="block-grid-"] {
     display: block;
     padding: 0;
-    margin: 0 -.625em;
+    margin: 0 -0.625em;
     *zoom: 1;
   }
 
@@ -840,12 +853,12 @@ select {
     display: inline;
     height: auto;
     float: left;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .small-block-grid-1 > li {
     width: 100%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .small-block-grid-1 > li:nth-of-type(n) {
@@ -858,7 +871,7 @@ select {
 
   .small-block-grid-2 > li {
     width: 50%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .small-block-grid-2 > li:nth-of-type(n) {
@@ -871,7 +884,7 @@ select {
 
   .small-block-grid-3 > li {
     width: 33.33333%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .small-block-grid-3 > li:nth-of-type(n) {
@@ -884,7 +897,7 @@ select {
 
   .small-block-grid-4 > li {
     width: 25%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .small-block-grid-4 > li:nth-of-type(n) {
@@ -897,7 +910,7 @@ select {
 
   .small-block-grid-5 > li {
     width: 20%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .small-block-grid-5 > li:nth-of-type(n) {
@@ -932,7 +945,7 @@ select {
 
   .large-block-grid-1 > li {
     width: 100%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .large-block-grid-1 > li:nth-of-type(n) {
@@ -945,7 +958,7 @@ select {
 
   .large-block-grid-2 > li {
     width: 50%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .large-block-grid-2 > li:nth-of-type(n) {
@@ -958,7 +971,7 @@ select {
 
   .large-block-grid-3 > li {
     width: 33.33333%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .large-block-grid-3 > li:nth-of-type(n) {
@@ -971,7 +984,7 @@ select {
 
   .large-block-grid-4 > li {
     width: 25%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .large-block-grid-4 > li:nth-of-type(n) {
@@ -984,7 +997,7 @@ select {
 
   .large-block-grid-5 > li {
     width: 20%;
-    padding: 0 .625em 1.25em;
+    padding: 0 0.625em 1.25em;
   }
 
   .large-block-grid-5 > li:nth-of-type(n) {
@@ -1030,7 +1043,7 @@ table.tableblock > .title,
   color: #7a2717;
   font-weight: normal;
   margin-top: 0;
-  margin-bottom: .25em;
+  margin-bottom: 0.25em;
 }
 
 div,
@@ -1069,7 +1082,7 @@ p {
 }
 
 p aside {
-  font-size: .875em;
+  font-size: 0.875em;
   line-height: 1.35;
   font-style: italic;
 }
@@ -1083,12 +1096,12 @@ h4,
 h5,
 h6 {
   font-family: $title-font;
-  font-weight: 300;
+  font-weight: 600;
   font-style: normal;
   color: $font-color-pink;
   text-rendering: optimizeLegibility;
   margin-top: 1em;
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
   line-height: 1.0125em;
 }
 
@@ -1218,7 +1231,7 @@ ol li ol {
 }
 
 dl dt {
-  margin-bottom: .3125em;
+  margin-bottom: 0.3125em;
   font-weight: bold;
 }
 
@@ -1241,13 +1254,13 @@ abbr {
 
 blockquote {
   margin: 0 0 1.25em;
-  padding: .5625em 1.25em 0 1.1875em;
+  padding: 0.5625em 1.25em 0 1.1875em;
   border-left: 1px solid #ddd;
 }
 
 blockquote cite {
   display: block;
-  font-size: .9375em;
+  font-size: 0.9375em;
   color: rgba(0, 0, 0, 0.6);
 }
 
@@ -1270,7 +1283,7 @@ blockquote p {
   display: inline-block;
   margin: 0 0 1.25em 0;
   border: 1px solid #ddd;
-  padding: .625em .75em;
+  padding: 0.625em 0.75em;
 }
 
 .vcard li {
@@ -1280,7 +1293,7 @@ blockquote p {
 
 .vcard .fn {
   font-weight: bold;
-  font-size: .9375em;
+  font-size: 0.9375em;
 }
 
 .vevent .summary {
@@ -1292,7 +1305,7 @@ blockquote p {
   text-decoration: none;
   font-weight: bold;
   border: none;
-  padding: 0 .0625em;
+  padding: 0 0.0625em;
 }
 
 .print-only {
@@ -1395,9 +1408,9 @@ button,
   text-decoration: none;
   text-align: center;
   display: inline-block;
-  padding-top: .75em;
+  padding-top: 0.75em;
   padding-right: 1.5em;
-  padding-bottom: .8125em;
+  padding-bottom: 0.8125em;
   padding-left: 1.5em;
   font-size: 1em;
   background-color: #2156a5;
@@ -1493,20 +1506,20 @@ button.large,
 
 button.small,
 .button.small {
-  padding-top: .5625em;
+  padding-top: 0.5625em;
   padding-right: 1.125em;
-  padding-bottom: .625em;
+  padding-bottom: 0.625em;
   padding-left: 1.125em;
-  font-size: .8125em;
+  font-size: 0.8125em;
 }
 
 button.tiny,
 .button.tiny {
-  padding-top: .4375em;
-  padding-right: .875em;
-  padding-bottom: .5em;
-  padding-left: .875em;
-  font-size: .6875em;
+  padding-top: 0.4375em;
+  padding-right: 0.875em;
+  padding-bottom: 0.5em;
+  padding-left: 0.875em;
+  font-size: 0.6875em;
 }
 
 button.expand,
@@ -1519,13 +1532,13 @@ button.expand,
 button.left-align,
 .button.left-align {
   text-align: left;
-  text-indent: .75em;
+  text-indent: 0.75em;
 }
 
 button.right-align,
 .button.right-align {
   text-align: right;
-  padding-right: .75em;
+  padding-right: 0.75em;
 }
 
 button.disabled,
@@ -1536,7 +1549,7 @@ button[disabled],
   border-color: #18407a;
   color: #fff;
   cursor: auto;
-  opacity: .6;
+  opacity: 0.6;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
@@ -1582,7 +1595,7 @@ button[disabled].secondary,
   border-color: #d0d0d0;
   color: #333;
   cursor: auto;
-  opacity: .6;
+  opacity: 0.6;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
@@ -1628,7 +1641,7 @@ button[disabled].success,
   border-color: #457a1a;
   color: #fff;
   cursor: auto;
-  opacity: .6;
+  opacity: 0.6;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
@@ -1674,7 +1687,7 @@ button[disabled].alert,
   border-color: #4f1910;
   color: #fff;
   cursor: auto;
-  opacity: .6;
+  opacity: 0.6;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
@@ -1714,22 +1727,22 @@ button[disabled].alert:focus,
 
 button,
 .button {
-  padding-top: .8125em;
-  padding-bottom: .75em;
+  padding-top: 0.8125em;
+  padding-bottom: 0.75em;
   -webkit-appearance: none;
 }
 
 button.tiny,
 .button.tiny {
-  padding-top: .5em;
-  padding-bottom: .4375em;
+  padding-top: 0.5em;
+  padding-bottom: 0.4375em;
   -webkit-appearance: none;
 }
 
 button.small,
 .button.small {
-  padding-top: .625em;
-  padding-bottom: .5625em;
+  padding-top: 0.625em;
+  padding-bottom: 0.5625em;
   -webkit-appearance: none;
 }
 
@@ -1928,7 +1941,7 @@ button.large,
 
 .button-bar .button-group {
   float: left;
-  margin-right: .625em;
+  margin-right: 0.625em;
 }
 
 .button-bar .button-group div {
@@ -1998,8 +2011,8 @@ button.large,
 }
 
 .top-bar .button {
-  padding-top: .5em;
-  padding-bottom: .5em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
   margin-bottom: 0;
 }
 
@@ -2037,7 +2050,7 @@ button.large,
 .top-bar .toggle-topbar a {
   color: #fff;
   text-transform: uppercase;
-  font-size: .8125em;
+  font-size: 0.8125em;
   font-weight: bold;
   position: relative;
   display: block;
@@ -2123,14 +2136,14 @@ button.large,
   color: #fff;
   padding: 12px 0 12px 0;
   padding-left: 15px;
-  font-size: .8125em;
+  font-size: 0.8125em;
   font-weight: 600;
   background: #222;
 }
 
 .top-bar-section ul li > a.button {
   background: #2156a5;
-  font-size: .8125em;
+  font-size: 0.8125em;
   padding-right: 15px;
   padding-left: 15px;
 }
@@ -2242,7 +2255,7 @@ button.large,
   text-transform: uppercase;
   color: #555;
   font-weight: bold;
-  font-size: .625em;
+  font-size: 0.625em;
 }
 
 .top-bar-js-breakpoint {
@@ -2286,7 +2299,7 @@ button.large,
   .top-bar input,
   .top-bar .button {
     line-height: 2em;
-    font-size: .875em;
+    font-size: 0.875em;
     height: 2em;
     padding: 0 10px;
     position: relative;
@@ -2445,19 +2458,19 @@ button.large,
 ul.pagination {
   display: block;
   height: 1.5em;
-  margin-left: -.3125em;
+  margin-left: -0.3125em;
 }
 
 ul.pagination li {
   height: 1.5em;
   color: #222;
   font-size: 1em;
-  margin-left: .3125em;
+  margin-left: 0.3125em;
 }
 
 ul.pagination li a {
   display: block;
-  padding: .0625em .4375em .0625em;
+  padding: 0.0625em 0.4375em 0.0625em;
   color: #999;
 }
 
@@ -2540,7 +2553,7 @@ ul.pagination li {
 .panel h5,
 .panel h6 {
   line-height: 1;
-  margin-bottom: .625em;
+  margin-bottom: 0.625em;
 }
 
 .panel h1.subheader,
@@ -2594,7 +2607,7 @@ ul.pagination li {
 .panel.callout h5,
 .panel.callout h6 {
   line-height: 1;
-  margin-bottom: .625em;
+  margin-bottom: 0.625em;
 }
 
 .panel.callout h1.subheader,
@@ -2633,7 +2646,7 @@ table thead tr th,
 table thead tr td,
 table tfoot tr th,
 table tfoot tr td {
-  padding: .5em .625em .625em;
+  padding: 0.5em 0.625em 0.625em;
   font-size: inherit;
   color: #222;
   text-align: left;
@@ -2641,7 +2654,7 @@ table tfoot tr td {
 
 table tr th,
 table tr td {
-  padding: .5625em .625em;
+  padding: 0.5625em 0.625em;
   font-size: inherit;
   color: #222;
 }
@@ -2685,9 +2698,9 @@ table tfoot tr td {
     margin: 0;
     font-weight: bold;
     text-align: left;
-    -webkit-transition: all .1s ease-out;
-    -moz-transition: all .1s ease-out;
-    transition: all .1s ease-out;
+    -webkit-transition: all 0.1s ease-out;
+    -moz-transition: all 0.1s ease-out;
+    transition: all 0.1s ease-out;
   }
 
   div.switch input {
@@ -2713,9 +2726,9 @@ table tfoot tr td {
     padding: 0;
     border-width: 1px;
     border-style: solid;
-    -webkit-transition: all .1s ease-out;
-    -moz-transition: all .1s ease-out;
-    transition: all .1s ease-out;
+    -webkit-transition: all 0.1s ease-out;
+    -moz-transition: all 0.1s ease-out;
+    transition: all 0.1s ease-out;
   }
 
   div.switch input:not(:checked) + label {
@@ -2781,7 +2794,7 @@ table tfoot tr td {
   div.switch label {
     padding: 0;
     line-height: 2.3em;
-    font-size: .875em;
+    font-size: 0.875em;
   }
 
   div.switch input:first-of-type:checked ~ span:last-child {
@@ -2800,10 +2813,10 @@ table tfoot tr td {
     background: -moz-linear-gradient(top, #fff 0%, #f2f2f2 100%);
     background: -webkit-linear-gradient(top, #fff 0%, #f2f2f2 100%);
     background: linear-gradient(to bottom, #ffffff 0%, #f2f2f2 100%);
-    -webkit-box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.07), 1000px 0 0 1000px #e1f5d1, -2px 0 10px 0 rgba(0, 0, 0, 0.07),
-      -1000px 0 0 1000px #f5f5f5;
-    box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.07), 1000px 0 0 980px #e1f5d1, -2px 0 10px 0 rgba(0, 0, 0, 0.07),
-      -1000px 0 0 1000px #f5f5f5;
+    -webkit-box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.07), 1000px 0 0 1000px #e1f5d1,
+      -2px 0 10px 0 rgba(0, 0, 0, 0.07), -1000px 0 0 1000px #f5f5f5;
+    box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.07), 1000px 0 0 980px #e1f5d1,
+      -2px 0 10px 0 rgba(0, 0, 0, 0.07), -1000px 0 0 1000px #f5f5f5;
   }
 
   div.switch:hover span:last-child,
@@ -2845,7 +2858,7 @@ table tfoot tr td {
   div.switch.small label {
     padding: 0;
     line-height: 2.1em;
-    font-size: .75em;
+    font-size: 0.75em;
   }
 
   div.switch.small input:first-of-type:checked ~ span:last-child {
@@ -2865,7 +2878,7 @@ table tfoot tr td {
   div.switch.tiny label {
     padding: 0;
     line-height: 1.9em;
-    font-size: .6875em;
+    font-size: 0.6875em;
   }
 
   div.switch.tiny input:first-of-type:checked ~ span:last-child {
@@ -2899,7 +2912,7 @@ table tfoot tr td {
   }
 
   div.switch.round label {
-    padding: 0 .5625em;
+    padding: 0 0.5625em;
   }
 
   @keyframes webkitSiblingBugfix {
@@ -3124,7 +3137,7 @@ td.content strong {
     margin-bottom: 0;
   }
   > ul {
-    margin-left: .125em;
+    margin-left: 0.125em;
   }
   ul {
     list-style-type: none;
@@ -3201,14 +3214,14 @@ pre {
 }
 
 *:not(pre) > code {
-  font-size: .9375em;
+  font-size: 0.9375em;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.9);
   background-color: #f7f7f8;
   -webkit-border-radius: 4px;
   border-radius: 4px;
   padding: 0.1em 0.5ex;
-  word-spacing: -.15em;
+  word-spacing: -0.15em;
 }
 
 em em {
@@ -3226,7 +3239,7 @@ strong strong {
 kbd:not(.keyseq) {
   display: inline-block;
   color: rgba(0, 0, 0, 0.8);
-  font-size: .75em;
+  font-size: 0.75em;
   line-height: 1.4;
   background-color: #f7f7f7;
   border: 1px solid #ccc;
@@ -3575,7 +3588,7 @@ table.tableblock.fit-content > caption.title {
   border-radius: 4px;
   word-wrap: break-word;
   padding: 1em;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .literalblock pre.nowrap,
@@ -3592,7 +3605,7 @@ table.tableblock.fit-content > caption.title {
   .literalblock pre[class],
   .listingblock pre,
   .listingblock pre[class] {
-    font-size: .9rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -3601,7 +3614,7 @@ table.tableblock.fit-content > caption.title {
   .literalblock pre[class],
   .listingblock pre,
   .listingblock pre[class] {
-    font-size: .9rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -3636,7 +3649,7 @@ table.tableblock.fit-content > caption.title {
   content: attr(data-lang);
   position: absolute;
   text-transform: uppercase;
-  font-size: .75em;
+  font-size: 0.75em;
   top: 0.425rem;
   right: 0.5rem;
   line-height: 1;
@@ -3769,7 +3782,7 @@ div.secondary .quoteblock blockquote {
 
 .quoteblock .attribution,
 .verseblock .attribution {
-  font-size: .9375em;
+  font-size: 0.9375em;
   font-style: italic;
 }
 
@@ -3958,7 +3971,7 @@ ol dd,
 .ulist .ulist,
 .ulist .olist,
 .olist .ulist {
-  margin-bottom: .625em;
+  margin-bottom: 0.625em;
 }
 
 ul.unstyled,
@@ -3971,7 +3984,7 @@ ul.none {
 ul.unstyled,
 ol.unnumbered,
 ul.checklist {
-  margin-left: .625em;
+  margin-left: 0.625em;
 }
 
 ul.checklist li > p:first-child > .fa-check-square-o:first-child,
@@ -4050,7 +4063,7 @@ ol.lowergreek {
 td.hdlist1,
 td.hdlist2 {
   vertical-align: top;
-  padding: 0 .625em;
+  padding: 0 0.625em;
 }
 
 td.hdlist1 {
@@ -4092,12 +4105,12 @@ td.hdlist1 {
 
 .imageblock.left,
 .imageblock[style*="float: left"] {
-  margin: .25em .625em 1.25em 0;
+  margin: 0.25em 0.625em 1.25em 0;
 }
 
 .imageblock.right,
 .imageblock[style*="float: right"] {
-  margin: .25em 0 1.25em .625em;
+  margin: 0.25em 0 1.25em 0.625em;
 }
 
 .imageblock > .title {
@@ -4111,23 +4124,23 @@ td.hdlist1 {
 
 .imageblock.thumb > .title,
 .imageblock.th > .title {
-  padding: 0 .125em;
+  padding: 0 0.125em;
 }
 
 .image.left,
 .image.right {
-  margin-top: .25em;
-  margin-bottom: .25em;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
   display: inline-block;
   line-height: 0;
 }
 
 .image.left {
-  margin-right: .625em;
+  margin-right: 0.625em;
 }
 
 .image.right {
-  margin-left: .625em;
+  margin-left: 0.625em;
 }
 
 a.image {
@@ -4136,7 +4149,7 @@ a.image {
 
 sup.footnote,
 sup.footnoteref {
-  font-size: .875em;
+  font-size: 0.875em;
   position: static;
   vertical-align: super;
 }
@@ -4152,22 +4165,22 @@ sup.footnoteref a:active {
 }
 
 #footnotes {
-  padding-top: .75em;
-  padding-bottom: .75em;
-  margin-bottom: .625em;
+  padding-top: 0.75em;
+  padding-bottom: 0.75em;
+  margin-bottom: 0.625em;
 }
 
 #footnotes hr {
   width: 20%;
   min-width: 6.25em;
-  margin: -.25em 0 0.75em 0;
+  margin: -0.25em 0 0.75em 0;
   border-width: 1px 0 0 0;
 }
 
 #footnotes .footnote {
   padding: 0 0.375em 0 0.225em;
   line-height: 1.3334;
-  font-size: .875em;
+  font-size: 0.875em;
   margin-left: 1.2em;
   margin-bottom: 0.2em;
 }
@@ -4183,9 +4196,9 @@ sup.footnoteref a:active {
 }
 
 #content #footnotes {
-  margin-top: -.625em;
+  margin-top: -0.625em;
   margin-bottom: 0;
-  padding: .75em 0;
+  padding: 0.75em 0;
 }
 
 .gist .file-data > table {
@@ -4356,7 +4369,7 @@ div.unbreakable {
 }
 
 .top-bar .toggle-topbar.menu-icon a {
-  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjxzdG9wIG9mZnNldD0iMjclIiBzdG9wLWNvbG9yPSIjMTExMTExIi8+PHN0b3Agb2Zmc2V0PSIyNyUiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz48c3RvcCBvZmZzZXQ9IjMzJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMzMlIiBzdG9wLWNvbG9yPSIjMTExMTExIi8+PHN0b3Agb2Zmc2V0PSI0NSUiIHN0b3AtY29sb3I9IiMxMTExMTEiLz48c3RvcCBvZmZzZXQ9IjQ1JSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjZmZmZmZmIi8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMxMTExMTEiLz48c3RvcCBvZmZzZXQ9IjYyJSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjxzdG9wIG9mZnNldD0iNjIlIiBzdG9wLWNvbG9yPSIjZmZmZmZmIi8+PHN0b3Agb2Zmc2V0PSI2OCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz48c3RvcCBvZmZzZXQ9IjY4JSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjxzdG9wIG9mZnNldD0iMjclIiBzdG9wLWNvbG9yPSIjMTExMTExIi8+PHN0b3Agb2Zmc2V0PSIyNyUiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz48c3RvcCBvZmZzZXQ9IjMzJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMzMlIiBzdG9wLWNvbG9yPSIjMTExMTExIi8+PHN0b3Agb2Zmc2V0PSI0NSUiIHN0b3AtY29sb3I9IiMxMTExMTEiLz48c3RvcCBvZmZzZXQ9IjQ1JSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iNTAlIiBzdG9wLWNvbG9yPSIjZmZmZmZmIi8+PHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9IiMxMTExMTEiLz48c3RvcCBvZmZzZXQ9IjYyJSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjxzdG9wIG9mZnNldD0iNjIlIiBzdG9wLWNvbG9yPSIjZmZmZmZmIi8+PHN0b3Agb2Zmc2V0PSI2OCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiLz48c3RvcCBvZmZzZXQ9IjY4JSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzExMTExMSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==");
   background-size: 100%;
   background-image: -webkit-gradient(
     linear,
@@ -4442,7 +4455,7 @@ div.unbreakable {
   border-width: 1px;
   border-color: #e6e6e6;
   margin-bottom: 1.25em;
-  padding: .5em;
+  padding: 0.5em;
   background: #fff;
 }
 
@@ -4475,7 +4488,7 @@ div.unbreakable {
 .imageblock.feature h5,
 .imageblock.feature h6 {
   line-height: 1;
-  margin-bottom: .625em;
+  margin-bottom: 0.625em;
 }
 
 .imageblock.feature h1.subheader,
@@ -4506,7 +4519,7 @@ div.unbreakable {
 
 .button-group > li i.fa {
   line-height: 1rem;
-  padding-left: .1875em;
+  padding-left: 0.1875em;
   padding-top: 0.2rem;
   vertical-align: middle;
 }
@@ -4546,7 +4559,7 @@ article.post .entry-content {
 }
 
 article.post .tags .label {
-  margin-right: .3125em;
+  margin-right: 0.3125em;
 }
 
 ul.pagination li.arrow a {
@@ -4588,7 +4601,7 @@ li.identity a.url {
 }
 
 li > span.separator {
-  content: ' ';
+  content: " ";
   display: block;
   float: left;
   background: #adadad;
@@ -4634,11 +4647,12 @@ ul.toolbar .toggle-navigation.off i.fa-toggle-off {
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
 @font-face {
-  font-family: 'FontAwesome';
+  font-family: "FontAwesome";
   src: url("./fonts/font-awesome/fonts/fontawesome-webfont.eot?v=4.7.0");
-  src: url("./fonts/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0") format("embedded-opentype"),
-       url("./fonts/font-awesome/fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"),
-       url("./fonts/font-awesome/fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype");
+  src: url("./fonts/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.7.0")
+      format("embedded-opentype"),
+    url("./fonts/font-awesome/fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"),
+    url("./fonts/font-awesome/fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -4702,9 +4716,9 @@ ul.toolbar .toggle-navigation.off i.fa-toggle-off {
 }
 
 .fa-border {
-  padding: .2em .25em .15em;
+  padding: 0.2em 0.25em 0.15em;
   border: solid 0.08em #eeeeee;
-  border-radius: .1em;
+  border-radius: 0.1em;
 }
 
 .fa-pull-left {
@@ -4716,11 +4730,11 @@ ul.toolbar .toggle-navigation.off i.fa-toggle-off {
 }
 
 .fa.fa-pull-left {
-  margin-right: .3em;
+  margin-right: 0.3em;
 }
 
 .fa.fa-pull-right {
-  margin-left: .3em;
+  margin-left: 0.3em;
 }
 
 .pull-right {
@@ -4732,11 +4746,11 @@ ul.toolbar .toggle-navigation.off i.fa-toggle-off {
 }
 
 .fa.pull-left {
-  margin-right: .3em;
+  margin-right: 0.3em;
 }
 
 .fa.pull-right {
-  margin-left: .3em;
+  margin-left: 0.3em;
 }
 
 .fa-spin {
@@ -8284,12 +8298,12 @@ b.conum * {
 
 .CodeRay .line-numbers {
   border-right: 1px solid #d8d8d8;
-  padding: 0 0.5em 0 .25em;
+  padding: 0 0.5em 0 0.25em;
 }
 
 .CodeRay span.line-numbers {
   display: inline-block;
-  margin-right: .5em;
+  margin-right: 0.5em;
   color: rgba(0, 0, 0, 0.3);
 }
 
@@ -8319,7 +8333,7 @@ table.CodeRay td.line-numbers > pre {
 }
 
 table.CodeRay td.code {
-  padding: 0 0 0 .5em;
+  padding: 0 0 0 0.5em;
 }
 
 table.CodeRay td.code > pre {

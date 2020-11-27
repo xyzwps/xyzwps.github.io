@@ -25,7 +25,7 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
         <div style={{ flexBasis: "15rem", borderRight: "1px solid lightgray" }}>
           <PostTocList postToc={toc} />
         </div>
-        <div style={{ flexBasis: 0, flexGrow: 1, padding: "1rem 2rem" }}>
+        <div style={{ flexBasis: 0, flexGrow: 1, padding: "1rem 3rem" }}>
           {(() => {
             switch (type) {
               case "adoc":
@@ -34,6 +34,9 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
                 return <Toc indexPostInfo={postInfo as IndexPostInfo} />
             }
           })()}
+        </div>
+        <div style={{ flexBasis: "15rem", borderLeft: "1px solid lightgray" }}>
+          TODO:
         </div>
       </div>
     </PageLayout>
