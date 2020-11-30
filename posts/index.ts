@@ -7,7 +7,13 @@ import { join } from "path"
 
 const POST_DIR = join(process.cwd(), "posts")
 
-const VOLUME = ["lang/java/concurrency", "lang/java/basic", "lang/go/basic", "algorithm/djbp"]
+const VOLUME = [
+  "lang/java/concurrency",
+  "lang/java/basic",
+  "lang/go/basic",
+  "algorithm/djbp",
+  "math/sum",
+]
 
 export interface PathInfo {
   params: { id: string }

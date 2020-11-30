@@ -21,11 +21,11 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
   const { type, doc, toc } = postInfo
   return (
     <PageLayout>
-      <div style={{ width: "100%", display: "flex" }}>
-        <div style={{ flexBasis: "15rem", borderRight: "1px solid lightgray" }}>
+      <div className="post-layout">
+        <div className="left">
           <PostTocList postToc={toc} />
         </div>
-        <div style={{ flexBasis: 0, flexGrow: 1, padding: "1rem 3rem" }}>
+        <div className="post">
           {(() => {
             switch (type) {
               case "adoc":
@@ -35,9 +35,7 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
             }
           })()}
         </div>
-        <div style={{ flexBasis: "15rem", borderLeft: "1px solid lightgray" }}>
-          TODO:
-        </div>
+        <div className="right">TODO:</div>
       </div>
     </PageLayout>
   )

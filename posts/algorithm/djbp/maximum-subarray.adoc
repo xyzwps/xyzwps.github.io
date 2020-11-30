@@ -1,8 +1,9 @@
-= 最大子序和问题
+= 最大子序和
 weily <xyzwps@outlook.com>
 v1.0, 2020-11-25
 :toc:
 :toc-title: 目录
+:tag: 动态规划, DP, 数组, 最大子数组, 最大子序和, 分治
 
 本来想刷一下 LeetCode 的动态规划题目，本来还想按顺序从简单题目开始，结果第一个题目就让我懵逼了——
 link:https://leetcode-cn.com/problems/maximum-subarray/[第 53 题：最大子序和]。

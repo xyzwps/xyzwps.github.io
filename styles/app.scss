@@ -23,3 +23,40 @@ div {
 .katex {
   font-size: 1.125rem;
 }
+
+.post-layout {
+  width: 100%;
+  display: flex;
+
+  .left {
+    flex-basis: 15rem;
+    border-right: 1px solid lightgray;
+  }
+
+  .post {
+    flex-basis: 0;
+    flex-grow: 1;
+    padding: 1rem 2rem;
+  }
+
+  .right {
+    flex-basis: 15rem;
+    border-left: 1px solid lightgray;
+  }
+
+  @media (max-width: 1200px) {
+    .right {
+      display: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .left {
+      display: none;
+    }
+
+    .post {
+      padding: 1rem;
+    }
+  }
+}

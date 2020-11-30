@@ -1,0 +1,6 @@
+{
+  "type": "simple",
+  "title": "数列",
+  "description": "数列",
+  "toc": [{ "path": "fibonacci.adoc", "title": "斐波那契数列" }]
+}
