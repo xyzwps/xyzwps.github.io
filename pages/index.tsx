@@ -12,6 +12,7 @@ const HomePage: React.FC<Record<string, unknown>> = () => {
       <TopicEntry title="Java 并发" url="/post/lang/java/concurrency/index" />
       <TopicEntry title="Go 基础" url="/post/lang/go/basic/index" />
       <TopicEntry title="DjbP" url="/post/algorithm/djbp/index" />
+      <TopicEntry title="数列" url="/post/math/sum/index" />
     </PageLayout>
   )
 }
