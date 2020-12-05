@@ -41,4 +41,13 @@ latexmath:[a_n - ta_{n-1}] 的公式，那么就可以进一步求出 latexmath:
 的方程变形，有 latexmath:[a_n = (s+t)a_{n-1} - sta_{n-2}]。把这个方程和原式作比较有 latexmath:[p=s+t]，latexmath:[-q=st]。在根据韦达定理，可以知道 latexmath:[s] 和 latexmath:[t] 是一元二次方程 latexmath:[x^2-px-q=0] 的两个根。
 原则上，只要解出这个方程，就可以求出 latexmath:[s] 和 latexmath:[t] 了，所以我们先认为 latexmath:[s] 和 latexmath:[t] 已经解出了。
 
-知道了 latexmath:[s] 和 latexmath:[t] 的值之后，我们可以算出 latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2}) = s^2(a_{n-2} - ta_{n-3}) = \cdots = s^{n-2}(a_2 - ta_1)]，于是 latexmath:[a_n = s^{n-2}(a_2 - ta_1) + ta_{n-1}]
+知道了 latexmath:[s] 和 latexmath:[t] 的值之后，我们可以算出 latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2}) = s^2(a_{n-2} - ta_{n-3}) = \cdots = s^{n-2}(a_2 - ta_1)]，于是
+latexmath:[a_n = s^{n-2}(a_2 - ta_1) + ta_{n-1} = s^{n-2}(a_2 - ta_1) + ts^{n-3}(a_2 - ta_1) + ta_{n-2} = ... = s^{n-2}(a_2 - ta_1) + ts^{n-3}(a_2 - ta_1) + ta_{n-2}]
+
+TODO:
+
+## 再再扩展一下
+
+从 latexmath:[a_n = ka_{n-1} + b] 到 latexmath:[a_n = pa_{n-1} + qa_{n-2}]，我们要解的方程从一次变成了两次。如果递推公式右边继续更加含有 latexmath:[a_{n-3}]、latexmath:[a_{n-4}]、……的项的话，我们要解的方程会变成更高次的方程。
+
+解不动了。考虑别的方式。
