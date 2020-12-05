@@ -1,6 +1,6 @@
 = 完全二叉树的节点个数
 weily <xyzwps@outlook.com>
-v1.0, 2020-11-25
+v1.0, 2020-12-05
 :toc:
 :toc-title: 目录
 :tag: 数, LeetCode, 完全二叉树
