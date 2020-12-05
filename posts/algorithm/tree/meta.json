@@ -1,0 +1,8 @@
+{
+  "type": "simple",
+  "title": "树研究中心",
+  "description": "树就是🌲，树就是锤",
+  "toc": [
+    { "path": "lc.count-complete-tree-nodes.adoc", "title": "[LeetCode]222. 完全二叉树的节点个数" }
+  ]
+}

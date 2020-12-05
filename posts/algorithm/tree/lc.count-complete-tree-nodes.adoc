@@ -1,0 +1,111 @@
+= 完全二叉树的节点个数
+weily <xyzwps@outlook.com>
+v1.0, 2020-11-25
+:toc:
+:toc-title: 目录
+:tag: 数, LeetCode, 完全二叉树
+
+题目：link:https://leetcode-cn.com/problems/count-complete-tree-nodes/[222. 完全二叉树的节点个数]。本文代码使用 JavaScript。
+
+预先定义节点:
+
+[source,js]
+----
+// 二叉树节点的定义
+function TreeNode(val) {
+    this.val = val;
+    this.left = this.right = null;
+}
+----
+
+== 遍历树节点
+
+直觉上，只要把树中节点数一遍就好了。这里使用选择逐层遍历：
+
+[source,js]
+----
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var countNodes = function(root) {
+    if (!root) return 0;
+
+    let result = 0;
+    const queue = [root];
+    while(queue.length > 0) {
+        const curr = queue.shift();
+        result++;
+        if (curr.left) queue.push(curr.left)
+        if (curr.right) queue.push(curr.right)
+    }
+    return result
+};
+----
+
+实际运行效果是只击败了 5% 的提交...
+
+== 二分法
+
+原则上，只要找到完全二叉树最后一个节点的位置，就可以算出树中节点的个数了。而最后一个节点，要么在左子树上，要么在右子树上，所以可以考虑二分法。
+
+这个算法是这样的：
+
+. 通过树左边的节点算出树有多高，记树的高度为 latexmath:[n]，这样，就可以算出前 latexmath:[n-1] 层中所有节点的个数了，把这个数加到总数中去。
+. 取根节点为当前节点，并记录以当前节点为根的子树的高度。
+. 如果当前节点的右子树没左子树高，说明最后一个节点在左子树上，否则在右子树上。
+.. 如果当前节点为叶子节点，把当前子树的节点数（就是1）加到总数中去。算法**结束**。
+.. 如果最后一个节点在右子树上，那么把左子树上最后一层的的节点数量加到总数里，然后把右子树的根节点作为当前节点，转入第2步继续操作。
+.. 如果最后一个节点在左子树上，那么把左子树的根节点作为当前节点，直接转入第2步继续操作。
+
+代码如下:
+
+[source,js]
+----
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var countNodes = function(root) {
+  if (!root) return 0;
+
+  let levelCount = countLevel(root);
+  let count = (1 << (levelCount - 1)) - 1;
+
+  let curr = root;
+  let currLevel = levelCount;
+  while(curr.left && curr.right) {
+      if (isLastNodeInRight(curr, currLevel)) {
+          count += (1 << (currLevel - 2))
+          curr = curr.right;
+      } else {
+          curr = curr.left
+      }
+      currLevel--;
+  }
+
+  return count + 1;
+};
+
+// 判断 node 子树中，最后一个节点在左子树还是右子树
+// nodeLevel 是 node 的高度
+function isLastNodeInRight(node, nodeLevel) {
+  const rightSubTreeLevel = countLevel(node.right)
+  return rightSubTreeLevel === nodeLevel - 1;
+}
+
+// 计算以 node 为根节点的树的高度
+function countLevel(node) {
+  if (!node) return 0;
+
+  let level = 1;
+  let curr = node;
+  while(curr.left) {
+      level++;
+      curr = curr.left
+  }
+  return level;
+}
+----
+
+读者（如果有的话）可以考虑一下，这里为什么写了一个叫 `isLastNodeInRight` 的函数，而不是 `isLastNodeInLeft`？

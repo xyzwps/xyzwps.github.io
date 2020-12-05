@@ -12,6 +12,7 @@ const VOLUME = [
   "lang/java/basic",
   "lang/go/basic",
   "algorithm/djbp",
+  "algorithm/tree",
   "math/sum",
 ]
 
