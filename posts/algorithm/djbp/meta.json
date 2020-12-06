@@ -2,6 +2,9 @@
   "type": "simple",
   "title": "DP",
   "description": "DP = Dynamic Programming = 动态规划。面向 LeetCode 的 DP 研究中心",
-  "toc": [{ "path": "maximum-subarray.adoc", "title": "最大子数组" },
-    { "path": "climbing-stairs.adoc", "title": "爬楼梯" }]
+  "toc": [
+    { "path": "buy-stock.adoc", "title": "买卖股票" },
+    { "path": "maximum-subarray.adoc", "title": "最大子数组" },
+    { "path": "climbing-stairs.adoc", "title": "爬楼梯" }
+  ]
 }
