@@ -60,3 +60,14 @@ div {
     }
   }
 }
+
+.post-mobile-toc {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .post-mobile-toc {
+    border-top: 1px solid $border-gray;
+    display: block;
+  }
+}

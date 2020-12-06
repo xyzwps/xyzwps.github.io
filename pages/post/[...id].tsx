@@ -37,6 +37,9 @@ const PostPage: React.FC<{ id; postInfo: PostInfo }> = ({ postInfo }) => {
         </div>
         <div className="right">TODO:</div>
       </div>
+      <div className="post-mobile-toc">
+        <PostTocList postToc={toc} />
+      </div>
     </PageLayout>
   )
 }
