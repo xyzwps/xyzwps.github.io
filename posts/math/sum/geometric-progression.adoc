@@ -11,11 +11,26 @@ v1.0, 2020-12-01
 
 设 latexmath:[a_1] 已知，则通项公式为 latexmath:[a_n = a_{n-1}k = a_{n-2}k^2 = \cdots = a_1k^{n-1}]。
 
-设其前 latexmath:[n] 项的和为 latexmath:[S_n]，即 latexmath:[S_n = a_n + a_{n-1} + \cdots + a_1]，此式两遍乘以
-latexmath:[k]，有 latexmath:[kS_n = ka_n + ka_{n-1} + \cdots + ka_1 = a_{n+1} + a_n + \cdots + ka_2]，于是
-latexmath:[kS_n - S_n = a_{n+1} - a_1 = a_1(k^n-1)]，两边再除以 latexmath:[k-1]，可得
-latexmath:[S_n = \frac{a_1(k^n-1)}{k-1} = \frac{a_1(1-k^n)}{1-k}]，其中 latexmath:[k\ne1]。当 latexmath:[k=1]
-时，数列退化为更简单的 latexmath:[a_n = a_{n-1} = \cdots = a_1] 的情况，太简单了，不再说明。
+设其前 latexmath:[n] 项的和为 latexmath:[S_n]，即
+[.text-center]
+latexmath:[S_n = a_n + a_{n-1} + \cdots + a_1]
+
+此式两遍乘以 latexmath:[k]，有
+
+[.text-center]
+latexmath:[kS_n = ka_n + ka_{n-1} + \cdots + ka_1 = a_{n+1} + a_n + \cdots + ka_2]
+
+于是
+
+[.text-center]
+latexmath:[kS_n - S_n = a_{n+1} - a_1 = a_1(k^n-1)]
+
+两边再除以 latexmath:[k-1]（其中 latexmath:[k\ne1]），可得
+
+[.text-center]
+latexmath:[S_n = \displaystyle\frac{a_1(k^n-1)}{k-1} = \frac{a_1(1-k^n)}{1-k}]
+
+当 latexmath:[k=1] 时，数列退化为更简单的 latexmath:[a_n = a_{n-1} = \cdots = a_1] 的情况，太简单了，不再说明。
 
 ## 扩展一下
 
@@ -27,7 +42,7 @@ latexmath:[S_n = \frac{a_1(k^n-1)}{k-1} = \frac{a_1(1-k^n)}{1-k}]，其中 latex
 latexmath:[a_n+t = (a_1+t)k^{n-1}]，于是 latexmath:[a_n = (a_1 + t)k^{n-1} - t]。下面我们求 latexmath:[t]。
 
 我们把这个带有未知数 latexmath:[t] 的方程改成这样：latexmath:[a_n = ka_{n-1} + kt -t]，和原递推公式比较，得
-latexmath:[b = kt-t]，于是 latexmath:[t = \frac{b}{k-1}]。代入上面带有参数 latexmath:[t] 的 latexmath:[a_n]
+latexmath:[b = kt-t]，于是 latexmath:[t = \displaystyle\frac{b}{k-1}]。代入上面带有参数 latexmath:[t] 的 latexmath:[a_n]
 的通项公式消去 latexmath:[t] 就可以得到结果了。
 
 我们记住这个方法，而不打算记住这个结果。
@@ -36,12 +51,33 @@ latexmath:[b = kt-t]，于是 latexmath:[t = \frac{b}{k-1}]。代入上面带有
 
 考虑数列 latexmath:[a_n = pa_{n-1} + qa_{n-2}]，其中 latexmath:[n\ge3]，latexmath:[a_1] 和 latexmath:[a_2] 已知， latexmath:[p\ne0] 且 latexmath:[q\ne0]。我们想求出通项公式。
 
-有了上面的启发，我们希望把这个递推公式改造成这样：latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2})]。这样一来，如果我们求出
-latexmath:[a_n - ta_{n-1}] 的公式，那么就可以进一步求出 latexmath:[a_n] 了。我们把这个关于 latexmath:[s] 和 latexmath:[t]
-的方程变形，有 latexmath:[a_n = (s+t)a_{n-1} - sta_{n-2}]。把这个方程和原式作比较有 latexmath:[p=s+t]，latexmath:[-q=st]。在根据韦达定理，可以知道 latexmath:[s] 和 latexmath:[t] 是一元二次方程 latexmath:[x^2-px-q=0] 的两个根。
+有了上面的启发，我们希望把这个递推公式改造成这样：
+
+[.text-center]
+latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2})]
+
+这样一来，如果我们求出 latexmath:[a_n - ta_{n-1}] 的公式，那么就可以进一步求出 latexmath:[a_n] 了。我们把这个关于 latexmath:[s] 和 latexmath:[t]
+的方程变形，有
+
+[.text-center]
+latexmath:[a_n = (s+t)a_{n-1} - sta_{n-2}]
+
+把这个方程和原式作比较有
+
+[.text-center]
+latexmath:[p=s+t]，latexmath:[-q=st]
+
+再根据韦达定理，可以知道 latexmath:[s] 和 latexmath:[t] 是一元二次方程 latexmath:[x^2-px-q=0] 的两个根。
 原则上，只要解出这个方程，就可以求出 latexmath:[s] 和 latexmath:[t] 了，所以我们先认为 latexmath:[s] 和 latexmath:[t] 已经解出了。
 
-知道了 latexmath:[s] 和 latexmath:[t] 的值之后，我们可以算出 latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2}) = s^2(a_{n-2} - ta_{n-3}) = \cdots = s^{n-2}(a_2 - ta_1)]，于是
+知道了 latexmath:[s] 和 latexmath:[t] 的值之后，我们可以算出
+
+[.text-center]
+latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2}) = s^2(a_{n-2} - ta_{n-3}) = \cdots = s^{n-2}(a_2 - ta_1)]
+
+于是
+
+[.text-center]
 latexmath:[a_n = s^{n-2}(a_2 - ta_1) + ta_{n-1} = s^{n-2}(a_2 - ta_1) + ts^{n-3}(a_2 - ta_1) + ta_{n-2} = ... = s^{n-2}(a_2 - ta_1) + ts^{n-3}(a_2 - ta_1) + ta_{n-2}]
 
 TODO:
