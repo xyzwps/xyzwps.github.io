@@ -5,6 +5,7 @@
   "toc": [
     { "path": "buy-stock.adoc", "title": "买卖股票" },
     { "path": "maximum-subarray.adoc", "title": "最大子数组" },
-    { "path": "climbing-stairs.adoc", "title": "爬楼梯" }
+    { "path": "climbing-stairs.adoc", "title": "爬楼梯" },
+    { "path": "house-robber.adoc", "title": "打家劫舍" }
   ]
 }

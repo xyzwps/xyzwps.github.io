@@ -3,7 +3,7 @@ weily <xyzwps@outlook.com>
 v1.0, 2020-12-06
 :toc:
 :toc-title: 目录
-:tag: 动态规划, DP, 数组, 最大子数组, 最大子序和, 分治
+:tag: 动态规划, DP, 数组, 最大子数组, 最大子序和, 分治, LeetCode
 
 link:https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/[121. 买卖股票的最佳时机]。
 
