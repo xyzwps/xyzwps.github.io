@@ -1,0 +1,123 @@
+= 齐次线性递推数列
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-05
+:toc:
+:toc-title: 目录
+:tag: 齐次线性递推数列, 数列, 递推
+
+== 齐次线性递推数列
+
+设实数列 latexmath:[\{a_n\}] 满足公式 latexmath:[a_n = \displaystyle\sum_{i=1}^m k_i a_{n-i}]，并且已经知道其前
+latexmath:[m] 项的值，系数 latexmath:[k_i] 不全为 0。我们想求出其通项公式。为此，我们构造 latexmath:[m] 阶方阵
+
+[.text-center]
+latexmath:[M = \begin{bmatrix}
+   k_1    & k_2    & k_3    & \cdots & k_m    \\
+   1      & 0      & 0      & \cdots & 0      \\
+   0      & 1      & 0      & \cdots & 0      \\
+   \vdots & \vdots & \vdots & \ddots & \vdots \\
+   0      & 0      & 0      & \cdots & 0
+\end{bmatrix}]
+
+需要说明的是，这个方阵的第 1 行是递推式右边的系数；从第 2 行开始，第 latexmath:[r] 行第 latexmath:[r-1] 列的值为 1，其他位置值为 0。所以上面的矩阵
+latexmath:[M] 的最后一行，写出来的部分都是 0，但是那一行倒数第二列的值是 1。
+
+这样，我们有：
+
+[.text-center]
+latexmath:[
+\begin{bmatrix}
+   k_1    & k_2    & k_3    & \cdots & k_m    \\
+   1      & 0      & 0      & \cdots & 0      \\
+   0      & 1      & 0      & \cdots & 0      \\
+   \vdots & \vdots & \vdots & \ddots & \vdots \\
+   0      & 0      & 0      & \cdots & 0
+\end{bmatrix}
+\begin{bmatrix}
+   a_{n-1} \\ a_{n-2}  \\ a_{n-3} \\ \vdots \\ a_{n-m}
+\end{bmatrix}
+=
+\begin{bmatrix}
+   k_1 a_{n-1} + k_2 a_{n-2} + \cdots + k_m a_{n-m} \\
+              a_{n-1}  \\ a_{n-2} \\ \vdots \\ a_{n-(m-1)}
+\end{bmatrix}
+=
+\begin{bmatrix}
+   a_n    \\  a_{n-1}  \\ a_{n-2} \\ \vdots \\ a_{n-(m-1)}
+\end{bmatrix}
+]
+
+于是
+
+[.text-center]
+latexmath:[
+\begin{bmatrix}  a_{n} \\ a_{n-1}  \\ a_{n-2} \\ \vdots \\ a_{n-(m-1)}  \end{bmatrix}
+= M       \begin{bmatrix}  a_{n-1} \\ a_{n-2}  \\ a_{n-3} \\ \vdots \\ a_{n-m}     \end{bmatrix}
+= M^2     \begin{bmatrix}  a_{n-2} \\ a_{n-3}  \\ a_{n-4} \\ \vdots \\ a_{n-(m+1)} \end{bmatrix}
+= \cdots
+= M^{n-m} \begin{bmatrix}  a_{m}   \\ a_{m-1}  \\ a_{m-2} \\ \vdots \\ a_{1}       \end{bmatrix}
+]
+
+这样依赖，求 latexmath:[a_n] 的过程就被转化成了矩阵乘法。
+
+== 例子
+
+=== 例一：等比数列
+
+对于等比数列 latexmath:[a_n = ka_{n_1}]。构造矩阵 latexmath:[M = [k\]]。代入上面的公式，有
+latexmath:[[a_n\] = M^{n-1}[a_1\] = [k\]^{n-1}[a_1\]]，这就是 latexmath:[a_n = k^{n-1}a_1]
+的一阶方阵写法。
+
+=== 例二：斐波那契数列
+
+斐波那契数列 latexmath:[a_n = a_{n_1} + a_{n-2}]。构造方阵
+
+[.text-center]
+latexmath:[M = \begin{bmatrix}  1 & 1  \\ 1 & 0  \end{bmatrix}]
+
+套用上面的公式，有
+
+[.text-center]
+latexmath:[\begin{bmatrix}  a_n  \\ a_{n-1}  \end{bmatrix} = M^{n-2} \begin{bmatrix}  1  \\ 1  \end{bmatrix}]
+
+=== 例三：带有常数项的递推示例
+
+对数列 latexmath:[a_n = 2a_{n-1} + 3a_{n-2} + 4]，我们希望使用上面的公式。我们把这个递推式做变形为
+latexmath:[ a_n + 1 = 2(a_{n-1} + 1) + 3(a_{n-2} + 1)]。 取 latexmath:[b_n = a_n + 1]，有
+latexmath:[b_n = 2b_{n-1} + 3b_{n-2}]。对 latexmath:[\{b_n\}] 使用上面的公式，有：
+
+[.text-center]
+latexmath:[
+  \begin{bmatrix}  b_n  \\ b_{n-1}  \end{bmatrix}
+= \begin{bmatrix}  2 & 3  \\ 1 & 0 \end{bmatrix}^{n-2} \begin{bmatrix}  b_2  \\ b_1  \end{bmatrix}
+]
+
+把 latexmath:[b_n] 替换为 latexmath:[a_n] 有：
+
+[.text-center]
+latexmath:[
+  \begin{bmatrix}  a_n + 1  \\ a_{n-1} + 1  \end{bmatrix}
+= \begin{bmatrix}  2 & 3  \\ 1 & 0 \end{bmatrix}^{n-2} \begin{bmatrix}  a_2 + 1  \\ a_1 + 1  \end{bmatrix}
+]
+
+故
+
+[.text-center]
+latexmath:[
+  \begin{bmatrix}  a_n  \\ a_{n-1} \end{bmatrix}
+= \begin{bmatrix}  2 & 3  \\ 1 & 0 \end{bmatrix}^{n-2} \begin{bmatrix}  a_2 + 1  \\ a_1 + 1  \end{bmatrix}
+  - \begin{bmatrix} 1  \\ 1  \end{bmatrix}
+]
+
+=== 例四：带有非常数项的递推示例
+
+对于数列 latexmath:[a_n = (2n-6)c + a_{n-1} + a_{n-2} + a_{n-3}]，我们把它变形为：
+
+[.text-center]
+latexmath:[a_n + nc = [a_{n-1} + (n-1)c\] + [a_{n-2} + (n-2)c\] + [a_{n-3} + (n-3)c\]]
+
+取 latexmath:[b_n = a_n + nc]，latexmath:[M = \begin{bmatrix}  1 & 1 & 1  \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{bmatrix}]。剩下的就不用写了。
+
+== 参考
+
+* link:https://leetcode-cn.com/problems/climbing-stairs/solution/pa-lou-ti-by-leetcode-solution/[LeetCode：爬楼梯官方题解]

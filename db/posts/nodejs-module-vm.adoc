@@ -1,0 +1,299 @@
+= Node.js - vm 模块
+weily <xyzwps@outlook.com>
+v1.0, 2020-06-18
+:toc:
+:toc-title: 目录
+
+## 开始
+
+JavaScript 代码可以在编译后立刻执行，也可以先编译后，保存起来，在之后的某个时间点再去执行。Node.js 的 vm 模块允许在 V8 虚拟机上下文中编译和执行代码。
+
+常见的场景是在一个不同的 V8 上下文中执行代码，这意味着被执行的代码和其调用者之间使用不同的全局变量。比如：
+
+```js
+const vm = require('vm');
+const x = 1;
+const context = { x: 2 };
+vm.createContext(context); // contextify the object
+
+const code = 'x += 400; var y = 17;';
+const result = vm.runInContext(code, context); // code string 中 x, y 在上下文中是全局变量
+
+console.log(result); // result 是最后一个语句执行的结果，输出 402
+console.log(context.x); // 输出 403
+console.log(context.y); // 输出 17
+
+console.log(x); // 输出 1
+console.log(y); // 未定义 y，抛错
+```
+
+模块 vm 并不对脚本做安全保证，不要在此执行你不信任的代码。
+
+## 上下文
+
+使用 vm 模块的 `createContext` 函数来创建上下文，使用 `isContext` 函数来判断一个对象是否是上下文对象：
+
+```js
+const vm = require('vm');
+const context = { x: 2 };
+console.log(vm.isContext(context)); // false
+const ctxObj = vm.createContext(context);
+console.log(vm.isContext(context)); // true
+console.log(context === ctxObj); // true
+```
+
+## 异步函数
+
+在上下文中可以执行异步函数。
+
+```js
+const vm = require('vm');
+// 新上下文中，没有 setTimeout 和 clearTimeout 函数……
+const context = { x: 2, setTimeout, clearTimeout };
+vm.createContext(context);
+
+const code = `
+const sleep = (ms) => new Promise((resolve) => {
+    const tot = setTimeout(() => {
+        resolve();
+        clearTimeout(tot);
+    }, ms);
+});
+
+(async () => {
+    await sleep(1000);
+    x += 10
+    return x
+})()
+`;
+
+(async () => {
+  const promise = vm.runInContext(code, context);
+  console.log(promise);   // 输出 [object Promise]
+  console.log(context.x); // 输出 2
+  const result = await promise;
+  console.log(result);    // 输出 12
+})();
+```
+
+## 预编译和 `vm.Script`
+
+可以把 JavaScript 脚本先编译好，再按需在指定上下文执行。通过 vm 模块的 `Script` 类来创建一个预编译好的代码脚本。
+
+```js
+const vm = require('vm');
+const context = { x: 2 };
+vm.createContext(context);
+
+const script = new vm.Script('x += 400');
+const result = script.runInContext(context);
+
+console.log(result);    // 402
+console.log(context.x); // 402
+```
+
+## 脚本出错
+
+脚本在执行时发生的错误，会被抛出来。比如下面的代码
+
+```js
+const vm = require('vm');
+const context = { x: 2 };
+vm.createContext(context);
+
+const script = new vm.Script('x += 400; var y = 17; z += 2');
+script.runInContext(context);
+```
+
+在执行时会得到类似下面的输出：
+
+```txt
+evalmachine.<anonymous>:1
+x += 400; var y = 17; z += 2
+                      ^
+
+ReferenceError: z is not defined
+    at evalmachine.<anonymous>:1:23
+    at Script.runInContext (vm.js:131:20)
+    ......
+```
+
+这些输出是是说，在文件 `evalmachine.<anonymous>` 的第一行的第23个字符处，出先了错误。
+
+丑东西 `evalmachine.<anonymous>` 是脚本的默认文件名，看着不爽的话，我们可以给脚本指定一个文件名。
+
+## 文件名
+
+通过指定 `filename` 参数，可以给脚本置一个文件名：
+
+```js
+const vm = require('vm');
+const context = { x: 2 };
+vm.createContext(context);
+
+const script = new vm.Script('x += 400; var y = 17; z += 2', {
+  filename: 'tom.js',
+});
+script.runInContext(context);
+```
+
+这一段代码出错时，就会在 stack trace 中带上文件名：
+
+```txt
+tom.js:1
+x += 400; var y = 17; z += 2
+                      ^
+
+ReferenceError: z is not defined
+    at tom.js:1:23
+    at Script.runInContext (vm.js:131:20)
+    ......
+```
+
+因为 vm 模块中有很多 API 可以指定 `fileName` 参数，所以这里没说 `fileName` 参数是哪些 API
+的，以避免本文变成对 API 文档的翻译……需要用的话，去官网查 API 文档就好了。
+
+## 超时
+
+为避免脚本执行时间过长，可以在脚本执行时指定一个 `timeout` 参数（单位：毫秒），一旦执行时长超过 `timeout`，脚本的执行就会被中断。
+
+```js
+const vm = require('vm');
+const context = { x: 2 };
+vm.createContext(context);
+
+const script = new vm.Script(
+  `for(let i = 0; i < 100000000; i++) x += 1;`,
+  { filename: 'tom.js' }
+);
+
+script.runInContext(context, { timeout: 1000 }); // 用时超过 1s 则超时退出
+```
+
+上面的代码一般会超时退出（除非你使用电脑超级快……），输出大约长这样：
+
+```txt
+vm.js:131
+      return super.runInContext(contextifiedObject, ...args);
+                   ^
+
+Error: Script execution timed out after 1000ms
+    at Script.runInContext (vm.js:131:20)
+    ......
+```
+
+## Break on `SIGINT`
+
+如果主程序被 `SIGINT`（Ctrl+C）中断执行，那么通过 vm 模块执行的脚本通常也会终止，但是你要是用 `process.on('SIGINT')` 来处理 `SIGINT`
+事件的话，脚本则会继续执行，直到执行完，之后 `process.on('SIGINT')` 注册的回调函数执行，完成后整个程序结束。
+
+如果你想使程序在接收到 `SIGINT` 后，一定是立刻终止，那么可以脚本执行时，把参数 `breakOnSigint` 置为 `true`：
+
+```js
+const vm = require('vm');
+const context = { x: 2 };
+vm.createContext(context);
+
+const script = new vm.Script(
+  `for(let i = 0; i < 10000000; i++) x += 1;`,
+  { filename: 'tom.js' }
+);
+
+const ts = Date.now();
+process.on('SIGINT', () => console.log(x));
+script.runInContext(context, { breakOnSigint: true }); // ①
+console.log(Date.now() - ts); // 执行完估计要 3s 以上
+```
+
+上面的代码在 ① 处，如果 `breakOnSigint` 值为 `false`（默认值），即使在执行时通过 Ctrl+C 尝试终止主程序，主程序也不会立刻退出；
+如果值为 `true`，Ctrl+C 会立刻终止整个程序。
+
+## 重用上下文
+
+可以重用上下文对象……
+
+```js
+const vm = require('vm');
+const context = { x: 2 };
+vm.createContext(context);
+
+const script = new vm.Script('x += 10');
+
+for (let i = 0; i < 100; i++) {
+  script.runInContext(context);
+}
+console.log(context.x); // 输出 1002，因为每次 script 执行都修改同一个 context
+```
+
+## `runInThisContext`
+
+这个函数会使用主程序的 `global` 上下文来执行脚本。
+
+```js
+const vm = require('vm');
+
+global.x = 1;
+
+const script = new vm.Script('x += 400');
+const result = script.runInThisContext(); // 这个 thisContext 是指 global
+
+console.log(result);   // 401
+console.log(global.x); // 401
+```
+
+## `runInNewContext`
+
+从外观上看，这个函数和 `runInContext` 的区别，仅仅是省去了 `createContext` 的过程。
+
+```js
+const vm = require('vm');
+const script = new vm.Script('globalVar = "set"');
+
+const context = {};
+console.log(vm.isContext(context)); // 输出 false
+script.runInNewContext(context);
+console.log(vm.isContext(context)); // 输出 true
+console.log(context); // 输出 { globalVar: 'set' }
+```
+
+## `eval` 和 WASM
+
+可以通过 `strings` 参数来禁用脚本中的 `eval` 函数；通过 `wasm` 参数来禁用脚本中的 WASM 模块。
+
+```js
+const vm = require('vm');
+const ctx = {};
+const script = new vm.Script('val = eval("1+2")');
+script.runInNewContext(ctx, { contextCodeGeneration: { strings: false } }); // ①
+console.log(ctx);
+```
+
+上一段代码中 ① 处，如果 `strings` 的值为 `true`（默认值），则代码最终输出 `{ val: 3 }`；值为 `false`
+则抛出类似下面的错误：
+
+```txt
+evalmachine.<anonymous>:1
+val = eval("1+2")
+^
+
+EvalError: Code generation from strings disallowed for this context
+    at evalmachine.<anonymous>:1:1
+    ......
+```
+
+WASM 我不理解，举不出例子😂
+
+## `compileFunction`
+
+函数 `compileFunction` 可以把一段代码编译并包装成一个函数。比如：
+
+```js
+const vm = require('vm');
+const fn = vm.compileFunction('return i + j', ['i', 'j']);
+console.log(fn(1, 2)); // 3
+```
+
+## 参考
+
+* link:https://nodejs.org/dist/latest/docs/api/vm.html[Node.js vm 模块文档]（link:http://nodejs.cn/api/vm.html[中文]）
+* link:https://zhuanlan.zhihu.com/p/106503378[知乎：nodejs虚拟机]

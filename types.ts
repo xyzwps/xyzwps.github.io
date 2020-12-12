@@ -1,3 +1,5 @@
+import { inflate } from "zlib"
+
 export interface AdocInfo {
   title: string
   author: string
@@ -24,4 +26,18 @@ export interface PostToc {
   title: string
   description: string
   toc: { title: string; path: string }[]
+}
+
+export type DocType = "adoc" | "md" | "html"
+
+// TODO: 上面的 Post* 废弃
+export interface PostMeta {
+  path: string
+  ext: DocType
+}
+
+export interface Post {
+  title: string
+  body: string
+  type: DocType
 }

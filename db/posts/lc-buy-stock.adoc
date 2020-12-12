@@ -1,0 +1,98 @@
+= 买卖股票的最佳时机
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-06
+:toc:
+:toc-title: 目录
+:tag: 动态规划, DP, 数组, 最大子数组, 最大子序和, 分治, LeetCode
+
+link:https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/[121. 买卖股票的最佳时机]。
+
+为讨论方便，约定输入数组为 `prices`，数组长度为 `n`，前 `i+1` 项构成的子列记为 `prices[0,i]`。
+
+## 暴力法
+
+我们对所有的 `prices[i]` 和 `prices[j]` 构成的有序对做处理（其中 `j > i`）。如果 `prices[j] > prices[i]`，
+说明有盈利，就记录 `prices[j] - prices[i]` 的值，求出所有的这个差，就其中最大的那个，就是答案了。
+
+[source,js]
+----
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function (prices) {
+    let result = 0;
+    for (let i = 0; i < prices.length; i++) {
+        for(let j = i + 1; j < prices.length; j++) {
+            if(prices[j] > prices[i]) {
+                result = Math.max(prices[j] - prices[i], result);
+            }
+        }
+    }
+    return result;
+};
+----
+
+这肯定是一个 latexmath:[O(n^2)] 的算法，不过空间复杂度是 latexmath:[O(1)]。
+
+## DP法
+
+我们考虑所有形如 `prices[0,i]` 的子列。对于每一个这样的子列，我们求出这个子列的最小值，记这个最小值构成的序列为
+`dp`（提前暴露了）。例如，如果 `prices = [7, 1, 5, 3, 6, 4]`，那么 `dp = [7, 1, 1, 1, 1, 1]`。然后，我们对
+`prices` 从第 2 项（也就是 `prices[1]`）开始往后，对每个 `prices[i]`
+做处理，如果 `prices[i] > dp[i-1]`，就记录 `prices[i] - dp[i-1]`，最后求这个差的最大值。这个最大值就是最大收益。
+
+求 `dp` 数列的话，思路就很简单了，`dp[i] = min(dp[i-1], prices[i])`，就这样。
+
+沿着这个思路，可以写出下面的代码：
+
+[source,js]
+----
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function(prices) {
+    const dp = [prices[0]]
+    for(let i = 1; i < prices.length; i++) {
+        const p = prices[i];
+        dp[i] = Math.min(p, dp[i-1])
+    }
+
+    let result = 0;
+    for(let i = 1; i < prices.length; i++) {
+        const p = prices[i];
+        if (p > dp[i-1]) {
+            result = Math.max(result, p - dp[i-1])
+        }
+    }
+    return result
+};
+----
+
+这段代码的时间复杂度是 latexmath:[O(n)]，空间复杂度也是 latexmath:[O(n)]（因为使用了一个额外的 `dp` 数组）。
+
+我们观察这段代码，发现使用了两个完全一样的 `for` 循环，在第二个 `for` 循环中，对每个 `i`，我们只关心 `dp[i-1]`，这暗示我们可以把
+`dp` 数组都给省了。改造后的代码如下：
+
+[source,js]
+----
+/**
+ * @param {number[]} prices
+ * @return {number}
+ */
+var maxProfit = function (prices) {
+    let dpi_1 = prices[0];
+    let result = 0;
+    for (let i = 1; i < prices.length; i++) {
+        const p = prices[i];
+        if (p > dpi_1) {
+            result = Math.max(result, p - dpi_1);
+        }
+        dpi_1 = Math.min(p, dpi_1);
+    }
+    return result;
+};
+----
+
+这样优化之后，空间复杂度就是 latexmath:[O(1)] 了。

@@ -1,0 +1,165 @@
+= LRU Cache
+weily <xyzwps@outlook.com>
+v1.0, 2018-04-23
+:toc:
+:toc-title: 
+:tag: 数据结构
+
+
+这是很久之前（2017-08-18）写的。因为之前的 Github Pages 作废重建了，所以就搬过来了。
+
+
+== https://en.wikipedia.org/wiki/Cache_replacement_policies#LRU[LRU]
+
+LeetCode 上有这样一个题目， https://leetcode.com/problems/lru-cache/description/[设计一个 LRUCache（最近最少使用缓存）] 。它需要支持这样两种操作：`get` 和 `put`。
+
+* `get(key)` - 如果缓存中存在这个 key，就返回对应的 value（正数），否则返回 -1。
+* `put(key, value)` - 如果 key 存在，就改变其对应的 value；如果不存在，就插入。如果缓存满了，在插入之前，删除最近最少使用的那一项。
+
+有个附加要求是，这两种操作都花费 latexmath:[O(1)] 的时间。
+
+== 分析
+
+=== 满足基本条件
+
+在缓存容量已经满了还要插入时，我们需要知道哪个元素是最近最少被使用的那个。为了达到这样的目的，可以这样做：
+
+* 把所有的 key 的按照先进先出的顺序放到一个列表中，这样最近被插入的元素一定在最前面；
+* 对于 `put` 操作，有两种情况，
+** 如果 key 存在，就改变其对应的 value，同时要把这个 key 放到列表最前面；
+** 如果不存在，就插入到列表最前面；
+* 对缓存做 `get` 操作时，如果命中，就把这个 key 放到列表的最前面；
+
+做上面两种操作后，最近最少被使用的元素就一定在列表末尾了。
+
+=== 满足附加条件
+
+根据上面的分析，对于 `put` 操作，首先要 `get` 一下，看看列表中是否已经存在了这个 key。这样一来，`put` 操作的时间复杂度就和 `get` 一样了。
+
+为了使得 `get` 能够有 latexmath:[O(1)] 的时间花费，只使用列表的话，每次搜索指定的 key，都要把列表遍历一遍， 所以肯定是不行的。Hash 表可以在 stem:[O(1)] 时间（平均）内查询到指定 key，所以可以把这些 key 也都存一份到 Hash 表中。
+
+在移动列表中的 key 到最前面的时候，如果使用数组来存放，那么移动的时间花费会高达 latexmath:[O(n)]。使用链表的话，就不需要使元素在列表中移动，只要把节点进行位移就可以了，于是考虑使用链表。
+
+
+=== 数据结构设计
+
+根据上面的分析，需要一个链表来保持时序，需要一个 Hash 表来保证操作有 stem:[O(1)] 的时间花费。
+
+为了使 Hash 表和链表之间的交互更加平滑，可以这样做：
+
+* 把链表节点作为 Hash 表的 value 填入，这样就可以根据 key 直接获取到指定节点；
+* 把 key 值保存一份到链表节点中，这样在从 Hash 表中移除最近最少被使用的元素时，可以直接用 key 到 Hash 表中搜索。
+
+原理说完了，就可以动手自己实现一个了。
+
+== 实现
+
+根据上面的分析，可以得到一个这样的 Java 实现（用其他语言也是可以的）：
+
+[source,java]
+----
+class LRUCache {
+
+    private Node root = new Node();               // 链表根节点（哨兵节点，不用来存放 key）
+    private Node tail = root;                     // 指向链表末尾
+    private java.util.HashMap<Integer, Node> map; // Hash 表
+    private int capacity;                         // 缓存容量
+
+    public LRUCache(int capacity) {
+        if (capacity < 1) {
+            throw new RuntimeException("Capacity must be positive.");
+        }
+        this.capacity = capacity;
+        map = new java.util.HashMap<>(capacity);
+    }
+
+    /**
+     * 如果命中，就把 key 放到链表最前面，并返回 data；否则返回 -1
+     */
+    public int get(int key) {
+        Node node = map.get(key);
+        if (node == null)
+            return -1;
+        node = isolate(node);
+        putFirst(node);
+        return node.data;
+    }
+
+    /**
+     * 如果命中，就把 key 放到链表最前面，并更新 data 的值；
+     * 否则如果缓存满了，就把 tail 节点移除，把 key 放到最前面；
+     * 否则直接把 key 放到最前面。
+     */
+    public void put(int key, int value) {
+        Node n = map.get(key);
+        if (n != null) {
+            get(key);
+            n.data = value;
+            return;
+        }
+
+        if (map.size() >= capacity) {
+            Node t = removeTail();
+            map.remove(t.key);
+        }
+
+        Node newNode = new Node(key, value, null, null);
+        putFirst(newNode);
+        map.put(key, newNode);
+    }
+
+    /**
+     * @returns removed tail node.
+     */
+    private Node removeTail() {
+        Node t = tail;
+        Node tp = tail.prev;
+        tp.next = null;
+        tail = tp;
+
+        t.prev = null;
+
+        return t;
+    }
+
+    private Node isolate(Node node) {
+        Node p = node.prev;
+        Node n = node.next;
+        p.next = n;
+        if (n != null) {
+            n.prev = p;
+        } else { // node is tail
+            tail = p;
+        }
+        node.prev = node.next = null;
+        return node;
+    }
+
+    private void putFirst(Node node) {
+        Node rn = root.next;
+
+        root.next = node;
+        node.prev = root;
+
+        node.next = rn;
+        if (rn != null) {
+            rn.prev = node;
+        } else {
+            tail = node;
+        }
+    }
+
+    class Node {
+        Node prev;
+        Node next;
+        int data;
+        int key;
+
+        public Node() { }
+
+        public Node(int k, int d, Node p, Node n) {
+            key = k;  data = d; prev = p; next = n;
+        }
+    }
+}
+----

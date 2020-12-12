@@ -1,0 +1,118 @@
+= 打家劫舍
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-08
+:toc:
+:toc-title: 目录
+:tag: 动态规划, DP, 数组, LeetCode
+
+请点击链接查看题目：link:https://leetcode-cn.com/problems/house-robber/[198. 打家劫舍]。
+为讨论方便，约定输入数组为 `nums`，数组长度为 `n`，前 `i+1` 项构成的子列记为 `nums[0,i]`。
+
+## 我的做法
+
+最开始的时候，我对这个题目是没有头绪的，搞的我都想暴力解了。冷静一下，决定先考虑一下这个问题的一些性质。
+假设小偷按顺序偷，偷完房间 `a` 之后，要偷的下一间房间为 `b`，那么：
+
+. `a` 和 `b` 之间至少应该间隔一间房，这样才不会触发报警。
+. `a` 和 `b` 之间可以间隔两间房。
+. `a` 和 `b` 之间不可以间隔三件房。进而，自然也不会间隔更多间房。
+
+要 DP 什么呢？我在 DP 这个问题本身时，公式推不出来，作罢。想到之前做过link:爬楼梯[./climbing-stairs.adoc]那个题目，
+参考它的 DP 做法，考虑所有形如 `nums[0,i]` 的子列。
+
+对于每个 `nums[0,i-1]`，其中以 `nums[i-1]` 为最后一间要偷的房间的最好的偷窃方案，并记录偷到的最搞金额为 `dp[i]`。
+按照上面的性质，`dp[i]` 要么是 `dp[i-2] + nums[i]`，要么是 `dp[i-3] + nums[i]`，取最大的那个就好了。现在，
+问题的答案就是 `dp` 组中最大的那个值（对吧？）。
+
+沿着这个思路，可以写出这样的代码：
+
+[source,js]
+----
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var rob = function (nums) {
+    // 前面几个情况特殊处理下
+    if (nums.length === 0) return 0;
+    if (nums.length === 1) return nums[0];
+    if (nums.length === 2) return Math.max(nums[0], nums[1])
+    if (nums.length === 3) return Math.max(nums[1], nums[0] + nums[2])
+
+    let dp = [nums[0], Math.max(nums[0], nums[1]), Math.max(nums[1], nums[0] + nums[2])]
+    const len = nums.length;
+    for (let i = 3; i < len; i++) {
+        const curr = nums[i];
+        dp[i] = Math.max(dp[i - 2] + curr, dp[i - 3] + curr);
+    }
+
+    return Math.max(...dp)
+};
+----
+
+我们注意到递推公式，`dp[i] = Math.max(dp[i - 2] + curr, dp[i - 3] + curr)`，可以观察到两点信息：
+
+① `dp` 数组中的最后三个数是递推过程中的最大数，所以不需要 `max(...dp)`，只需要 `max(...dp[n-3, n-1])`
+就好了。改造如下：
+
+[source,js]
+----
+var rob = function (nums) {
+    // ... 前面省略
+    return Math.max(dp[len - 1], dp[len - 2], dp[len - 3])
+};
+----
+
+② 递推公式并没有使用整个 `dp` 数组，这意味着我们可以把 `dp` 数组省掉。改造如下：
+
+
+[source,js]
+----
+var rob = function (nums) {
+    // ... 前面省略
+    let dpi_1 = Math.max(nums[1], nums[0] + nums[2]),
+        dpi_2 = Math.max(nums[0], nums[1]),
+        dpi_3 = nums[0];
+    const len = nums.length;
+    for (let i = 3; i < len; i++) {
+        const curr = nums[i];
+        const dpi = Math.max(dpi_2 + curr, dpi_3 + curr);
+        dpi_3 = dpi_2;
+        dpi_2 = dpi_1;
+        dpi_1 = dpi;
+    }
+    return Math.max(dpi_1, dpi_2, dpi_3)
+};
+----
+
+## 官方题解
+
+官方给的题解，DP 的是问题本身。思路很简单：偷到第 `i` 间的时候，有两种选择：
+
+* 如果偷钱，那么最大金额就是偷前 `i-2` 间的最大金额 + 偷第 `i` 间的金额
+* 如果不偷钱，那么最大金额就是偷前 `i-1` 间的最大金额
+
+即 `dp[i] = max(dp[i-1], dp[i-2] + nums[i])`。这样，就可以写出如下代码：
+
+[source,js]
+----
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var rob = function (nums) {
+    if (nums.length === 0) return 0;
+    if (nums.length === 1) return nums[0];
+
+    let dpi_1 = nums[0],
+        dpi_2 = 0;
+    const len = nums.length;
+    for (let i = 1; i < len; i++) {
+        const curr = nums[i];
+        const dpi = Math.max(dpi_2 + curr, dpi_1);
+        dpi_2 = dpi_1;
+        dpi_1 = dpi;
+    }
+    return dpi_1;
+};
+----
