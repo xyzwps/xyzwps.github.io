@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Book, BookToc } from "../types"
+import styles from "./BookTocBlock.module.scss"
 
 const TocBlock: React.FC<{ toc: BookToc; book: Book }> = ({ toc, book }) => {
   const list = []
@@ -22,7 +23,7 @@ const TocBlock: React.FC<{ toc: BookToc; book: Book }> = ({ toc, book }) => {
     }
   }
 
-  return <ol>{list}</ol>
+  return <ol className={styles["book-toc-block"]}>{list}</ol>
 }
 
 const BookTocBlock: React.FC<{ book: Book }> = ({ book }) => {

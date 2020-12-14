@@ -6,7 +6,6 @@ import BookTocBlock from "../../../segments/BookTocBlock"
 
 const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book: Book }> = ({
   bookPath,
-  postPath,
   post,
   book,
 }) => {
@@ -14,7 +13,6 @@ const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book:
     <PageLayout>
       <div className="post-layout">
         <div className="left">
-          {bookPath} - {postPath}
           <h2>
             <a href={`/b/${bookPath}`}>{book.title}</a>
           </h2>
