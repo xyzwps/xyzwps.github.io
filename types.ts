@@ -1,5 +1,3 @@
-import { inflate } from "zlib"
-
 export interface AdocInfo {
   title: string
   author: string
@@ -42,8 +40,24 @@ export interface Post {
   type: DocType
 }
 
+export interface BookTocPostItem {
+  title: string
+  type?: "post"
+  path: string
+}
+
+export interface BookTocSubTocItem {
+  title: string
+  type: "sub"
+  sub: BookToc
+}
+
+export type BookTocItem = BookTocPostItem | BookTocSubTocItem
+
+export type BookToc = BookTocItem[]
+
 export interface Book {
   title: string
   path: string
-  toc: { title: string; path: string }[]
+  toc: BookTocItem[]
 }

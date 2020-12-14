@@ -1,8 +1,8 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
-import Link from "next/link"
 import { getAllBooks, getBookByPath } from "../../../db"
 import { Book } from "../../../types"
 import PageLayout from "../../../segments/PageLayout"
+import BookTocBlock from "../../../segments/BookTocBlock"
 
 const BookPostPage: React.FC<{ path: string; book: Book }> = ({ path, book }) => {
   return (
@@ -10,15 +10,7 @@ const BookPostPage: React.FC<{ path: string; book: Book }> = ({ path, book }) =>
       <div className="post-layout">
         <div className="left">{path}</div>
         <div className="post">
-          <ol>
-            {book.toc.map((it) => (
-              <li key={it.path}>
-                <Link href={`/b/${path}/${it.path}`}>
-                  <a>{it.title}</a>
-                </Link>
-              </li>
-            ))}
-          </ol>
+          <BookTocBlock book={book} />
         </div>
         <div className="right">TODO:</div>
       </div>

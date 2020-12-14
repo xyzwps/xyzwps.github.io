@@ -1,0 +1,16 @@
+{
+  "title": "Java",
+  "toc": [
+    {
+      "title": "DB",
+      "type": "sub",
+      "sub": [
+        { "title": "数组", "path": "java-array" },
+        { "title": "ClassLoader", "path": "java-classloader" },
+        { "title": "CountDownLatch", "path": "java-count-down-latch" },
+        { "title": "线程", "path": "java-thread" },
+        { "title": "volatile", "path": "java-volatile" }
+      ]
+    }
+  ]
+}

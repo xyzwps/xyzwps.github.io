@@ -1,9 +1,0 @@
-{
-  "title": "DJBP",
-  "toc": [
-    { "title": "买卖股票", "path": "lc-buy-stock" },
-    { "title": "最大子数组", "path": "lc-maximum-subarray" },
-    { "title": "爬楼梯", "path": "lc-climbing-stairs" },
-    { "title": "打家劫舍", "path": "lc-house-robber" }
-  ]
-}

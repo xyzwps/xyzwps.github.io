@@ -21,7 +21,6 @@ const BooksPage: React.FC<{ books: Book[] }> = ({ books }) => {
           </li>
         ))}
       </ul>
-      <pre>{JSON.stringify(books, null, "     ")}</pre>
     </PageLayout>
   )
 }

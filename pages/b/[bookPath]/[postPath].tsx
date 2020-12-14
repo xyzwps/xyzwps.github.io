@@ -1,8 +1,8 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
-import Link from "next/link"
 import { getAllBooks, getBookByPath, getPostByPath } from "../../../db"
-import { Post, Book } from "../../../types"
+import { Post, Book, BookToc } from "../../../types"
 import PageLayout from "../../../segments/PageLayout"
+import BookTocBlock from "../../../segments/BookTocBlock"
 
 const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book: Book }> = ({
   bookPath,
@@ -15,17 +15,10 @@ const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book:
       <div className="post-layout">
         <div className="left">
           {bookPath} - {postPath}
-          <h2>{book.title}</h2>
-          <ol>
-            {book.toc.map((it) => (
-              <li key={it.path}>
-                <Link href={`/b/${bookPath}/${it.path}`}>
-                  <a>{it.title}</a>
-                </Link>
-              </li>
-            ))}
-          </ol>
-          <pre>{JSON.stringify(book, null, "   ")}</pre>
+          <h2>
+            <a href={`/b/${bookPath}`}>{book.title}</a>
+          </h2>
+          <BookTocBlock book={book} />
         </div>
         <div className="post">
           <h1>{post.title}</h1>
@@ -49,13 +42,26 @@ export default PostPage
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const allBooks = await getAllBooks()
-  const paths = []
+  const allPaths = []
   for (const book of allBooks) {
-    for (const post of book.toc) {
-      paths.push({ params: { bookPath: book.path, postPath: post.path } })
-    }
+    const postPaths = extractPostPath(book.toc).map((path) => ({
+      params: { bookPath: book.path, postPath: path },
+    }))
+    allPaths.push(...postPaths)
   }
-  return { paths, fallback: false }
+  return { paths: allPaths, fallback: false }
+
+  function extractPostPath(toc: BookToc): string[] {
+    const paths = []
+    for (const item of toc) {
+      if (item.type === "sub") {
+        paths.push(...extractPostPath(item.sub))
+      } else {
+        paths.push(item.path)
+      }
+    }
+    return paths
+  }
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }: GetStaticPropsContext) => {
