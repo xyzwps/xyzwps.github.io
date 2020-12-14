@@ -41,3 +41,9 @@ export interface Post {
   body: string
   type: DocType
 }
+
+export interface Book {
+  title: string
+  path: string
+  toc: { title: string; path: string }[]
+}

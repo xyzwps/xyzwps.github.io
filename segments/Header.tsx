@@ -15,6 +15,7 @@ const Header: React.FC<Record<string, unknown>> = () => {
       <HeaderItem href="/">Home</HeaderItem>
       <HeaderItem href="/tool/datetime">Datetime</HeaderItem>
       <HeaderItem href="/post-list">Post list</HeaderItem>
+      <HeaderItem href="/b">Book list</HeaderItem>
     </nav>
   )
 }
