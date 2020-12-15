@@ -1,0 +1,95 @@
+= 栅栏涂色
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-16
+:toc:
+:toc-title: 目录
+:tag: 动态规划, DP, 数组, 栅栏涂色, LeetCode
+
+题目link:https://leetcode-cn.com/problems/paint-fence/[276. 栅栏涂色]。
+
+这一题之前做过，现在看又看不懂了。这里记一下思路。
+
+## 思路一
+
+记前 `t` 个栅栏有 `dp[t]` 种涂法。现在的问题是，已知 `dp[0]` 到 `dp[t-1]`，由此推出 `dp[t]`。这样，最后的答案就是 `dp[n]`。
+`dp[t]` 有两种方式得到：
+
+. 第 `t` 个栅栏和第 `t-1` 个的颜色不同，这时共有 `dp[t-1] * (k-1)` 种涂法；
+. 第 `t` 个占了和第 `t-1` 个的颜色相同，这要求第 `t-1` 个栅栏和第 `t-2` 个的颜色不同，共 `dp[t-2] * (k-1)` 种涂法。
+
+故 `dp[t] = dp[t-1] * (k-1) + dp[t-2] * (k-1)`。
+
+[source,js]
+----
+/**
+ * @param {number} n
+ * @param {number} k
+ * @return {number}
+ */
+var numWays = function(n, k) {
+    if (n == 0) return 0;
+
+    let dp = [0, k, k * k]
+    for (let i = 3; i <= n; i++) {
+        dp[i] = dp[i-1] * (k-1) + dp[i-2] * (k-1);
+    }
+    return dp[n];
+};
+----
+
+这段代码因为只使用了 `dp` 数组的最后两项来递推，所以只要保存最后两项，就可以把 `dp` 数组省掉了。改动代码如下：
+
+[source,js]
+----
+/**
+ * @param {number} n
+ * @param {number} k
+ * @return {number}
+ */
+var numWays = function(n, k) {
+    if (n == 0) return 0;
+    if (n == 1) return k;
+
+    let dp = [0, k, k * k]
+    let dpi_2 = k, dpi_1 = k * k
+    for (let i = 3; i <= n; i++) {
+        const dpi = dpi_1 * (k-1) + dpi_2 * (k-1);
+        dpi_2 = dpi_1;
+        dpi_1 = dpi;
+    }
+    return dpi_1;
+};
+----
+
+另外，因为这个递推公式中，`k` 是常数，所以可以求出 `dp` 数组的通项公式。见 TODO:
+
+
+## 思路二
+
+记录两个 `dp` 数组，`dp1[t]` 表示第 `t` 个栅栏和第 `t-1` 个颜色相同的涂法数量，`dp2[t]` 表示第 `t`
+个栅栏和第 `t-1` 个颜色不同的涂法数量。于是有下面的关系：
+
+. `dp1[t] = dp2[t-1]`
+. `dp2[t] = (dp1[t-1] + dp2[t-1]) * (k - 1)`
+
+最后的答案就是 `dp1[n] + dp2[n]`。因为这俩 `dp` 数组我们只用最后一项，所一干脆就记录最后一一项，从而把数组给省了。
+代码如下：
+
+[source,js]
+----
+/**
+ * @param {number} n
+ * @param {number} k
+ * @return {number}
+ */
+var numWays = function(n, k) {
+    if (n == 0) return 0;
+
+    let dp1 = 0; // 表示和前一个相同的数量
+    let dp2 = k; // 表示和前一个不同的数量
+    for (let i = 2; i <= n; i++) {
+        [dp1, dp2] = [dp2, (dp1 + dp2) * (k - 1)];
+    }
+    return dp1 + dp2;
+};
+----
