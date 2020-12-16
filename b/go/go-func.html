@@ -1,0 +1,151 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width"/><link rel="preload" href="/_next/static/css/ba709f22e6d86992cc8a.css" as="style"/><link rel="stylesheet" href="/_next/static/css/ba709f22e6d86992cc8a.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4cb5383c89798982a5e3.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4cb5383c89798982a5e3.css" data-n-p=""/><noscript data-n-css="true"></noscript><link rel="preload" href="/_next/static/chunks/main-14d0c979473839d1cb39.js" as="script"/><link rel="preload" href="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" as="script"/><link rel="preload" href="/_next/static/chunks/framework.2113c6061a2f456066a1.js" as="script"/><link rel="preload" href="/_next/static/chunks/commons.5bf50d780b059c687421.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/_app-a24f04606ca6ad661417.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/b/%5BbookPath%5D/%5BpostPath%5D-74be22d27545968f3664.js" as="script"/></head><body><div id="__next"><div style="max-width:1366px;margin:0px auto"><nav style="display:flex;border-bottom:1px solid lightgray;padding:0.5rem 1rem"><a class="Header_header-item__ZebU6" href="/">Home</a><a class="Header_header-item__ZebU6" href="/tool/datetime">Datetime</a><a class="Header_header-item__ZebU6" href="/post-list">Post list</a><a class="Header_header-item__ZebU6" href="/b">Book list</a></nav><div><div class="post-layout"><div class="left"><h2><a href="/b/go">Go 基础</a></h2><ol class="BookTocBlock_book-toc-block__2pSbM"><li><a href="/b/go/go-basic">基础</a></li><li><a href="/b/go/go-func">函数</a></li><li><a href="/b/go/go-var">变量</a></li><li><a href="/b/go/go-basic-types">基本类型</a></li><li><a href="/b/go/go-string">字符串</a></li><li><a href="/b/go/go-ptr">指针</a></li><li><a href="/b/go/go-array-slice">数组和切片</a></li><li><a href="/b/go/go-map">映射</a></li><li><a href="/b/go/go-struct">结构：struct</a></li><li><a href="/b/go/go-itf">接口：interface</a></li><li><a href="/b/go/go-type">type 关键字</a></li><li><a href="/b/go/go-for">for 语句</a></li><li><a href="/b/go/go-if">if 语句</a></li><li><a href="/b/go/go-switch">switch 语句</a></li><li><a href="/b/go/go-defer">defer 语句</a></li><li><a href="/b/go/go-concurrency">并发</a></li><li><a href="/b/go/go-pkg-import">包和导入</a></li></ol></div><div class="post"><h1>Go: 函数</h1><div class="adoc"><div id="toc" class="toc">
+<div id="toctitle"></div>
+<ul class="sectlevel1">
+<li><a href="#_函数定义">函数定义</a></li>
+<li><a href="#_函数参数">函数参数</a></li>
+<li><a href="#_函数返回值">函数返回值</a></li>
+<li><a href="#_高阶函数">高阶函数</a></li>
+<li><a href="#_闭包">闭包</a></li>
+<li><a href="#_defer_语句">defer 语句</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_函数定义">函数定义</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Go 语言中，函数可以接受 0 个或多个参数。函数的声明以关键字 <code>func</code> 开头，后面依次是：函数名、函数的参数列表、函数的返回值和函数体。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">add</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>, y <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> {
+	<span class="hljs-keyword">return</span> x + y
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_函数参数">函数参数</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>函数参数中，如果连续有几个参数类型相同，那么除了最后一个参数的类型之外，前面的可以省略。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">add</span><span class="hljs-params">(x, y <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> {
+	<span class="hljs-keyword">return</span> x + y
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_函数返回值">函数返回值</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>在 Go 语言中，函数可以一次返回多个值。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">package</span> main
+<span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">swap</span><span class="hljs-params">(x, y <span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, <span class="hljs-keyword">string</span>)</span></span> {
+	<span class="hljs-keyword">return</span> y, x
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	a, b := swap(<span class="hljs-string">"hello"</span>, <span class="hljs-string">"world"</span>)
+	fmt.Println(a, b)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>你甚至可以给每个返回值取个名字，不过它们在函数内部被视为变量。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">split</span><span class="hljs-params">(sum <span class="hljs-keyword">int</span>)</span> <span class="hljs-params">(x, y <span class="hljs-keyword">int</span>)</span></span> {
+	x = sum * <span class="hljs-number">4</span> / <span class="hljs-number">9</span>
+	y = sum - x
+	<span class="hljs-keyword">return</span> x, y
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>如果能用文档的形式说明一下返回值名称的意思，那就再好不过啦。</p>
+</div>
+<div class="paragraph">
+<p>如果给返回值取了名，那么 <code>return</code> 语句后面可以啥也不写，比如下例。这种写法叫”裸“返回。
+如果函数比较短，这种写法就很简洁。如果函数比较长，这种写法就影响可读性了。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">split</span><span class="hljs-params">(sum <span class="hljs-keyword">int</span>)</span> <span class="hljs-params">(x, y <span class="hljs-keyword">int</span>)</span></span> {
+	x = sum * <span class="hljs-number">4</span> / <span class="hljs-number">9</span>
+	y = sum - x
+	<span class="hljs-keyword">return</span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_高阶函数">高阶函数</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>函数也是值，所以函数可以被作为参数传来传去，也可以作为返回值返回。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">compute</span><span class="hljs-params">(fn <span class="hljs-keyword">func</span>(<span class="hljs-keyword">float64</span>, <span class="hljs-keyword">float64</span>)</span> <span class="hljs-title">float64</span>) <span class="hljs-title">float64</span></span> {
+	<span class="hljs-keyword">return</span> fn(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>)
+}
+
+hypot := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x, y <span class="hljs-keyword">float64</span>)</span> <span class="hljs-title">float64</span></span> {
+	<span class="hljs-keyword">return</span> math.Sqrt(x*x + y*y)
+}
+
+fmt.Println(compute(hypot))    <span class="hljs-comment">// 5</span>
+fmt.Println(compute(math.Pow)) <span class="hljs-comment">// 81</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_闭包">闭包</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Go 语言中的函数可能是一个闭包。闭包是一种特殊的函数，它引用了自己函数体外部的变量。闭包可以访问和修改外部引用。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">package</span> main
+<span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">adder</span><span class="hljs-params">()</span> <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> {
+	sum := <span class="hljs-number">0</span>
+	<span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(x <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> {
+		sum += x
+		<span class="hljs-keyword">return</span> sum
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	pos, neg := adder(), adder()
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ {
+		fmt.Println(pos(i), neg(<span class="hljs-number">-2</span>*i))
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_defer_语句">defer 语句</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>见<a href="./defer/">Defer 语句</a>。</p>
+</div>
+</div>
+</div></div></div><div class="right">TODO:</div></div><div class="post-mobile-toc">go</div></div></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"bookPath":"go","postPath":"go-func","post":{"title":"Go: 函数","body":"\u003cdiv id=\"toc\" class=\"toc\"\u003e\n\u003cdiv id=\"toctitle\"\u003e\u003c/div\u003e\n\u003cul class=\"sectlevel1\"\u003e\n\u003cli\u003e\u003ca href=\"#_函数定义\"\u003e函数定义\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_函数参数\"\u003e函数参数\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_函数返回值\"\u003e函数返回值\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_高阶函数\"\u003e高阶函数\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_闭包\"\u003e闭包\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_defer_语句\"\u003edefer 语句\u003c/a\u003e\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_函数定义\"\u003e函数定义\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003eGo 语言中，函数可以接受 0 个或多个参数。函数的声明以关键字 \u003ccode\u003efunc\u003c/code\u003e 开头，后面依次是：函数名、函数的参数列表、函数的返回值和函数体。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eadd\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(x \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e, y \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eint\u003c/span\u003e\u003c/span\u003e {\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e x + y\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_函数参数\"\u003e函数参数\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e函数参数中，如果连续有几个参数类型相同，那么除了最后一个参数的类型之外，前面的可以省略。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eadd\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(x, y \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eint\u003c/span\u003e\u003c/span\u003e {\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e x + y\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_函数返回值\"\u003e函数返回值\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e在 Go 语言中，函数可以一次返回多个值。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003epackage\u003c/span\u003e main\n\u003cspan class=\"hljs-keyword\"\u003eimport\u003c/span\u003e \u003cspan class=\"hljs-string\"\u003e\"fmt\"\u003c/span\u003e\n\n\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eswap\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(x, y \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-params\"\u003e(\u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e, \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e)\u003c/span\u003e\u003c/span\u003e {\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e y, x\n}\n\n\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003emain\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e()\u003c/span\u003e\u003c/span\u003e {\n\ta, b := swap(\u003cspan class=\"hljs-string\"\u003e\"hello\"\u003c/span\u003e, \u003cspan class=\"hljs-string\"\u003e\"world\"\u003c/span\u003e)\n\tfmt.Println(a, b)\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e你甚至可以给每个返回值取个名字，不过它们在函数内部被视为变量。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003esplit\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(sum \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-params\"\u003e(x, y \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e\u003c/span\u003e {\n\tx = sum * \u003cspan class=\"hljs-number\"\u003e4\u003c/span\u003e / \u003cspan class=\"hljs-number\"\u003e9\u003c/span\u003e\n\ty = sum - x\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e x, y\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e如果能用文档的形式说明一下返回值名称的意思，那就再好不过啦。\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e如果给返回值取了名，那么 \u003ccode\u003ereturn\u003c/code\u003e 语句后面可以啥也不写，比如下例。这种写法叫”裸“返回。\n如果函数比较短，这种写法就很简洁。如果函数比较长，这种写法就影响可读性了。\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003esplit\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(sum \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-params\"\u003e(x, y \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e\u003c/span\u003e {\n\tx = sum * \u003cspan class=\"hljs-number\"\u003e4\u003c/span\u003e / \u003cspan class=\"hljs-number\"\u003e9\u003c/span\u003e\n\ty = sum - x\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_高阶函数\"\u003e高阶函数\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e函数也是值，所以函数可以被作为参数传来传去，也可以作为返回值返回。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003ecompute\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(fn \u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e(\u003cspan class=\"hljs-keyword\"\u003efloat64\u003c/span\u003e, \u003cspan class=\"hljs-keyword\"\u003efloat64\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003efloat64\u003c/span\u003e) \u003cspan class=\"hljs-title\"\u003efloat64\u003c/span\u003e\u003c/span\u003e {\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e fn(\u003cspan class=\"hljs-number\"\u003e3\u003c/span\u003e, \u003cspan class=\"hljs-number\"\u003e4\u003c/span\u003e)\n}\n\nhypot := \u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(x, y \u003cspan class=\"hljs-keyword\"\u003efloat64\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003efloat64\u003c/span\u003e\u003c/span\u003e {\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e math.Sqrt(x*x + y*y)\n}\n\nfmt.Println(compute(hypot))    \u003cspan class=\"hljs-comment\"\u003e// 5\u003c/span\u003e\nfmt.Println(compute(math.Pow)) \u003cspan class=\"hljs-comment\"\u003e// 81\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_闭包\"\u003e闭包\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003eGo 语言中的函数可能是一个闭包。闭包是一种特殊的函数，它引用了自己函数体外部的变量。闭包可以访问和修改外部引用。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003epackage\u003c/span\u003e main\n\u003cspan class=\"hljs-keyword\"\u003eimport\u003c/span\u003e \u003cspan class=\"hljs-string\"\u003e\"fmt\"\u003c/span\u003e\n\n\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eadder\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e()\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003efunc\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(\u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eint\u003c/span\u003e\u003c/span\u003e {\n\tsum := \u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e \u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(x \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003eint\u003c/span\u003e\u003c/span\u003e {\n\t\tsum += x\n\t\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e sum\n\t}\n}\n\n\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003emain\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e()\u003c/span\u003e\u003c/span\u003e {\n\tpos, neg := adder(), adder()\n\t\u003cspan class=\"hljs-keyword\"\u003efor\u003c/span\u003e i := \u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e; i \u0026lt; \u003cspan class=\"hljs-number\"\u003e10\u003c/span\u003e; i++ {\n\t\tfmt.Println(pos(i), neg(\u003cspan class=\"hljs-number\"\u003e-2\u003c/span\u003e*i))\n\t}\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_defer_语句\"\u003edefer 语句\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e见\u003ca href=\"./defer/\"\u003eDefer 语句\u003c/a\u003e。\u003c/p\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e","type":"adoc"},"book":{"title":"Go 基础","toc":[{"title":"基础","path":"go-basic"},{"title":"函数","path":"go-func"},{"title":"变量","path":"go-var"},{"title":"基本类型","path":"go-basic-types"},{"title":"字符串","path":"go-string"},{"title":"指针","path":"go-ptr"},{"title":"数组和切片","path":"go-array-slice"},{"title":"映射","path":"go-map"},{"title":"结构：struct","path":"go-struct"},{"title":"接口：interface","path":"go-itf"},{"title":"type 关键字","path":"go-type"},{"title":"for 语句","path":"go-for"},{"title":"if 语句","path":"go-if"},{"title":"switch 语句","path":"go-switch"},{"title":"defer 语句","path":"go-defer"},{"title":"并发","path":"go-concurrency"},{"title":"包和导入","path":"go-pkg-import"}],"path":"go"}},"__N_SSG":true},"page":"/b/[bookPath]/[postPath]","query":{"bookPath":"go","postPath":"go-func"},"buildId":"NTLTEsUt6Ho2-4iu2vnUT","nextExport":false,"isFallback":false,"gsp":true,"head":[["meta",{"charSet":"utf-8"}],["meta",{"name":"viewport","content":"width=device-width"}]]}</script><script nomodule="" src="/_next/static/chunks/polyfills-e5012cf49fbb0a2642db.js"></script><script src="/_next/static/chunks/main-14d0c979473839d1cb39.js" async=""></script><script src="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" async=""></script><script src="/_next/static/chunks/framework.2113c6061a2f456066a1.js" async=""></script><script src="/_next/static/chunks/commons.5bf50d780b059c687421.js" async=""></script><script src="/_next/static/chunks/pages/_app-a24f04606ca6ad661417.js" async=""></script><script src="/_next/static/chunks/pages/b/%5BbookPath%5D/%5BpostPath%5D-74be22d27545968f3664.js" async=""></script><script src="/_next/static/NTLTEsUt6Ho2-4iu2vnUT/_buildManifest.js" async=""></script><script src="/_next/static/NTLTEsUt6Ho2-4iu2vnUT/_ssgManifest.js" async=""></script></body></html>
