@@ -1,0 +1,21 @@
+= 一阶线性递推数列
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-17
+:toc:
+:toc-title: 目录
+:tag: 一阶线性递推数列, 数列, 递推
+
+已知数列 latexmath:[\{a_n\}] 满足 latexmath:[a_n = ka_{n-1} + b]，并且已知 latexmath:[a_1]
+的值。称这样的数列为**一阶线性递推数列**。我们想求出其通项公式。latexmath:[k=0] 时是常数数列；latexmath:[k=1] 时是等差数列；latexmath:[b=0]
+时是等比数列，所以这三种情况这里不讨论。
+
+对于这个数列，我们可以找规律，然后来一发数学归纳法。
+
+我们也可以这样考虑，把递推公式变形为这样：latexmath:[a_n + t = k(a_{n-1} + t)]，这样就变成了等比数列的问题。
+latexmath:[a_n+t = (a_1+t)k^{n-1}]，于是 latexmath:[a_n = (a_1 + t)k^{n-1} - t]。下面我们求 latexmath:[t]。
+
+我们把这个带有未知数 latexmath:[t] 的方程改成这样：latexmath:[a_n = ka_{n-1} + kt -t]，和原递推公式比较，得
+latexmath:[b = kt-t]，于是 latexmath:[t = \displaystyle\frac{b}{k-1}]。代入上面带有参数 latexmath:[t] 的 latexmath:[a_n]
+的通项公式消去 latexmath:[t] 就可以得到结果了。
+
+我们记住这个方法，而不打算记住这个结果。

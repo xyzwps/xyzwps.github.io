@@ -1,0 +1,41 @@
+= 二阶线性递推数列
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-17
+:toc:
+:toc-title: 目录
+:tag: 二阶线性递推数列, 数列, 递推
+
+TODO:
+
+已知数列 latexmath:[\{a_n\}] 满足 latexmath:[a_n = pa_{n-1} + qa_{n-2}]，其中 latexmath:[n\ge3]，latexmath:[a_1]
+和 latexmath:[a_2] 已知，latexmath:[p\ne0] 且 latexmath:[q\ne0]。称形如这样的数列为**二阶线性递推数列**。
+我们想求出通项公式。
+
+受一阶线性递推公式的启发，我们希望把这个递推公式改造成这样：
+
+[.text-center]
+latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2})]
+
+这样一来，如果我们求出 latexmath:[a_n - ta_{n-1}] 的公式，那么就可以进一步求出 latexmath:[a_n] 了。我们把这个关于 latexmath:[s] 和 latexmath:[t]
+的方程变形，有
+
+[.text-center]
+latexmath:[a_n = (s+t)a_{n-1} - sta_{n-2}]
+
+把这个方程和原式作比较有
+
+[.text-center]
+latexmath:[p=s+t]，latexmath:[-q=st]
+
+再根据韦达定理，可以知道 latexmath:[s] 和 latexmath:[t] 是一元二次方程 latexmath:[x^2-px-q=0] 的两个根。
+原则上，只要解出这个方程，就可以求出 latexmath:[s] 和 latexmath:[t] 了。这个方程很容易解，所以我们先认为 latexmath:[s] 和 latexmath:[t] 已经解出了。
+
+知道了 latexmath:[s] 和 latexmath:[t] 的值之后，我们可以算出
+
+[.text-center]
+latexmath:[a_n - ta_{n-1} = s(a_{n-1} - ta_{n-2}) = s^2(a_{n-2} - ta_{n-3}) = \cdots = s^{n-2}(a_2 - ta_1)]
+
+于是
+
+[.text-center]
+latexmath:[a_n = s^{n-2}(a_2 - ta_1) + ta_{n-1} = s^{n-2}(a_2 - ta_1) + ts^{n-3}(a_2 - ta_1) + ta_{n-2} = ... = s^{n-2}(a_2 - ta_1) + ts^{n-3}(a_2 - ta_1) + ta_{n-2}]
