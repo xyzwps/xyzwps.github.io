@@ -1,0 +1,61 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width"/><link rel="preload" href="/_next/static/css/ba709f22e6d86992cc8a.css" as="style"/><link rel="stylesheet" href="/_next/static/css/ba709f22e6d86992cc8a.css" data-n-g=""/><link rel="preload" href="/_next/static/css/5a8b39ee6ee640343325.css" as="style"/><link rel="stylesheet" href="/_next/static/css/5a8b39ee6ee640343325.css" data-n-p=""/><noscript data-n-css="true"></noscript><link rel="preload" href="/_next/static/chunks/main-14d0c979473839d1cb39.js" as="script"/><link rel="preload" href="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" as="script"/><link rel="preload" href="/_next/static/chunks/framework.2113c6061a2f456066a1.js" as="script"/><link rel="preload" href="/_next/static/chunks/commons.5bf50d780b059c687421.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/_app-a24f04606ca6ad661417.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/p/%5Bpath%5D-bbf84d9a79d215dbbf55.js" as="script"/></head><body><div id="__next"><div style="max-width:1366px;margin:0px auto"><nav style="display:flex;border-bottom:1px solid lightgray;padding:0.5rem 1rem"><a class="Header_header-item__ZebU6" href="/">Home</a><a class="Header_header-item__ZebU6" href="/tool/datetime">Datetime</a><a class="Header_header-item__ZebU6" href="/post-list">Post list</a><a class="Header_header-item__ZebU6" href="/b">Book list</a></nav><div><div class="post-layout"><div class="left">go-if</div><div class="post"><h1>Go: if 语句</h1><div class="adoc"><div id="toc" class="toc">
+<div id="toctitle">目录</div>
+<ul class="sectlevel1">
+<li><a href="#_基本_if_语句">基本 if 语句</a></li>
+<li><a href="#_带有初始语句的_if_语句">带有初始语句的 if 语句</a></li>
+<li><a href="#_ifelse">if&#8230;&#8203;else&#8230;&#8203;</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_基本_if_语句">基本 if 语句</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>就像 <code>for</code> 语句那样，<code>if</code> 语句的条件表达式不需要用括号圈住，而且后面的花括号不可省略。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">if</span> x &lt; <span class="hljs-number">0</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">"negative"</span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_带有初始语句的_if_语句">带有初始语句的 if 语句</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>就像 <code>for</code> 语句那样，<code>if</code> 语句可以以一个短语句开始，这个语句在每次条件判断前执行。其中声明的变量只在 <code>if</code> 语句的作用域内有效。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">pow</span><span class="hljs-params">(x, n, lim <span class="hljs-keyword">float64</span>)</span> <span class="hljs-title">float64</span></span> {
+	<span class="hljs-keyword">if</span> v := math.Pow(x, n); v &lt; lim {
+		<span class="hljs-keyword">return</span> v
+	}
+	<span class="hljs-keyword">return</span> lim
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_ifelse">if&#8230;&#8203;else&#8230;&#8203;</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>if</code> 语句后面可以带有一个 <code>else</code> 块。在 <code>if</code> 语句的短语句中声明的变量也可以在 <code>else</code> 块中访问。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">pow</span><span class="hljs-params">(x, n, lim <span class="hljs-keyword">float64</span>)</span> <span class="hljs-title">float64</span></span> {
+	<span class="hljs-keyword">if</span> v := math.Pow(x, n); v &lt; lim {
+		<span class="hljs-keyword">return</span> v
+	} <span class="hljs-keyword">else</span> {
+		fmt.Printf(<span class="hljs-string">"%g &gt;= %g\n"</span>, v, lim)
+	}
+	<span class="hljs-keyword">return</span> lim
+}</code></pre>
+</div>
+</div>
+</div>
+</div></div></div><div class="right">TODO:</div></div><div class="post-mobile-toc">go-if</div></div></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"path":"go-if","post":{"title":"Go: if 语句","body":"\u003cdiv id=\"toc\" class=\"toc\"\u003e\n\u003cdiv id=\"toctitle\"\u003e目录\u003c/div\u003e\n\u003cul class=\"sectlevel1\"\u003e\n\u003cli\u003e\u003ca href=\"#_基本_if_语句\"\u003e基本 if 语句\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_带有初始语句的_if_语句\"\u003e带有初始语句的 if 语句\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_ifelse\"\u003eif\u0026#8230;\u0026#8203;else\u0026#8230;\u0026#8203;\u003c/a\u003e\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_基本_if_语句\"\u003e基本 if 语句\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e就像 \u003ccode\u003efor\u003c/code\u003e 语句那样，\u003ccode\u003eif\u003c/code\u003e 语句的条件表达式不需要用括号圈住，而且后面的花括号不可省略。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003eif\u003c/span\u003e x \u0026lt; \u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e {\n    \u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e \u003cspan class=\"hljs-string\"\u003e\"negative\"\u003c/span\u003e\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_带有初始语句的_if_语句\"\u003e带有初始语句的 if 语句\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e就像 \u003ccode\u003efor\u003c/code\u003e 语句那样，\u003ccode\u003eif\u003c/code\u003e 语句可以以一个短语句开始，这个语句在每次条件判断前执行。其中声明的变量只在 \u003ccode\u003eif\u003c/code\u003e 语句的作用域内有效。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003epow\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(x, n, lim \u003cspan class=\"hljs-keyword\"\u003efloat64\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003efloat64\u003c/span\u003e\u003c/span\u003e {\n\t\u003cspan class=\"hljs-keyword\"\u003eif\u003c/span\u003e v := math.Pow(x, n); v \u0026lt; lim {\n\t\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e v\n\t}\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e lim\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_ifelse\"\u003eif\u0026#8230;\u0026#8203;else\u0026#8230;\u0026#8203;\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e\u003ccode\u003eif\u003c/code\u003e 语句后面可以带有一个 \u003ccode\u003eelse\u003c/code\u003e 块。在 \u003ccode\u003eif\u003c/code\u003e 语句的短语句中声明的变量也可以在 \u003ccode\u003eelse\u003c/code\u003e 块中访问。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003epow\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e(x, n, lim \u003cspan class=\"hljs-keyword\"\u003efloat64\u003c/span\u003e)\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003efloat64\u003c/span\u003e\u003c/span\u003e {\n\t\u003cspan class=\"hljs-keyword\"\u003eif\u003c/span\u003e v := math.Pow(x, n); v \u0026lt; lim {\n\t\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e v\n\t} \u003cspan class=\"hljs-keyword\"\u003eelse\u003c/span\u003e {\n\t\tfmt.Printf(\u003cspan class=\"hljs-string\"\u003e\"%g \u0026gt;= %g\\n\"\u003c/span\u003e, v, lim)\n\t}\n\t\u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e lim\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e","type":"adoc"}},"__N_SSG":true},"page":"/p/[path]","query":{"path":"go-if"},"buildId":"NTLTEsUt6Ho2-4iu2vnUT","nextExport":false,"isFallback":false,"gsp":true,"head":[["meta",{"charSet":"utf-8"}],["meta",{"name":"viewport","content":"width=device-width"}]]}</script><script nomodule="" src="/_next/static/chunks/polyfills-e5012cf49fbb0a2642db.js"></script><script src="/_next/static/chunks/main-14d0c979473839d1cb39.js" async=""></script><script src="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" async=""></script><script src="/_next/static/chunks/framework.2113c6061a2f456066a1.js" async=""></script><script src="/_next/static/chunks/commons.5bf50d780b059c687421.js" async=""></script><script src="/_next/static/chunks/pages/_app-a24f04606ca6ad661417.js" async=""></script><script src="/_next/static/chunks/pages/p/%5Bpath%5D-bbf84d9a79d215dbbf55.js" async=""></script><script src="/_next/static/NTLTEsUt6Ho2-4iu2vnUT/_buildManifest.js" async=""></script><script src="/_next/static/NTLTEsUt6Ho2-4iu2vnUT/_ssgManifest.js" async=""></script></body></html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width"/><link rel="preload" href="/_next/static/css/ba709f22e6d86992cc8a.css" as="style"/><link rel="stylesheet" href="/_next/static/css/ba709f22e6d86992cc8a.css" data-n-g=""/><link rel="preload" href="/_next/static/css/4cb5383c89798982a5e3.css" as="style"/><link rel="stylesheet" href="/_next/static/css/4cb5383c89798982a5e3.css" data-n-p=""/><noscript data-n-css="true"></noscript><link rel="preload" href="/_next/static/chunks/main-14d0c979473839d1cb39.js" as="script"/><link rel="preload" href="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" as="script"/><link rel="preload" href="/_next/static/chunks/framework.2113c6061a2f456066a1.js" as="script"/><link rel="preload" href="/_next/static/chunks/commons.5bf50d780b059c687421.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/_app-a24f04606ca6ad661417.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/b/%5BbookPath%5D/%5BpostPath%5D-74be22d27545968f3664.js" as="script"/></head><body><div id="__next"><div style="max-width:1366px;margin:0px auto"><nav style="display:flex;border-bottom:1px solid lightgray;padding:0.5rem 1rem"><a class="Header_header-item__ZebU6" href="/">Home</a><a class="Header_header-item__ZebU6" href="/tool/datetime">Datetime</a><a class="Header_header-item__ZebU6" href="/post-list">Post list</a><a class="Header_header-item__ZebU6" href="/b">Book list</a></nav><div><div class="post-layout"><div class="left"><h2><a href="/b/go">Go 基础</a></h2><ol class="BookTocBlock_book-toc-block__2pSbM"><li><a href="/b/go/go-basic">基础</a></li><li><a href="/b/go/go-func">函数</a></li><li><a href="/b/go/go-var">变量</a></li><li><a href="/b/go/go-basic-types">基本类型</a></li><li><a href="/b/go/go-string">字符串</a></li><li><a href="/b/go/go-ptr">指针</a></li><li><a href="/b/go/go-array-slice">数组和切片</a></li><li><a href="/b/go/go-map">映射</a></li><li><a href="/b/go/go-struct">结构：struct</a></li><li><a href="/b/go/go-itf">接口：interface</a></li><li><a href="/b/go/go-type">type 关键字</a></li><li><a href="/b/go/go-for">for 语句</a></li><li><a href="/b/go/go-if">if 语句</a></li><li><a href="/b/go/go-switch">switch 语句</a></li><li><a href="/b/go/go-defer">defer 语句</a></li><li><a href="/b/go/go-concurrency">并发</a></li><li><a href="/b/go/go-pkg-import">包和导入</a></li></ol></div><div class="post"><h1>Go: type 关键字</h1><div class="adoc"><div id="toc" class="toc">
+<div id="toctitle"></div>
+<ul class="sectlevel1">
+<li><a href="#_类型别名">类型别名</a></li>
+<li><a href="#_定义类型">定义类型</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>type</code> 关键字有两个作用：<strong>声明类型别名</strong>和<strong>定义类型</strong>。</p>
+</div>
+<div class="paragraph">
+<p>每个类型都有一个<a href="https://golang.org/ref/spec#Types">底层类型</a>。</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_类型别名">类型别名</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>定义类型别名的语法是：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">type</span> 类型别名 = 类型</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">type</span> (
+    A1 = <span class="hljs-keyword">string</span>  <span class="hljs-comment">// A1 是 string</span>
+    A2 = A1      <span class="hljs-comment">// A2 是 string</span>
+    A3 = []A2    <span class="hljs-comment">// A3 是 []string</span>
+)
+
+<span class="hljs-keyword">type</span> A4 = <span class="hljs-keyword">string</span> <span class="hljs-comment">// A4 是 string</span>
+
+<span class="hljs-keyword">type</span> Point = <span class="hljs-keyword">struct</span> { X, Y <span class="hljs-keyword">int</span> } <span class="hljs-comment">// Point 是 struct { x int; y int; z int }</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>类型别名和原来的类型是一回事：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">"fmt"</span>
+	<span class="hljs-string">"reflect"</span>
+)
+
+<span class="hljs-keyword">type</span> A1 = <span class="hljs-keyword">string</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	tstring := reflect.TypeOf(<span class="hljs-string">"a0"</span>)
+	fmt.Println(tstring)        <span class="hljs-comment">// 输出 string</span>
+
+	<span class="hljs-keyword">var</span> a1 A1 = <span class="hljs-string">"a1"</span>
+	ta1 := reflect.TypeOf(a1)
+	fmt.Println(ta1, a1)        <span class="hljs-comment">// 输出 string a1</span>
+	fmt.Println(ta1 == tstring) <span class="hljs-comment">// 输出 true</span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_定义类型">定义类型</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>类型定义的语法是：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">type</span> 类型别名 类型</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">type</span> (
+    A1 <span class="hljs-keyword">string</span>  <span class="hljs-comment">// A1 是 main.A1，底层类型是 string</span>
+    A2 A1      <span class="hljs-comment">// A2 是 main.A2，底层类型是 string</span>
+    A3 []A2    <span class="hljs-comment">// A3 是 main.A3，底层类型是 []string</span>
+)
+
+<span class="hljs-keyword">type</span> A4 <span class="hljs-keyword">string</span> <span class="hljs-comment">// A4 是 main.A4，底层类型是 string</span>
+
+<span class="hljs-keyword">type</span> Point <span class="hljs-keyword">struct</span> { X, Y <span class="hljs-keyword">int</span> } <span class="hljs-comment">// Point 是 main.Point，底层类型是 struct { x int; y int; z int }</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>可以直接把底层类型的值赋值给新定义的类型。比如：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">var</span> a1 A1 = <span class="hljs-string">"a1"</span> <span class="hljs-comment">// 把 string 值赋值给 main.A4 变量</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>类型定义之后，新类型和原类型就不是同一个类型了：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">"fmt"</span>
+	<span class="hljs-string">"reflect"</span>
+)
+
+<span class="hljs-keyword">type</span> A1 <span class="hljs-keyword">string</span> <span class="hljs-comment">// 这是和上一节例子的唯一区别</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	tstring := reflect.TypeOf(<span class="hljs-string">"a0"</span>)
+	fmt.Println(tstring)       <span class="hljs-comment">// 输出 string</span>
+
+	<span class="hljs-keyword">var</span> a1 A1 = <span class="hljs-string">"a1"</span>
+	ta1 := reflect.TypeOf(a1)
+	fmt.Println(ta1, a1)        <span class="hljs-comment">// 输出 main.A1 a1</span>
+	fmt.Println(ta1 == tstring) <span class="hljs-comment">// 输出 false</span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div></div></div><div class="right">TODO:</div></div><div class="post-mobile-toc">go</div></div></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"bookPath":"go","postPath":"go-type","post":{"title":"Go: type 关键字","body":"\u003cdiv id=\"toc\" class=\"toc\"\u003e\n\u003cdiv id=\"toctitle\"\u003e\u003c/div\u003e\n\u003cul class=\"sectlevel1\"\u003e\n\u003cli\u003e\u003ca href=\"#_类型别名\"\u003e类型别名\u003c/a\u003e\u003c/li\u003e\n\u003cli\u003e\u003ca href=\"#_定义类型\"\u003e定义类型\u003c/a\u003e\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/div\u003e\n\u003cdiv id=\"preamble\"\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e\u003ccode\u003etype\u003c/code\u003e 关键字有两个作用：\u003cstrong\u003e声明类型别名\u003c/strong\u003e和\u003cstrong\u003e定义类型\u003c/strong\u003e。\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e每个类型都有一个\u003ca href=\"https://golang.org/ref/spec#Types\"\u003e底层类型\u003c/a\u003e。\u003c/p\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_类型别名\"\u003e类型别名\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e定义类型别名的语法是：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e 类型别名 = 类型\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e (\n    A1 = \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e  \u003cspan class=\"hljs-comment\"\u003e// A1 是 string\u003c/span\u003e\n    A2 = A1      \u003cspan class=\"hljs-comment\"\u003e// A2 是 string\u003c/span\u003e\n    A3 = []A2    \u003cspan class=\"hljs-comment\"\u003e// A3 是 []string\u003c/span\u003e\n)\n\n\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e A4 = \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e \u003cspan class=\"hljs-comment\"\u003e// A4 是 string\u003c/span\u003e\n\n\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e Point = \u003cspan class=\"hljs-keyword\"\u003estruct\u003c/span\u003e { X, Y \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e } \u003cspan class=\"hljs-comment\"\u003e// Point 是 struct { x int; y int; z int }\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e类型别名和原来的类型是一回事：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003epackage\u003c/span\u003e main\n\n\u003cspan class=\"hljs-keyword\"\u003eimport\u003c/span\u003e (\n\t\u003cspan class=\"hljs-string\"\u003e\"fmt\"\u003c/span\u003e\n\t\u003cspan class=\"hljs-string\"\u003e\"reflect\"\u003c/span\u003e\n)\n\n\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e A1 = \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e\n\n\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003emain\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e()\u003c/span\u003e\u003c/span\u003e {\n\ttstring := reflect.TypeOf(\u003cspan class=\"hljs-string\"\u003e\"a0\"\u003c/span\u003e)\n\tfmt.Println(tstring)        \u003cspan class=\"hljs-comment\"\u003e// 输出 string\u003c/span\u003e\n\n\t\u003cspan class=\"hljs-keyword\"\u003evar\u003c/span\u003e a1 A1 = \u003cspan class=\"hljs-string\"\u003e\"a1\"\u003c/span\u003e\n\tta1 := reflect.TypeOf(a1)\n\tfmt.Println(ta1, a1)        \u003cspan class=\"hljs-comment\"\u003e// 输出 string a1\u003c/span\u003e\n\tfmt.Println(ta1 == tstring) \u003cspan class=\"hljs-comment\"\u003e// 输出 true\u003c/span\u003e\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"sect1\"\u003e\n\u003ch2 id=\"_定义类型\"\u003e定义类型\u003c/h2\u003e\n\u003cdiv class=\"sectionbody\"\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e类型定义的语法是：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e 类型别名 类型\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003epackage\u003c/span\u003e main\n\n\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e (\n    A1 \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e  \u003cspan class=\"hljs-comment\"\u003e// A1 是 main.A1，底层类型是 string\u003c/span\u003e\n    A2 A1      \u003cspan class=\"hljs-comment\"\u003e// A2 是 main.A2，底层类型是 string\u003c/span\u003e\n    A3 []A2    \u003cspan class=\"hljs-comment\"\u003e// A3 是 main.A3，底层类型是 []string\u003c/span\u003e\n)\n\n\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e A4 \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e \u003cspan class=\"hljs-comment\"\u003e// A4 是 main.A4，底层类型是 string\u003c/span\u003e\n\n\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e Point \u003cspan class=\"hljs-keyword\"\u003estruct\u003c/span\u003e { X, Y \u003cspan class=\"hljs-keyword\"\u003eint\u003c/span\u003e } \u003cspan class=\"hljs-comment\"\u003e// Point 是 main.Point，底层类型是 struct { x int; y int; z int }\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e可以直接把底层类型的值赋值给新定义的类型。比如：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003evar\u003c/span\u003e a1 A1 = \u003cspan class=\"hljs-string\"\u003e\"a1\"\u003c/span\u003e \u003cspan class=\"hljs-comment\"\u003e// 把 string 值赋值给 main.A4 变量\u003c/span\u003e\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e类型定义之后，新类型和原类型就不是同一个类型了：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-go\" data-lang=\"go\"\u003e\u003cspan class=\"hljs-keyword\"\u003epackage\u003c/span\u003e main\n\n\u003cspan class=\"hljs-keyword\"\u003eimport\u003c/span\u003e (\n\t\u003cspan class=\"hljs-string\"\u003e\"fmt\"\u003c/span\u003e\n\t\u003cspan class=\"hljs-string\"\u003e\"reflect\"\u003c/span\u003e\n)\n\n\u003cspan class=\"hljs-keyword\"\u003etype\u003c/span\u003e A1 \u003cspan class=\"hljs-keyword\"\u003estring\u003c/span\u003e \u003cspan class=\"hljs-comment\"\u003e// 这是和上一节例子的唯一区别\u003c/span\u003e\n\n\u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunc\u003c/span\u003e \u003cspan class=\"hljs-title\"\u003emain\u003c/span\u003e\u003cspan class=\"hljs-params\"\u003e()\u003c/span\u003e\u003c/span\u003e {\n\ttstring := reflect.TypeOf(\u003cspan class=\"hljs-string\"\u003e\"a0\"\u003c/span\u003e)\n\tfmt.Println(tstring)       \u003cspan class=\"hljs-comment\"\u003e// 输出 string\u003c/span\u003e\n\n\t\u003cspan class=\"hljs-keyword\"\u003evar\u003c/span\u003e a1 A1 = \u003cspan class=\"hljs-string\"\u003e\"a1\"\u003c/span\u003e\n\tta1 := reflect.TypeOf(a1)\n\tfmt.Println(ta1, a1)        \u003cspan class=\"hljs-comment\"\u003e// 输出 main.A1 a1\u003c/span\u003e\n\tfmt.Println(ta1 == tstring) \u003cspan class=\"hljs-comment\"\u003e// 输出 false\u003c/span\u003e\n}\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003c/div\u003e","type":"adoc"},"book":{"title":"Go 基础","toc":[{"title":"基础","path":"go-basic"},{"title":"函数","path":"go-func"},{"title":"变量","path":"go-var"},{"title":"基本类型","path":"go-basic-types"},{"title":"字符串","path":"go-string"},{"title":"指针","path":"go-ptr"},{"title":"数组和切片","path":"go-array-slice"},{"title":"映射","path":"go-map"},{"title":"结构：struct","path":"go-struct"},{"title":"接口：interface","path":"go-itf"},{"title":"type 关键字","path":"go-type"},{"title":"for 语句","path":"go-for"},{"title":"if 语句","path":"go-if"},{"title":"switch 语句","path":"go-switch"},{"title":"defer 语句","path":"go-defer"},{"title":"并发","path":"go-concurrency"},{"title":"包和导入","path":"go-pkg-import"}],"path":"go"}},"__N_SSG":true},"page":"/b/[bookPath]/[postPath]","query":{"bookPath":"go","postPath":"go-type"},"buildId":"NTLTEsUt6Ho2-4iu2vnUT","nextExport":false,"isFallback":false,"gsp":true,"head":[["meta",{"charSet":"utf-8"}],["meta",{"name":"viewport","content":"width=device-width"}]]}</script><script nomodule="" src="/_next/static/chunks/polyfills-e5012cf49fbb0a2642db.js"></script><script src="/_next/static/chunks/main-14d0c979473839d1cb39.js" async=""></script><script src="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" async=""></script><script src="/_next/static/chunks/framework.2113c6061a2f456066a1.js" async=""></script><script src="/_next/static/chunks/commons.5bf50d780b059c687421.js" async=""></script><script src="/_next/static/chunks/pages/_app-a24f04606ca6ad661417.js" async=""></script><script src="/_next/static/chunks/pages/b/%5BbookPath%5D/%5BpostPath%5D-74be22d27545968f3664.js" async=""></script><script src="/_next/static/NTLTEsUt6Ho2-4iu2vnUT/_buildManifest.js" async=""></script><script src="/_next/static/NTLTEsUt6Ho2-4iu2vnUT/_ssgManifest.js" async=""></script></body></html>

@@ -1,4 +1,4 @@
 {
   "title": "JS",
-  "toc": [{ "title": "Nodejs vm 模块", "path": "nodejs-module-vm.adoc" }]
+  "toc": [{ "title": "Nodejs vm 模块", "path": "nodejs-module-vm" }]
 }
