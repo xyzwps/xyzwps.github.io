@@ -6,6 +6,7 @@
     { "title": "121. 买卖股票", "path": "lc-buy-stock" },
     { "title": "198. 打家劫舍", "path": "lc-house-robber" },
     { "title": "276. 栅栏涂色", "path": "lc-paint-fence" },
+    { "title": "303. 区域和检索 - 数组不可变]", "path": "lc-range-sum-query-immutable" },
     { "title": "LRU Cache", "path": "lc-lru-cache" },
     { "title": "数完全二叉树节点", "path": "lc-count-complete-tree-nodes" }
   ]
