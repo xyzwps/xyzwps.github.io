@@ -9,15 +9,11 @@ const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book:
   post,
   book,
 }) => {
+  const tocBlock = <BookTocBlock book={book} title={book.title} titleUrl={`/b/${bookPath}`} />
   return (
     <PageLayout>
       <div className="post-layout">
-        <div className="left">
-          <h2>
-            <a href={`/b/${bookPath}`}>{book.title}</a>
-          </h2>
-          <BookTocBlock book={book} />
-        </div>
+        <div className="left">{tocBlock}</div>
         <div className="post">
           <h1>{post.title}</h1>
           {(() => {
@@ -31,7 +27,7 @@ const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book:
         </div>
         <div className="right">TODO:</div>
       </div>
-      <div className="post-mobile-toc">{bookPath}</div>
+      <div className="post-mobile-toc">{tocBlock}</div>
     </PageLayout>
   )
 }

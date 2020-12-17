@@ -26,8 +26,21 @@ const TocBlock: React.FC<{ toc: BookToc; book: Book }> = ({ toc, book }) => {
   return <ol className={styles["book-toc-block"]}>{list}</ol>
 }
 
-const BookTocBlock: React.FC<{ book: Book }> = ({ book }) => {
-  return <TocBlock book={book} toc={book.toc} />
+interface BookTocBlockProps {
+  book: Book
+  title: string
+  titleUrl: string
+}
+
+const BookTocBlock: React.FC<BookTocBlockProps> = ({ book, title, titleUrl }) => {
+  return (
+    <>
+      <h2 className={styles["book-toc-title"]}>
+        <a href={titleUrl}>{title}</a>
+      </h2>
+      <TocBlock book={book} toc={book.toc} />
+    </>
+  )
 }
 
 export default BookTocBlock

@@ -14,7 +14,6 @@ const Header: React.FC<Record<string, unknown>> = () => {
     <nav style={{ display: "flex", borderBottom: "1px solid lightgray", padding: "0.5rem 1rem" }}>
       <HeaderItem href="/">Home</HeaderItem>
       <HeaderItem href="/tool/datetime">Datetime</HeaderItem>
-      <HeaderItem href="/post-list">Post list</HeaderItem>
       <HeaderItem href="/b">Book list</HeaderItem>
     </nav>
   )
