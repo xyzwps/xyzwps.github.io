@@ -10,11 +10,10 @@ const BookPostPage: React.FC<{ path: string; book: Book }> = ({ path, book }) =>
       <div className="post-layout">
         <div className="left">{path}</div>
         <div className="post">
-          <BookTocBlock book={book} />
+          <BookTocBlock book={book} title={book.title} titleUrl={`/b/${book.path}`} />
         </div>
         <div className="right">TODO:</div>
       </div>
-      <div className="post-mobile-toc">{path}</div>
     </PageLayout>
   )
 }
