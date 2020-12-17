@@ -7,6 +7,7 @@
     { "title": "198. 打家劫舍", "path": "lc-house-robber" },
     { "title": "276. 栅栏涂色", "path": "lc-paint-fence" },
     { "title": "303. 区域和检索 - 数组不可变", "path": "lc-range-sum-query-immutable" },
+    { "title": "746. 使用最小花费爬楼梯", "path": "lc-min-cost-climbing-stairs" },
     { "title": "146. LRU 缓存机制", "path": "lc-lru-cache" },
     { "title": "数完全二叉树节点", "path": "lc-count-complete-tree-nodes" }
   ]
