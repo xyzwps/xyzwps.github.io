@@ -8,27 +8,27 @@ v1.0, 2020-12-21
 题目link:https://leetcode-cn.com/problems/palindrome-partitioning-ii/[132. 分割回文串 II]。
 刚开始的时候，花了非常长的时间去调试暴露解法，结果暴力解法超时。之后冷静想一想，想到一个 DP 方案，跑了一下效率还可以，这里记录下。
 
-这一题是求把一个字符串分割成一些子串，使得这些子串都是回文串的最小分割数。设把一个字符串分隔成一些子串，
+这一题是求把一个字符串分割成一些子串，使得这些子串都是回文串的最小分割数。设把一个字符串分割成一些子串，
 使得这些子串都是回文串的最少子串个数，那么答案就是最小子串个数减一。举个例子：设 `s = "abaabac"`，可以把它分成这样：
 `"aba", "aba", "c"`，也可以分成 `"abaaba", "c"`，甚至还有别的分割方法。肉眼观察，显现 `"abaaba", "c"`
-是分隔后可以得到最少子串的方案，所以最少可以分割成 2 个回文子串，只需要分割 1 次。
+是分割后可以得到最少子串的方案，所以最少可以分割成 2 个回文子串，只需要分割 1 次。
 
 为讨论方便，设输入数组为 latexmath:[s]：其从第 latexmath:[a] 个字符到第 latexmath:[b] 个字符构成的子串为
 latexmath:[s[a,b\]]；如果子串不包含第 latexmath:[b] 个字符，则记为 latexmath:[s[a,b)]；
 其第 latexmath:[a] 个字符记为 latexmath:[s[a\]]。
 
-记 latexmath:[dp[i\]]（提前暴露）表示子串 latexmath:[s[0,i\]] 被分隔为一些回文子串时，得到的最少子串数。
+记 latexmath:[dp[i\]]（提前暴露）表示子串 latexmath:[s[0,i\]] 被分割为一些回文子串时，得到的最少子串数。
 我们的目的是从 latexmath:[dp[0\]] 到 latexmath:[dp[i-1\]] 出发，得到 latexmath:[dp[i\]]。首先 latexmath:[dp[0\]] 肯定是 1。
 
-对于字符串 latexmath:[s[0,i\]]，会被分隔成几个回文子串，比如分隔成这样 latexmath:[s[0,t_1\], s[t_1,t_2), ..., s[t_k,i\]]。
+对于字符串 latexmath:[s[0,i\]]，会被分割成几个回文子串，比如分割成这样 latexmath:[s[0,t_1), s[t_1,t_2), ..., s[t_k,i\]]。
 这一些列子串可以看成两部分 latexmath:[s[0,t)] 和 latexmath:[s[t,i\]]（这里取 latexmath:[t = t_k]），
 其中 latexmath:[s[t,i\]] 是一个回文子串，latexmath:[dp[t-1\]] 已知。那么 latexmath:[dp[i\]] 是否就是 latexmath:[dp[t-1\] + 1]
 呢？不一定，因为在 latexmath:[s[0,i\]] 中，以 latexmath:[s[i\]] 结尾的回文子串可不止一个。这样的话，
 latexmath:[dp[i\]] 就应该来自可以使得 latexmath:[dp[t-1\]] 最小的那个 latexmath:[s[t,i\]]。
 
 设 latexmath:[s[0,i\]] 中，所有以 latexmath:[s[i\]] 结尾的回文串构成的集合为
-latexmath:[\{ s[t_1,i\], s[t_2,1\], ..., s[t_k,i\] \}]。由以上的分析可以知道，
-latexmath:[dp[i\] = \min \limits_{1 \le a \le k} \{ dp[t_{a-1}\] + 1 \}]。另外，我们注意到，当
+latexmath:[\{ s[t_1,i\], s[t_2,i\], ..., s[t_k,i\] \}]。由以上的分析可以知道，
+latexmath:[dp[i\] = \min \limits_{1 \le a \le k} \{ dp[t_a-1\] + 1 \}]。另外，我们注意到，当
 latexmath:[s[0,i\]] 本身就是回文串的时候，是没办法套用这个公式的，但是因为它本身就是回文串，所以 latexmath:[dp[i\] = 1]。
 这样状态转义方程就被我们推出来了。
 
