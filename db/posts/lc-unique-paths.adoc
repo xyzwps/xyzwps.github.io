@@ -1,0 +1,59 @@
+= 不同路径
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-22
+:toc:
+:toc-title: 目录
+:tag: DP, 动态规划, 数学, LeetCode
+
+题目link:https://leetcode-cn.com/problems/unique-paths/[62. 不同路径]。
+
+## DP 解法
+
+设棋盘大小是 latexmath:[m \times n]，其中 latexmath:[m \gt 0, n \gt 0]。设 latexmath:[dp[i\][j\]]（提前暴露）
+表示从大小为 latexmath:[i \times j] 的棋盘左上角走到右下角的走法。显然，本地的答案是 latexmath:[dp[m\][n\]]。
+
+下面我们考虑如何求任意一个 latexmath:[dp[i\][j\]]，其中 latexmath:[m \ge i \gt 0, n \gt j \gt 0]。
+因为题目没说左上角和右下角的坐标是什么，这里为了方便，令左上角的坐标是 latexmath:[(m,n)]，右下角的坐标是 latexmath:[(1,1)]。
+显然，从坐标 latexmath:[(i,j)] 处走到 latexmath:[(1,1)] 处的走法数量，就是 latexmath:[dp[i\][j\]]。
+
+首先，latexmath:[dp[1\][j\] = 1, dp[i\][1\] = 1]，对所有的 latexmath:[m \ge i \gt 0, n \gt j \gt 0] 成立，
+因为在棋盘边缘没有办法转弯，所以只有一种走法。如果 latexmath:[i \gt 1] 且 latexmath:[j \gt 1]，那么从格子 latexmath:[(i,j)]
+处起步，有两种走法——横着走和竖着走，而且这两种走法走一步之后就到了 latexmath:[(i-1,j)] 或者 latexmath:[(i,j-i)]，这就是在说，
+latexmath:[dp[i\][j\] = dp[i-1\][j\] + dp[i\][j-1\]]。
+
+沿着这样的思路，就可以写出下面的代码（注意，分析中棋盘右下角的坐标是 latexmath:[(1,1)]，但是代码里的二维数组坐标是从 右下角的坐标是 latexmath:[(0,0)] 开始的）：
+
+[source,ts]
+----
+function uniquePaths(m: number, n: number): number {
+    const dp: number[][] = [[]];
+    dp[0][0] = 1;
+    for (let i = 0; i < m; i++) {
+        if (i > 0) dp[i] = []
+        for (let j = 0; j < n; j++) {
+            if (i == j && j == 0) continue;
+            if (i == 0 || j == 0) {
+                dp[i][j] = 1;
+            } else {
+                dp[i][j] = dp[i][j - 1] + dp[i - 1][j]
+            }
+        }
+    }
+    return dp[m - 1][n - 1]
+};
+----
+
+## 公式法
+
+我们注意到，函数 `uniquePaths` 是一个关于 latexmath:[m] 和 latexmath:[n] 的纯函数，这意味着我们可以推出通项公式。
+LeetCode 官方题解说得很好，我直接抄过来了。
+
+从左上角到右下角的过程中，我们需要移动 latexmath:[m+n−2] 次，其中有 latexmath:[m−1] 次向下移动，latexmath:[n−1]
+次向右移动。因此路径的总数，就等于从 latexmath:[m+n−2] 次移动中选择 latexmath:[m−1] 次向下移动的方案数，即组合数：
+
+latexmath:[
+\displaystyle {\Large C}_{m+n-2}^{m-1} = \binom{m+n-2}{m-1}
+= \frac{(m+n-2)(m+n-3)\cdots n}{(m-1)!} = \frac{(m+n-2)!}{(m-1)!(n-1)!}
+]
+
+代码非常简单，就不写了。
