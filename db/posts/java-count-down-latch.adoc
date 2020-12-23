@@ -1,4 +1,4 @@
-= CountDownLatch
+= Java CountDownLatch
 weily <xyzwps@outlook.com>
 v1.0.1, 2020-11-21
 :toc:

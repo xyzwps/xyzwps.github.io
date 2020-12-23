@@ -1,0 +1,32 @@
+= Java Semaphore
+weily <xyzwps@outlook.com>
+v1.0.0, 2020-12-23
+:toc:
+:toc-title:
+:tag: Java, Semaphore, 信号量
+
+信号量（__Semaphore__）表示可用使用的资源数，并发的线程能够获取足够的资源时，就允许执行，否则就先等着，直到有足够的资源为止。Java 并发包中的 `Semaphore` 支持公平和不公平两种模式。这里的“公平”是指 FIFO，即先请求资源的先获得资源；否则就是不公平。
+
+下面给一个很戳的例子：
+
+[source,java]
+----
+ExecutorService executor = Executors.newFixedThreadPool(10);
+Semaphore signal = new Semaphore(5);
+for(int i = 0; i < 50; i++) {
+    final int cost = i;
+    System.out.println("submit task " + i);
+    executor.submit(() -> {
+        try {
+            signal.acquire();
+            System.out.println("task " + cost + " is doing...");
+            Thread.sleep(cost * 100);
+            signal.release();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    });
+}
+System.out.println("submit all tasks");
+executor.shutdown();
+----
