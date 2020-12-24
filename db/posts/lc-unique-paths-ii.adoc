@@ -7,7 +7,7 @@ v1.0, 2020-12-24
 
 题目link:https://leetcode-cn.com/problems/unique-paths-ii/[63. 不同路径 II]。
 
-这一题和link:不同路径[./lc-unique-paths]相比，多了障碍物。而障碍物跟棋盘没关系，所以推不出所谓的数学通项公式。不过那题 DP 的思路可以直接搬过来，和不同路径相比，这题 latexmath:[dp[i\][j\]] 多了一种可能：
+这一题和link:./lc-unique-paths[62. 不同路径]相比，多了障碍物。而障碍物跟棋盘没关系，所以推不出所谓的数学通项公式。不过那题 DP 的思路可以直接搬过来，和不同路径相比，这题 latexmath:[dp[i\][j\]] 多了一种可能：
 如果 latexmath:[(i,j)] 上放有障碍物，那么从 latexmath:[(i,j)] 到达 latexmath:[(0,0)] 处的路径数为 0。
 
 这样，我们把不同路径那题的代码改改就可以继续用了。代码如下：
@@ -17,10 +17,10 @@ v1.0, 2020-12-24
 function uniquePathsWithObstacles(obstacleGrid: number[][]): number {
     const m = obstacleGrid.length;
     const n = obstacleGrid[0].length;
-    const dp: number[][] = [[]];
+    const dp: number[][] = [];
 
     for (let i = 0; i < m; i++) {
-        if (i > 0) dp[i] = []
+        dp[i] = []
         for (let j = 0; j < n; j++) {
             if (i == 0 && j == 0) {
                 dp[0][0] = 1 - obstacleGrid[0][0] // 处理终点
