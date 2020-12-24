@@ -1,8 +1,10 @@
-$default-font: -apple-system,BlinkMacSystemFont,Helvetica Neue,PingFang SC,Microsoft YaHei,Source Han Sans SC,Noto Sans CJK SC,WenQuanYi Micro Hei,sans-serif;
-$mono-font: Menlo, Monaco, Consolas, monospace;
+$default-font: Ovo, Georgia, STZhongsong, "Microsoft YaHei", serif;
+$mono-font: "Cascadia Code", "Source Code Pro", Consolas, Monaco, Menlo, Consolas, monospace;
 $title-font: "Open Sans", "DejaVu Sans", "Sans", sans-serif;
 
 $pink: #fb7299;
+$pink-2: #fceef2;
+$pink-1: #fef8fa;
 
 $font-color-black: #212529;
 $font-color-pink: $pink;
@@ -12,6 +14,8 @@ $color-primary: #007bff;
 
 $border-gray: #e0e0dc;
 $border-primary: $color-primary;
+
+$border-radius-standard: 4px;
 
 $background-lightgray: #f8f8f7;
 
