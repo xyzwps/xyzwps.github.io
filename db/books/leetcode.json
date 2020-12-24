@@ -3,6 +3,7 @@
   "toc": [
     { "title": "53. 最大子数组", "path": "lc-maximum-subarray" },
     { "title": "62. 不同路径", "path": "lc-unique-paths" },
+    { "title": "63. 不同路径 II", "path": "lc-unique-paths-ii" },
     { "title": "70. 爬楼梯", "path": "lc-climbing-stairs" },
     { "title": "121. 买卖股票", "path": "lc-buy-stock" },
     { "title": "132. 分割回文串 II", "path": "lc-palindrome-partitioning-ii" },
