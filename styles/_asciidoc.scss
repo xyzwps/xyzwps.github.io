@@ -31,3 +31,15 @@ code {
     }
   }
 }
+
+.olist,
+.ulist {
+  ol,
+  ul {
+    margin-left: 1rem;
+    li p {
+      margin-top: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+  }
+}
