@@ -1,0 +1,166 @@
+= 不同的二叉搜索树 II
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-26
+:toc:
+:toc-title: 目录
+:tag: DP, 动态规划, 二叉树, 二叉搜索树, BST, LeetCode
+
+题目link:https://leetcode-cn.com/problems/unique-binary-search-trees-ii/[95. 不同的二叉搜索树 II]。这一题比较简单，先说说沃动思路。
+
+## 我的做法
+
+首先，当 latexmath:[n=0] 时，答案是 `[]`；当 latexmath:[n=1] 时，答案是 `[[1]]`；当 latexmath:[n=2] 时，有对应以下 2 种 BST：
+
+----
+     2    1
+    /      \
+   1        2
+----
+
+当 latexmath:[n=3] 时，有对应以下 5 种 BST：
+
+----
+       3    2      3   1    1
+      /    / \    /     \    \
+     2    1   3  1       3    2
+    /             \     /      \
+   1               2   2        3
+----
+
+观察一下上面两个图，我们似乎发现了规律：
+
+* latexmath:[n] 是树的最大节点，所以 latexmath:[n] 要是是跟节点，要么是右子树的节点
+* latexmath:[n] 是根节点时，其左子树是一个有 latexmath:[n-1] 个节点的 BST
+* latexmath:[n] 是右子树节点时，它不可能有右子树
+
+更进一步地，如果 `t` 是一个拥有 latexmath:[n-1] 个节点的子树，那么从 `t` 出发，根据上面的规律，我们可以得到一些有
+latexmath:[n] 个节点的子树。做法是这样的：
+
+* 把 latexmath:[n] 作为新树的根节点，那么 `t` 就是新树的左子树
+* 对 `t` 的最右侧节点依次做如下处理：
+** 设 `r` 是 `t` 最右侧的某一个节点
+** 把 latexmath:[n] 作为 `r` 的右子节点，并把原来 `r` 的右子节点作为新节点的左子树
+
+这样，我们对所有的拥有 latexmath:[n-1] 个节点的 BST 都做这样的处理，就可以得到所有拥有 latexmath:[n] 个节点的 BST 了。
+
+这里还有个麻烦的地方，就是答案要输出所有的子树，所以我们的代码里需要一端对树做深复制的逻辑。话不多说，代码如下：
+
+[source,ts]
+----
+// 缓存所有已经算出来的具有 n 个节点的 BST
+const MAP: { [n: number]: TreeNode[] } = {}
+MAP[0] = []
+MAP[1] = [new TreeNode(1)]
+
+function generateTrees(n: number): Array<TreeNode | null> {
+    if (!(n in MAP)) generateTreesWithFromPrevious(n);
+    return MAP[n];
+};
+
+// 从所有 n-1 个节点的 BST 中生成所有 n 节点 BST
+function generateTreesWithFromPrevious(n: number) {
+    if (!((n - 1) in MAP)) {
+        // 如果 n-1 不在 MAP 里，就先生成
+        generateTreesWithFromPrevious(n - 1)
+    }
+    const trees = MAP[n - 1]
+    const nTrees: TreeNode[] = []
+    for (const tree of trees) {
+        generateTreesFromOnePrevious(tree, n, nTrees)
+    }
+    MAP[n] = nTrees;
+}
+
+// 根据其中一个具有 n-1 个节点的 BST（参数 tree），产生 n 节点 BST，并把这些新 BST 放到 nTrees 数组里
+function generateTreesFromOnePrevious(tree: TreeNode, n: number, nTrees: TreeNode[]) {
+    // n 在顶部
+    {
+        const [newTree] = copyTreeWithCutNode(tree, 0)
+        nTrees.push(new TreeNode(n, newTree))
+    }
+    // n 在右侧
+    {
+        for (let curr = tree; curr; curr = curr.right) {
+            const cutValue = curr.val;
+            const [newTree, cutNode] = copyTreeWithCutNode(tree, cutValue)
+            const cutNodeRight = cutNode.right;
+            cutNode.right = new TreeNode(n, cutNodeRight)
+            nTrees.push(newTree)
+        }
+    }
+}
+
+// 深复制一个树（参数 root），并记录割点
+// 这里割点的意思是，被割掉右子树的节点，就是上面分析中说的 r
+function copyTreeWithCutNode(root: TreeNode, cutValue: number): [TreeNode, TreeNode] {
+    const newRoot: TreeNode = new TreeNode(root.val)
+    let cutNode: TreeNode = null
+    copyOneLevel(newRoot, root, cutValue);
+    return [newRoot, cutNode]
+
+    function copyOneLevel(target: TreeNode, origin: TreeNode, cutValue: number) {
+        if (target.val === cutValue) {
+            cutNode = target;
+        }
+        if (origin && origin.left) {
+            target.left = new TreeNode(origin.left.val)
+            copyOneLevel(target.left, origin.left, cutValue)
+        }
+        if (origin && origin.right) {
+            target.right = new TreeNode(origin.right.val)
+            copyOneLevel(target.right, origin.right, cutValue)
+        }
+    }
+}
+----
+
+代码虽然很长，但是逻辑很简单，我第一遍写完有一个 bug，调一下就通过了。这段代码中，关于
+latexmath:[n] 的结果是从关于 latexmath:[n-1] 的结果中得到的，所以这段代码形式上算是个 DP 吧。
+
+另外，上面的代码里 `TreeNode` 长这样：
+
+[source,ts]
+----
+class TreeNode {
+    val: number
+    left: TreeNode | null
+    right: TreeNode | null
+    constructor(val?: number, left?: TreeNode | null, right?: TreeNode | null) {
+        this.val = (val===undefined ? 0 : val)
+        this.left = (left===undefined ? null : left)
+        this.right = (right===undefined ? null : right)
+    }
+}
+----
+
+## 官方题解
+
+官方题解的思路更简单。BST 的根节点左子树节点值都小于根节点，右子树节点值都大于根节点，所以，只要使 1 到
+latexmath:[n] 中的每个数都做为根节点，然后（递归地）生成对应的所有左子树和右子树就好了。
+
+[source,ts]
+----
+function generateTrees(n: number): Array<TreeNode | null> {
+    if (n === 0) return []
+    return generateTreesBetween(1, n);
+};
+
+function generateTreesBetween(start: number, end: number): (TreeNode|null)[] {
+    if (start > end) {
+        return [null]
+        // 逻辑上来说，返回 [] 会合适一些，但是返回 [null] 会使下面的 for 循环更容易处理
+    }
+
+    const result = []
+    for(let i = start; i <= end; i++) {
+        const leftTrees = generateTreesBetween(start, i - 1);
+        const rightTrees = generateTreesBetween(i+1, end);
+        for (let j = 0; j < leftTrees.length; j++) {
+            for(let k = 0; k < rightTrees.length; k++) {
+                result.push(new TreeNode(i, leftTrees[j], rightTrees[k]))
+            }
+        }
+    }
+    return result
+}
+----

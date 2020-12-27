@@ -4,6 +4,11 @@ q {
   quotes: "\201C""\201D""\2018""\2019";
 }
 
+#toctitle {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
 .paragraph > p {
   text-indent: 2rem;
   line-height: 1.8;
@@ -18,10 +23,12 @@ code {
   font-weight: normal;
   color: rgba(0, 0, 0, 0.9);
   font-size: 90%;
+  background-color: $pink-1;
+  padding: 0.25rem;
 }
 
 .listingblock {
-  padding: 1rem;
+  padding: 0.8rem 1.2rem;
   background-color: $pink-1;
   border-radius: $border-radius-standard;
   .content {
@@ -36,7 +43,8 @@ code {
 .ulist {
   ol,
   ul {
-    margin-left: 1rem;
+    padding: 0px;
+    margin: 1rem 0 1rem 3.5rem;
     li p {
       margin-top: 0.4rem;
       margin-bottom: 0.4rem;

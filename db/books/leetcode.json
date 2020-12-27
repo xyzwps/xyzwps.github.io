@@ -6,6 +6,7 @@
     { "title": "63. 不同路径 II", "path": "lc-unique-paths-ii" },
     { "title": "64. 最小路径和", "path": "lc-minimum-path-sum" },
     { "title": "70. 爬楼梯", "path": "lc-climbing-stairs" },
+    { "title": "95. 不同的二叉搜索树 II", "path": "lc-unique-binary-search-trees-ii" },
     { "title": "121. 买卖股票", "path": "lc-buy-stock" },
     { "title": "132. 分割回文串 II", "path": "lc-palindrome-partitioning-ii" },
     { "title": "198. 打家劫舍", "path": "lc-house-robber" },
