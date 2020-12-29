@@ -1,0 +1,59 @@
+= 不同的二叉搜索树
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-28
+:toc:
+:toc-title: 目录
+:tag: DP, 动态规划, 二叉树, 二叉搜索树, BST, LeetCode
+
+题目link:https://leetcode-cn.com/problems/unique-binary-search-trees/[96. 不同的二叉搜索树]。
+
+## DP 解法
+
+沿着link:./lc-unique-binary-search-trees-ii[第 95 题——不同的二叉搜索树 II]的官方题解思路，很容易就可以写出下面的代码，
+还是 DP 代码：
+
+[source,ts]
+----
+function numTrees(n: number): number {
+    const dp: number[] = [0, 1, 2] // 这里强行指定了 n 比较小的情况的值
+    for (let i = 3; i <= n; i++) {
+        let r: number = 0;
+        for (let t = 0; t <= i; t++) {
+            if (t == 0) r += dp[i - 1]        // 没有左子树的情况
+            else if (t == i) r += dp[i - 1]   // 没有右子树的情况
+            else r += (dp[t] * dp[i - 1 - t]) // 有左右子树的情况
+        }
+        dp[i] = r
+    }
+    return dp[n]
+};
+----
+
+上面的代码可以改成这样：
+
+[source,ts]
+----
+function numTrees(n: number): number {
+    const dp: number[] = [1] // 注意，这里 dp[0] == 1
+    for (let i = 1; i <= n; i++) {
+        let r: number = 0;
+        for (let t = 0; t < i; t++) {
+            r += (dp[t] * dp[i - 1 - t])
+        }
+        dp[i] = r
+    }
+    return dp[n]
+};
+----
+
+修改后的代码，告诉我们：
+
+latexmath:[\displaystyle \textrm{dp}[0\]=1, \textrm{dp}[n\]=\sum_{i=0}^{n-1} \textrm{dp}[i\] \cdot \textrm{dp}[n-i-1\]]
+
+改造一下，变成这样：
+
+latexmath:[\displaystyle \textrm{dp}[n\]=\sum_{i=1}^{n} \textrm{dp}[i-1\] \cdot \textrm{dp}[n-i\]]
+
+## 数学解法
+
+上面的公式实际上是link:/p/math-catalan[卡塔兰数]的定义，这东西有一个通项公式，按照通项公式，就可以把代码写出来了。

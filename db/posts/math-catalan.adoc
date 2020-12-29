@@ -1,0 +1,8 @@
+= 卡塔兰数
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-29
+:toc:
+:toc-title: 目录
+:tag: 卡塔兰数, Catalan Number
+
+TODO:
