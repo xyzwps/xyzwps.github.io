@@ -38,6 +38,8 @@ export interface Post {
   title: string
   body: string
   type: DocType
+  createTime: number
+  authorName: string
 }
 
 export interface BookTocPostItem {

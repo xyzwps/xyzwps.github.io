@@ -22,7 +22,13 @@ export async function getPostByPath(path: string): Promise<Post> {
   const filePath = join(POSTS_DIR, postMeta.path + "." + postMeta.ext)
   const fileText = await readTextFile(filePath)
   const adocInfo = adoc(fileText) // TODO: 支持更多文档
-  return { title: adocInfo.title, body: adocInfo.content, type: postMeta.ext }
+  return {
+    title: adocInfo.title,
+    body: adocInfo.content,
+    createTime: adocInfo.date,
+    authorName: adocInfo.author,
+    type: postMeta.ext,
+  }
 }
 
 export async function getAllBooks(): Promise<Book[]> {

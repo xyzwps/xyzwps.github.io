@@ -1,0 +1,65 @@
+= 【LeetCode】120. 三角形最小路径和
+weily <xyzwps@outlook.com>
+v1.0, 2020-12-31
+:toc:
+:toc-title: 目录
+:tag: DP, 动态规划, 三角形, LeetCode
+
+题目link:hhttps://leetcode-cn.com/problems/triangle/[120. 三角形最小路径和]。这是个经典 DP 题目。
+
+首先我们找一下三角形的对应关系。设输入数组为 latexmath:[\textrm t]。如下图所示，latexmath:[\textrm t[i\][j\]]
+上面的两个数分别是 latexmath:[\textrm t[i-1\][j-1\]] 和 latexmath:[\textrm t[i-1\][j\]]。
+
+----
+t = [                   [
+         [2],             [2],
+        [3,4],   ===>     [3,4],
+       [6,5,7],           [6,5,7],
+      [4,1,8,3]           [4,1,8,3]
+    ]                   ]
+----
+
+作为一个 DP 题目，我们应该 DP 什么呢？最开始我想的是每一层的最小路径，发现行不通，从第 latexmath:[i] 层的最小路径推出不第
+latexmath:[i+1] 层的最小路径，反例还很好举。既然这样不行，就想着干脆求出第 latexmath:[i] 层每个位置的最小路径好了，这样一来，
+我们就可以从第 latexmath:[i] 层每个位置的最小路径，推出latexmath:[i+1] 层每个位置的最小路径，最终从最后一层每个位置的最小路径中
+选择最小的那个，就是答案了。
+
+记第 latexmath:[i] 层 latexmath:[j] 号位置的最小路径为 latexmath:[\textrm{dp}[i\][j\]]。
+显然第 0 层的最小路径就是 latexmath:[\textrm{dp}[0\] = \textrm t[0\]]。
+
+如果已知第 latexmath:[\textrm{dp}[i-1\]]，那么第 latexmath:[\textrm{dp}[i\]] 要分三种情况计算：
+
+. latexmath:[\textrm t[i\][0\]] 位于左边，它上面只有一个数 latexmath:[\textrm t[i-1\][0\]]。所以
+  latexmath:[\textrm{dp}[i\][0\] = \textrm{dp}[i-1\][0\] + \textrm{t}[i\][0\]]
+. latexmath:[\textrm t[i\][i\]] 位于右边，它上面只有一个数 latexmath:[\textrm t[i-1\][i-1\]]。所以
+  latexmath:[\textrm{dp}[i\][i\] = \textrm{dp}[i-1\][i-1\] + \textrm{t}[i\][i\]]
+. latexmath:[\textrm{dp}[i\][j\] = \min(\textrm{dp}[i-1\][j-1\], \textrm{dp}[i-1\][j\]) +  \textrm{t}[i\][j\]]
+
+这样的话，代码就呼之欲出了：
+
+[source,ts]
+----
+function minimumTotal(triangle: number[][]): number {
+    const dp: number[][] = []
+    dp[0] = triangle[0]
+    for (let i = 1; i < triangle.length; i++) {
+        const dpi: number[] = []; // dp[i]，我们要求它
+        const dpp = dp[i - 1];    // dp previous; dp[i-1]
+        for (let t = 0; t <= i; t++) {
+            if (t == 0) {
+                dpi[t] = dpp[0] + triangle[i][t];
+            } else if (t == i) {
+                dpi[t] = dpp[t - 1] + triangle[i][t];
+            } else {
+                dpi[t] = Math.min(dpp[t - 1], dpp[t]) + triangle[i][t];
+            }
+        }
+        dp[i] = dpi;
+    }
+    return Math.min(...dp[triangle.length - 1])
+};
+----
+
+我们注意到代码中，在求 `dpi`（`dp[i]`） 的时候，只使用了 `dpp`（`dp[i-1]`），但是 `dp[i-更多]`
+没有被使用却被存了下来，浪费了空间。为了计算 `dp[i]`，我们只要保存 `dp[i-1]` 就好了，这样就可以把多使用的空间省下来了，
+这是一个空间复杂度从 latexmath:[O(n^2)] 到 latexmath:[O(n)] 的优化。因为原理都说清楚了，代码就不写了。

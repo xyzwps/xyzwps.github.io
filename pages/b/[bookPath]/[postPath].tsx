@@ -1,6 +1,7 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
 import { getAllBooks, getBookByPath, getPostByPath } from "../../../db"
 import { Post, Book, BookToc } from "../../../types"
+import dayjs from "dayjs"
 import PageLayout from "../../../segments/PageLayout"
 import BookTocBlock from "../../../segments/BookTocBlock"
 
@@ -16,6 +17,9 @@ const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book:
         <div className="left">{tocBlock}</div>
         <div className="post">
           <h1>{post.title}</h1>
+          <small style={{ color: "gray" }}>
+            {post.authorName} 创建于{dayjs(post.createTime).format("YYYY年M月D日")}
+          </small>
           {(() => {
             switch (post.type) {
               case "adoc":
