@@ -1,0 +1,45 @@
+= 【LeetCode】256. 刷房子
+weily <xyzwps@outlook.com>
+v1.0, 2021-01-08
+:toc:
+:toc-title: 目录
+:tag: 动态规划, DP, LeetCode
+
+题目link:https://leetcode-cn.com/problems/paint-house/[256. 刷房子]。
+
+设 `dp[i]` 表示把第 `i` 间房子刷完得到的最小花费，其实从 `dp[i]` 到 `dp[i+1]` 的公式是不太好推的，所以换一种思路。
+
+设 `dp[i]` 表示把第 `i` 间房子分别刷成三种颜色的最小花费，那么显然有以下结论：
+
+----
+dp[i+1] = [
+    costs[i+1][0] + min(dp[i][1], dp[i][2]),
+    costs[i+1][1] + min(dp[i][0], dp[i][2])
+    costs[i+1][2] + min(dp[i][0], dp[i][1])
+]
+----
+
+这样，本题的答案就是 `min(dp[costs.length-1])` 了。
+
+我们注意到这个递推关系里，只关心前一项，所以写代码的时候可以对空间进行些优化。代码如下：
+
+[source,js]
+----
+/**
+ * @param {number[][]} costs
+ * @return {number}
+ */
+var minCost = function (costs) {
+    if (costs.length === 0) return 0;
+    let dp = costs[0];
+    for (let i = 1; i < costs.length; i++) {
+        const [f, s, t] = costs[i];
+        dp = [
+            f + Math.min(dp[1], dp[2]),
+            s + Math.min(dp[0], dp[2]),
+            t + Math.min(dp[0], dp[1])
+        ]
+    }
+    return Math.min(...dp)
+};
+----
