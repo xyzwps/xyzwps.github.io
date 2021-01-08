@@ -1,6 +1,7 @@
 import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from "next"
 import { getAllBooks, getBookByPath, getPostByPath } from "../../../db"
 import { Post, Book, BookToc } from "../../../types"
+import Image from "next/image"
 import dayjs from "dayjs"
 import PageLayout from "../../../segments/PageLayout"
 import BookTocBlock from "../../../segments/BookTocBlock"
@@ -20,6 +21,9 @@ const PostPage: React.FC<{ bookPath: string; postPath: string; post: Post; book:
           <small style={{ color: "gray" }}>
             {post.authorName} 创建于{dayjs(post.createTime).format("YYYY年M月D日")}
           </small>
+          <div style={{ margin: "1rem 0", userSelect: "none" }}>
+            <img src="/assets/separator.png" alt="sep" style={{ width: "100%" }} />
+          </div>
           {(() => {
             switch (post.type) {
               case "adoc":
