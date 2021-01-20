@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width"/><link rel="preload" href="/_next/static/css/36ea62f95a64ab7b4e86.css" as="style"/><link rel="stylesheet" href="/_next/static/css/36ea62f95a64ab7b4e86.css" data-n-g=""/><link rel="preload" href="/_next/static/css/27cf56d9b7bd9cc5cc02.css" as="style"/><link rel="stylesheet" href="/_next/static/css/27cf56d9b7bd9cc5cc02.css" data-n-p=""/><noscript data-n-css="true"></noscript><link rel="preload" href="/_next/static/chunks/main-3ead2e0091e7dd003860.js" as="script"/><link rel="preload" href="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" as="script"/><link rel="preload" href="/_next/static/chunks/framework.2113c6061a2f456066a1.js" as="script"/><link rel="preload" href="/_next/static/chunks/commons.5bf50d780b059c687421.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/_app-603783ad1980263ad37c.js" as="script"/><link rel="preload" href="/_next/static/chunks/pages/p/%5Bpath%5D-58bbc6caf14e36bb171c.js" as="script"/></head><body><div id="__next"><div style="max-width:1366px;margin:0px auto"><nav style="display:flex;border-bottom:1px solid lightgray;padding:0.5rem 1rem"><a class="Header_header-item__ZebU6" href="/">Home</a><a class="Header_header-item__ZebU6" href="/tool/datetime">Datetime</a><a class="Header_header-item__ZebU6" href="/b">Book list</a></nav><div><div class="post-layout"><div class="left">lc-paint-house</div><div class="post"><h1>【LeetCode】256. 刷房子</h1><div class="adoc"><div class="paragraph">
+<p>题目<a href="https://leetcode-cn.com/problems/paint-house/">256. 刷房子</a>。</p>
+</div>
+<div class="paragraph">
+<p>设 <code>dp[i]</code> 表示把第 <code>i</code> 间房子刷完得到的最小花费，其实从 <code>dp[i]</code> 到 <code>dp[i+1]</code> 的公式是不太好推的，所以换一种思路。</p>
+</div>
+<div class="paragraph">
+<p>设 <code>dp[i]</code> 表示把第 <code>i</code> 间房子分别刷成三种颜色的最小花费，那么显然有以下结论：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dp[i+1] = [
+    costs[i+1][0] + min(dp[i][1], dp[i][2]),
+    costs[i+1][1] + min(dp[i][0], dp[i][2])
+    costs[i+1][2] + min(dp[i][0], dp[i][1])
+]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>这样，本题的答案就是 <code>min(dp[costs.length-1])</code> 了。</p>
+</div>
+<div class="paragraph">
+<p>我们注意到这个递推关系里，只关心前一项，所以写代码的时候可以对空间进行些优化。代码如下：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-js" data-lang="js"><span class="hljs-comment">/**
+ * <span class="hljs-doctag">@param <span class="hljs-type">{number[][]}</span> <span class="hljs-variable">costs</span></span>
+ * <span class="hljs-doctag">@return <span class="hljs-type">{number}</span></span>
+ */</span>
+<span class="hljs-keyword">var</span> minCost = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">costs</span>) </span>{
+    <span class="hljs-keyword">if</span> (costs.length === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">let</span> dp = costs[<span class="hljs-number">0</span>];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">1</span>; i &lt; costs.length; i++) {
+        <span class="hljs-keyword">const</span> [f, s, t] = costs[i];
+        dp = [
+            f + <span class="hljs-built_in">Math</span>.min(dp[<span class="hljs-number">1</span>], dp[<span class="hljs-number">2</span>]),
+            s + <span class="hljs-built_in">Math</span>.min(dp[<span class="hljs-number">0</span>], dp[<span class="hljs-number">2</span>]),
+            t + <span class="hljs-built_in">Math</span>.min(dp[<span class="hljs-number">0</span>], dp[<span class="hljs-number">1</span>])
+        ]
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Math</span>.min(...dp)
+};</code></pre>
+</div>
+</div></div></div><div class="right">TODO:</div></div><div class="post-mobile-toc">lc-paint-house</div></div></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"path":"lc-paint-house","post":{"title":"【LeetCode】256. 刷房子","body":"\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e题目\u003ca href=\"https://leetcode-cn.com/problems/paint-house/\"\u003e256. 刷房子\u003c/a\u003e。\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e设 \u003ccode\u003edp[i]\u003c/code\u003e 表示把第 \u003ccode\u003ei\u003c/code\u003e 间房子刷完得到的最小花费，其实从 \u003ccode\u003edp[i]\u003c/code\u003e 到 \u003ccode\u003edp[i+1]\u003c/code\u003e 的公式是不太好推的，所以换一种思路。\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e设 \u003ccode\u003edp[i]\u003c/code\u003e 表示把第 \u003ccode\u003ei\u003c/code\u003e 间房子分别刷成三种颜色的最小花费，那么显然有以下结论：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre\u003edp[i+1] = [\n    costs[i+1][0] + min(dp[i][1], dp[i][2]),\n    costs[i+1][1] + min(dp[i][0], dp[i][2])\n    costs[i+1][2] + min(dp[i][0], dp[i][1])\n]\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e这样，本题的答案就是 \u003ccode\u003emin(dp[costs.length-1])\u003c/code\u003e 了。\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"paragraph\"\u003e\n\u003cp\u003e我们注意到这个递推关系里，只关心前一项，所以写代码的时候可以对空间进行些优化。代码如下：\u003c/p\u003e\n\u003c/div\u003e\n\u003cdiv class=\"listingblock\"\u003e\n\u003cdiv class=\"content\"\u003e\n\u003cpre class=\"highlight\"\u003e\u003ccode class=\"language-js\" data-lang=\"js\"\u003e\u003cspan class=\"hljs-comment\"\u003e/**\n * \u003cspan class=\"hljs-doctag\"\u003e@param \u003cspan class=\"hljs-type\"\u003e{number[][]}\u003c/span\u003e \u003cspan class=\"hljs-variable\"\u003ecosts\u003c/span\u003e\u003c/span\u003e\n * \u003cspan class=\"hljs-doctag\"\u003e@return \u003cspan class=\"hljs-type\"\u003e{number}\u003c/span\u003e\u003c/span\u003e\n */\u003c/span\u003e\n\u003cspan class=\"hljs-keyword\"\u003evar\u003c/span\u003e minCost = \u003cspan class=\"hljs-function\"\u003e\u003cspan class=\"hljs-keyword\"\u003efunction\u003c/span\u003e (\u003cspan class=\"hljs-params\"\u003ecosts\u003c/span\u003e) \u003c/span\u003e{\n    \u003cspan class=\"hljs-keyword\"\u003eif\u003c/span\u003e (costs.length === \u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e) \u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e \u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e;\n    \u003cspan class=\"hljs-keyword\"\u003elet\u003c/span\u003e dp = costs[\u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e];\n    \u003cspan class=\"hljs-keyword\"\u003efor\u003c/span\u003e (\u003cspan class=\"hljs-keyword\"\u003elet\u003c/span\u003e i = \u003cspan class=\"hljs-number\"\u003e1\u003c/span\u003e; i \u0026lt; costs.length; i++) {\n        \u003cspan class=\"hljs-keyword\"\u003econst\u003c/span\u003e [f, s, t] = costs[i];\n        dp = [\n            f + \u003cspan class=\"hljs-built_in\"\u003eMath\u003c/span\u003e.min(dp[\u003cspan class=\"hljs-number\"\u003e1\u003c/span\u003e], dp[\u003cspan class=\"hljs-number\"\u003e2\u003c/span\u003e]),\n            s + \u003cspan class=\"hljs-built_in\"\u003eMath\u003c/span\u003e.min(dp[\u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e], dp[\u003cspan class=\"hljs-number\"\u003e2\u003c/span\u003e]),\n            t + \u003cspan class=\"hljs-built_in\"\u003eMath\u003c/span\u003e.min(dp[\u003cspan class=\"hljs-number\"\u003e0\u003c/span\u003e], dp[\u003cspan class=\"hljs-number\"\u003e1\u003c/span\u003e])\n        ]\n    }\n    \u003cspan class=\"hljs-keyword\"\u003ereturn\u003c/span\u003e \u003cspan class=\"hljs-built_in\"\u003eMath\u003c/span\u003e.min(...dp)\n};\u003c/code\u003e\u003c/pre\u003e\n\u003c/div\u003e\n\u003c/div\u003e","createTime":1610035200000,"authorName":"weily","type":"adoc"}},"__N_SSG":true},"page":"/p/[path]","query":{"path":"lc-paint-house"},"buildId":"LNCknC3mifbVOHoACuSx_","nextExport":false,"isFallback":false,"gsp":true,"head":[["meta",{"charSet":"utf-8"}],["meta",{"name":"viewport","content":"width=device-width"}]]}</script><script nomodule="" src="/_next/static/chunks/polyfills-555defa4e62ba07d4446.js"></script><script src="/_next/static/chunks/main-3ead2e0091e7dd003860.js" async=""></script><script src="/_next/static/chunks/webpack-e067438c4cf4ef2ef178.js" async=""></script><script src="/_next/static/chunks/framework.2113c6061a2f456066a1.js" async=""></script><script src="/_next/static/chunks/commons.5bf50d780b059c687421.js" async=""></script><script src="/_next/static/chunks/pages/_app-603783ad1980263ad37c.js" async=""></script><script src="/_next/static/chunks/pages/p/%5Bpath%5D-58bbc6caf14e36bb171c.js" async=""></script><script src="/_next/static/LNCknC3mifbVOHoACuSx_/_buildManifest.js" async=""></script><script src="/_next/static/LNCknC3mifbVOHoACuSx_/_ssgManifest.js" async=""></script></body></html>

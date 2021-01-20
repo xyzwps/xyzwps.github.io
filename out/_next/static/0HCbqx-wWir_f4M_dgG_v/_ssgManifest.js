@@ -1,1 +1,0 @@
-self.__SSG_MANIFEST=new Set(["\u002F","\u002Fb","\u002Fpost-list","\u002Fp\u002F[path]","\u002Fb\u002F[bookPath]","\u002Fpost\u002F[...id]","\u002Fb\u002F[bookPath]\u002F[postPath]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

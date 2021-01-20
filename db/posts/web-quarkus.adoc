@@ -1,0 +1,25 @@
+= Web 框架之 Quarkus
+weily <xyzwps@outlook.com>
+v1.0, 2021-01-09
+:toc:
+:toc-title: 目录
+:tag: Java
+
+这是 Quarkus 框架的官网：link:https://quarkus.io/[https://quarkus.io/]，打开的过程有点慢。打开之后，
+***SUPERSONIC SUBATOMIC JAVA*** 这几个词映入眼帘，字面意思就是超音速、亚原子的 Java，虽然有点中二的感觉，
+但是显然能够感受到，这个框架说它很快。它是专门为 OpenJDK HotSpot VM 和 GraalVM 定制的 K8S 原生 Java
+技术栈。
+
+## 开始
+
+从官网生成项目模板后，就可以开始进行开发了。
+
+目前支持的构建工具有 Maven 和 Gradle，但是 Gradle 支持还处在预览阶段，使用起来有些折腾，所以建议使用 Maven。
+另外，官方给的教程里，也是使用 Maven，所以从一开始就选择使用 Maven，在学习和使用过程中，遇到问题也比较好解决。
+
+Quarkus 程序支持使用 Kotlin 和 Scala 进行开发，不过也是处在预览阶段。想用就用个试试吧。
+
+## Web 框架
+
+Quarkus 默认是使用 JBoss RESTEasy 的 API 来进行 Web 服务开发的。
+
