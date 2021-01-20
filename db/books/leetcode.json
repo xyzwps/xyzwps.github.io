@@ -11,6 +11,7 @@
     { "title": "120. 三角形最小路径和", "path": "lc-triangle" },
     { "title": "121. 买卖股票", "path": "lc-buy-stock" },
     { "title": "132. 分割回文串 II", "path": "lc-palindrome-partitioning-ii" },
+    { "title": "152. 乘积最大子数组", "path": "lc-maximum-product-subarray" },
     { "title": "198. 打家劫舍", "path": "lc-house-robber" },
     { "title": "256. 粉刷房子", "path": "lc-paint-house" },
     { "title": "276. 栅栏涂色", "path": "lc-paint-fence" },

@@ -1,0 +1,122 @@
+= 152. 乘积最大子数组
+weily <xyzwps@outlook.com>
+v1.0, 2021-01-20
+:toc:
+:toc-title: 目录
+:tag: 动态规划, DP, 数组, LeetCode
+
+题目link:https://leetcode-cn.com/problems/maximum-product-subarray/[152. 乘积最大子数组]。
+这个题目和link:https://leetcode-cn.com/problems/maximum-subarray/[53. 最大子序和]不太一样，
+原因是有负数的连乘会导致符号变来变去。
+
+最开始，除了暴力方法之外，我没啥头绪，看了其他人写的题解，我才找到点感觉。
+
+## 利用本题的性质
+
+**性质一**：在一个不含 0 的数组中，最大乘积不可能是数组的中间某部分。
+
+**证明**：如果最大乘积在数组的中间部分，那么就可以把数组分成前面、中间、后面三部分，其中中间部分的乘积是最大乘积。我们记
+latexmath:[a]、latexmath:[b]、latexmath:[c] 分别表示这三部分的乘积，那么
+
+* 设 latexmath:[b>0]
+** 如果 latexmath:[a] 和 latexmath:[c] 同号，则 latexmath:[abc > b]，矛盾；
+** 如果 latexmath:[a] 和 latexmath:[c] 异号，那么其中一个一定大于零，记 latexmath:[x = \textrm{max}(a,c)]，则 latexmath:[xb > b]，矛盾。
+* 设 latexmath:[b<0]
+** 如果 latexmath:[a] 和 latexmath:[c] 中有一个为负数，记为之 latexmath:[x]，则 latexmath:[xb > 0 > b]，矛盾；
+** 如果 latexmath:[a] 和 latexmath:[c] 都是整数，则它们都大于 0，进而大于 latexmath:[b]，矛盾。
+
+这就证完了。
+
+这个性质是说，最大乘积要么包含第一个数，要么包含最后一个数。
+
+**性质二**：如果数组长度大于 1，则最大乘积至少是 0。
+
+**证明**：任意选取数组中的连续两数。如果它们之中至少有一个 0，那么数组的最大成绩肯定大于或等于 0。
+如果都不为 0，如果它们同号，那么同号相乘大于 0；如果它们异号，则至少有一个大于 0。证完。
+
+这个性质可以简化代码。
+
+沿着性质一的思路，我们只要把数组分成一些连续的、不含 0 的子数组，分别计算最大乘积就好了。代码如下：
+
+```js
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxProduct = function (nums) {
+    if (nums.length === 1) return nums[0]
+
+    let list = [];
+    let max = 0; // 根据性质二，结果至少是 0，就初始化为 0 好了
+    for (const n of nums) {
+        if (n != 0) {
+            list.push(n)
+        } else {
+            if (list.length > 0) {
+                max = Math.max(max, maxProductForNonZeroList(list))
+                list = []
+            }
+        }
+    }
+    if (list.length > 0) {
+        max = Math.max(max, maxProductForNonZeroList(list))
+    }
+    return max
+};
+
+function maxProductForNonZeroList(nums) {
+    // 从左往右算一遍
+    const LEN = nums.length;
+    let base = nums[0];
+    let leftMax = nums[0];
+    for (let i = 1; i < LEN; i++) {
+        base *= nums[i];
+        leftMax = Math.max(base, leftMax)
+    }
+
+    // 从右往左算一遍
+    base = nums[LEN - 1];
+    let rightMax = nums[LEN - 1];
+    for (let i = LEN - 2; i >= 0; i--) {
+        base *= nums[i];
+        rightMax = Math.max(base, rightMax)
+    }
+    return Math.max(leftMax, rightMax)
+}
+```
+
+## 动态规划
+
+动态规划对我来说比较难想，看懂了就自己说一遍再写一遍吧。
+
+因为有负数的连乘中，积的符号会变来变去，所以干脆维护两个列表——最大乘积的列表和最小乘积的列表，
+分别记为 `maxs` 和 `mins` 吧。`maxs[i]` 的精确说法是，`nums` 数组中以 `nums[i]`
+结尾的连续子数组中最大乘积，`mins` 类似，不啰嗦了。显然，`maxs[0] = nums[0]`。
+
+显然（因为详细说起来太啰嗦了。。），`maxs[i] = max(maxs[i-1]*nums[i], mins[i-1]*nums[i])`。如果
+`mins[i-1]` 和 `maxs[i-1]` 都是 0，显然 `maxs[i] = nums[i]`。这样，公式就可以这么写：
+`maxs[i] = max(maxs[i-1]*nums[i], mins[i-1]*nums[i], nums[i])`。
+
+`mins[i]` 的递推公式类似。
+
+于是可以写出下面的代码：
+
+[source,js]
+----
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+var maxProduct = function (nums) {
+    const mins = [nums[0]], maxs = [nums[0]];
+    for (let i = 1; i < nums.length; i++) {
+        const n = nums[i];
+        mins[i] = Math.min(mins[i - 1] * n, maxs[i - 1] * n, n);
+        maxs[i] = Math.max(mins[i - 1] * n, maxs[i - 1] * n, n);
+    }
+    return Math.max(...maxs)
+};
+----
+
+从公式中看，数组 `mins` 和 `maxs` 是可以被优化掉，从而达到仅使用 latexmath:[O(1)] 的额外空间这种境界。
+优化方式比较简单，算了。
