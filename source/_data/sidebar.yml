@@ -1,0 +1,62 @@
+docs:
+  getting_started:
+    overview: index.html
+    setup: setup.html
+    configuration: configuration.html
+    commands: commands.html
+    migration: migration.html
+  basic_usage:
+    writing: writing.html
+    front_matter: front-matter.html
+    tag_plugins: tag-plugins.html
+    asset_folders: asset-folders.html
+    data_files: data-files.html
+    server: server.html
+    generating: generating.html
+  deployment:
+    github_pages: github-pages.html
+    gitlab_pages: gitlab-pages.html
+    one_command_deployment: one-command-deployment.html
+  customization:
+    permalinks: permalinks.html
+    themes: themes.html
+    templates: templates.html
+    variables: variables.html
+    helpers: helpers.html
+    internationalization: internationalization.html
+    syntax_highlight: syntax-highlight.html
+    plugins: plugins.html
+  miscellaneous:
+    troubleshooting: troubleshooting.html
+    contributing: contributing.html
+
+java:
+  开始:
+    介绍: index.html
+  多线程:
+    线程: thread.html
+    Executor: executor.html
+
+redis:
+  开始:
+    介绍: index.html
+    安装: install.html
+  数据类型:
+    Key 和 String: key-and-string.html
+    Hash: hash.html
+    List: list.html
+    Set: set.html
+    Zset: zset.html
+    Bitmap: bitmap.html
+    Geo: geo.html
+    HyperLogLog: hyperloglog.html
+  其他特性:
+    Pipeline: pipeline.html
+    Select: select.html
+  持久化:
+    持久化在说什么: durability.html
+    持久化方案: persistence.html
+    RDB: rdb.html
+    AOF: aof.html
+  使用场景:
+    Blogs: blogs.html
