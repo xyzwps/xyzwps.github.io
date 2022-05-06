@@ -35,3 +35,5 @@ func main() {
 	fmt.Println("New random integer:", rand.Intn(10))
 }
 ```
+
+TODO: 可见性问题

@@ -21,15 +21,15 @@ func main() {
     a = 3
 	fmt.Println(add(a, b))
 }
+```
 
-/**
- * 这段代码输出：
- *
- * add 1 + 2
- * add 3 + 2
- * 5
- * defered 3
- */
+这段代码输出：
+
+```console
+add 1 + 2
+add 3 + 2
+5
+defered 3
 ```
 
 ## defer 栈
@@ -48,16 +48,16 @@ func main() {
 	}
 	fmt.Println("done")
 }
-/**
- * 这段代码输出：
- *
- * counting
- * done
- * 2
- * 1
- * 0
- */
+```
 
+这段代码输出：
+
+```console
+counting
+done
+2
+1
+0
 ```
 
 ## 参考

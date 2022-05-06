@@ -70,21 +70,32 @@ patterns:
 golang:
   开始:
     引言: index.html
+    第一个程序: first-program.html
     杂项: basic.html
-  基础:
-    函数: func.html
-    变量: var.html
-    基本类型: basic-types.html
-    字符串: string.html
-    指针: pointer.html
-    数组和切片: array-slice.html
-    映射: map.html
-    结构-struct: struct.html
-    接口-interface: interface.html
-    type 关键字: type.html
-    for 语句: for.html
+  流程控制语句:
     if 语句: if.html
     switch 语句: switch.html
+    for 语句: for.html
     defer 语句: defer.html
+  函数:
+    函数: func.html
+    特殊函数: special-func.html
+  常见类型与变量:
+    基本类型: basic-types.html
+    变量与常量: var.html
+    字符串: string.html
+    指针: pointer.html
+    数组和 slice: array-slice.html
+    map: map.html
+  自定义数据类型:
+    struct: struct.html
+    type 关键字: type.html
+    interface: interface.html
+    泛型: generic.html
+    等值比较: equal.html
+  错误处理:
+    error: error.html
+    panic-recover: panic.html
+  其他:
     并发: concurrency.html
     包和导入: pkg-import.html

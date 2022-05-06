@@ -6,6 +6,8 @@ title: type 关键字
 
 每个类型都有一个[底层类型](https://golang.org/ref/spec#Types)。
 
+TODO: 底层类型
+
 ## 类型别名
 
 定义类型别名的语法是：
@@ -103,3 +105,8 @@ func main() {
 	fmt.Println(ta1 == tstring) // 输出 false
 }
 ```
+
+
+TODO: 比如把一个原来类型的变量赋值给别名类型
+TODO: 比如创建别名类型的方法
+TODO: 底层类型

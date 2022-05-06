@@ -55,9 +55,8 @@ func main() {
 ```go
 switch i {
 case 0:
-case f():
+case f(): // i == 0 时，不会调用函数 f
 }
-// i == 0 时，不会调用函数 f
 ```
 
 ## 无条件表达式的 switch 语句

@@ -22,6 +22,83 @@ func add(x, y int) int {
 }
 ```
 
+### 按值传递
+
+函数的参数一般都是按值传递。对于 struct，传入的是一份 struct 的深复制：
+
+```go
+package main
+
+import "fmt"
+
+type Point2D struct {
+	X, Y int
+}
+
+type Line struct {
+	Start Point2D
+	End   Point2D
+	Extra int
+}
+
+func MoveX(l Line) Line {
+	l.Start.X *= 2
+	l.End.X *= 2
+	l.Extra *= 2
+	return l
+}
+
+func main() {
+	l := Line{
+		Start: Point2D{1, 2},
+		End:   Point2D{3, 4},
+		Extra: 5,
+	}
+	fmt.Printf("l  = %v\n", l)
+	sl := MoveX(l)
+	fmt.Printf("sl = %v\n", sl)
+	fmt.Printf("l  = %v\n", l)
+}
+```
+
+输出结果：
+
+```console
+l  = {{1 2} {3 4} 5}
+sl = {{2 2} {6 4} 10}
+l  = {{1 2} {3 4} 5}
+```
+
+### varargs
+
+Go 语言的函数支持可变参数。`fmt` 包和 `log` 包里有很多这样的函数。这里也写一个例子演示下：
+
+```go
+package main
+
+func sum(start int, values ...int) int {
+	result := start
+	for _, it := range values {
+		result += it
+	}
+	return result
+}
+
+func main() {
+	println(sum(1, 2, 3, 4))
+	println(sum(1))
+	println(sum(1, []int{2, 3, 4}...)) // 解构 slice 时把三个点放到后面
+}
+```
+
+输出：
+
+```console
+10
+1
+10
+```
+
 ## 函数返回值
 
 在 Go 语言中，函数可以一次返回多个值。比如：

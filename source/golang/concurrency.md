@@ -6,11 +6,9 @@ title: 并发
 
 Goroutine 是一种“轻量级线程”，由 Go 运营时管理。
 
-`go f(x, y, z)` 启动一个 goroutine 来执行 `f(x, y, z)`。
-其中，`f`、`x`、`y`、`z` 来自当前 goroutine，`f` 的计算发生在新的 goroutine 中。
+`go f(x, y, z)` 启动一个 goroutine 来执行 `f(x, y, z)`。其中，`f`、`x`、`y`、`z` 来自当前 goroutine，`f` 的计算发生在新的 goroutine 中。
 
-所有的 goroutine 都在同一个地址空间中中允许，所以访问共享内存必须要同步。`sync`
-包提供了很多有用的原语，你可能不会太依赖他们，因为 go 中还提供了一些其他原语。
+所有的 goroutine 都在同一个地址空间中中允许，所以访问共享内存必须要同步。`sync` 包提供了很多有用的原语，你可能不会太依赖他们，因为 go 中还提供了一些其他原语。
 
 ## Channel
 
@@ -31,8 +29,7 @@ ch := make(chan int) // ch 是一个可以向其发送或从其接收 int 值的
 
 一般地，发送和接收操作会 block 住，直到另一端准备好了。这使得 goroutine 不用显式的锁或条件变量就能进行同步。
 
-下面的例子对一个 slice 中的数求和，把工作分配给了两个 goroutine，一旦两个 goroutine 都完成了计算，就把两个
-goroutine 的计算结果相加，计算总和：
+下面的例子对一个 slice 中的数求和，把工作分配给了两个 goroutine，一旦两个 goroutine 都完成了计算，就把两个 goroutine 的计算结果相加，计算总和：
 
 ```go
 package main
@@ -66,8 +63,7 @@ Channel 可以缓冲。使用 `make` 创建 channel 时，可以在第二个参�
 ch := make(chan int, 100) // ch 是缓冲区大小为 100 的 channel
 ```
 
-往缓冲 channel 中发送数据时，只有当缓冲区满了，goroutine 才会被 block。接收者在
-channel 的缓冲区空了的时候被 block。
+往缓冲 channel 中发送数据时，只有当缓冲区满了，goroutine 才会被 block。接收者在 channel 的缓冲区空了的时候被 block。
 
 ```go
 package main
@@ -84,8 +80,7 @@ func main() {
 
 ### 关闭 Channel
 
-发送者可以 `close` channel 来表示没有新值要发送了。接收者可以通过接收表达式返回的第二个参数来判断
-channel 是否被关闭了：
+发送者可以 `close` channel 来表示没有新值要发送了。接收者可以通过接收表达式返回的第二个参数来判断 channel 是否被关闭了：
 
 ```go
 v, ok := <-ch
@@ -126,8 +121,7 @@ func main() {
 
 ## `select` 语句
 
-`select` 语句允许 goroutine 等待多个通信操作。`select` 被阻塞，直到其中一个 `case` 可以执行为止。如果有多个
-`case` 可以执行，那么就随机选择一个：
+`select` 语句允许 goroutine 等待多个通信操作。`select` 被阻塞，直到其中一个 `case` 可以执行为止。如果有多个 `case` 可以执行，那么就随机选择一个：
 
 ```go
 package main
@@ -190,11 +184,9 @@ func main() {
 
 如果我们只是想确保，在同一时刻只有一个 goroutine 有权访问一个共享变量，以避免冲突。我们该怎么办呢？
 
-这里就引入了一个叫做**互斥**（__mutual exclusion__）的概念了，按照不成文的约定，提供互斥功能的数据结构叫 __mutex__。
+这里就引入了一个叫做**互斥**（*mutual exclusion*）的概念了，按照不成文的约定，提供互斥功能的数据结构叫 *mutex*。
 
-Go 语言标准库通过 `sync.Mutex` 来提供互斥功能，它有两个方法：`Lock` 和 `Unlock`。
-我们可以写一个以互斥方式执行的代码块，只需要用 `Lock` 和 `Unlock` 把这段代码包住就行了。我们还可以利用
-`defer` 语句来保证函数结束后 mutex 会被解锁。
+Go 语言标准库通过 `sync.Mutex` 来提供互斥功能，它有两个方法：`Lock` 和 `Unlock`。我们可以写一个以互斥方式执行的代码块，只需要用 `Lock` 和 `Unlock` 把这段代码包住就行了。我们还可以利用 `defer` 语句来保证函数结束后 mutex 会被解锁。
 
 下例是一个并发安全的计数器实现：
 
