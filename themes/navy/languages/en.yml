@@ -1,7 +1,9 @@
 menu:
   docs: 文档
   java: Java
+  golang: Go语言
   redis: Redis
+  patterns: 设计模式
   plugins: 插件
   themes: 主题
   about: 关于

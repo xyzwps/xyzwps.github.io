@@ -60,3 +60,31 @@ redis:
     AOF: aof.html
   使用场景:
     Blogs: blogs.html
+
+patterns:
+  介绍:
+    介绍: index.html
+  模式:
+    分层模式: layered.html
+
+golang:
+  开始:
+    引言: index.html
+    杂项: basic.html
+  基础:
+    函数: func.html
+    变量: var.html
+    基本类型: basic-types.html
+    字符串: string.html
+    指针: pointer.html
+    数组和切片: array-slice.html
+    映射: map.html
+    结构-struct: struct.html
+    接口-interface: interface.html
+    type 关键字: type.html
+    for 语句: for.html
+    if 语句: if.html
+    switch 语句: switch.html
+    defer 语句: defer.html
+    并发: concurrency.html
+    包和导入: pkg-import.html
