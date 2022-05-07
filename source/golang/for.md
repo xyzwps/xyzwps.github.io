@@ -56,4 +56,6 @@ for i, j := 0, len(a)-1; i < j; i, j = i+1, j-1 {
 }
 ```
 
-TODO: for range
+## for...range
+
+我们可以使用 for...range 来遍历数组、slice、map，甚至可以从 channel 接受数据。具体用法请参见对应的部分，这里不再举例。

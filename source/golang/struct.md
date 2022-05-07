@@ -83,33 +83,6 @@ fmt.Println(v.Abs()) // 5
 fmt.Println(Abs(v)) // 5
 ```
 
-## 非 struct 类型的方法
-
-TODO: 放到 type 关键字那一节是不是更好
-
-你不可以为非本地（__non-local__）类型定义方法。比如下面为 `int` 定义的新方法是不允许的：
-
-```go
-func (v int) p() int {
-	return v
-}
-```
-
-但是下面这样就行，因为下例中 `MyInt` 是一个新类型：
-
-```go
-type MyInt int
-
-func (i MyInt) p() int {
-	return int(i)
-}
-
-func main() {
-	i := MyInt(2)
-	fmt.Println(i.p())
-}
-```
-
 ## 指针接受参数
 
 接受参数可以是指针类型的。如果接受参数是值类型，那么传入方法的其实是值的副本，你在方法里对它做的任何修改都不会影响函数调用者。使用指针接受参数，就不会有此限制。因为这个原因，指针类型的接受参数实际上会被用得更多。下例演示了两种接受参数的区别：

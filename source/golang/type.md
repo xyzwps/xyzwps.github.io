@@ -106,7 +106,29 @@ func main() {
 }
 ```
 
+### 方法
 
-TODO: 比如把一个原来类型的变量赋值给别名类型
-TODO: 比如创建别名类型的方法
+我们可以给新定义的类型增加方法。为 struct 类型增加方法的例子可以在 [struct](./struct/#方法) 这一节找到。这里给一个更加简单的例子：
+
+```go
+type Integer int64
+
+func (i Integer) isOdd() bool {
+	return i%2 == 1
+}
+
+func main() {
+	i := Integer(32)
+	fmt.Printf("%v is odd: %v", i, i.isOdd())
+}
+```
+
+注意，你不可以为非本地（*non-local*）类型定义方法。比如下面为 `int` 定义的新方法是不允许的：
+
+```go
+func (v int) p() int {
+	return v
+}
+```
+
 TODO: 底层类型

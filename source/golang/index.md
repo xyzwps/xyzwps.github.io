@@ -2,11 +2,19 @@
 title: 突击学点 Go 语言
 ---
 
-最近要接手一个项目，突击学点 Go 语言。Go 语言这货暂时还不支持泛型，真是麻烦。
+突击学点 Go 语言。
 
-这是 Go 语言官网——[https://golang.org](https://golang.org)，需要搭云梯才可以访问，真是令人伤心。
+Go dev 网站集合：
 
-长城宽带这狗网，一如既往的差劲，哎😔。
+* https://go.dev/（曾经的 https://golang.org）
+* https://golang.google.cn/
+* https://go-zh.org/
+
+Go 国内加速镜像：
+
+* https://goproxy.cn/
+* https://mirrors.aliyun.com/goproxy/
+* https://goproxy.io/
 
 其他资料：
 
