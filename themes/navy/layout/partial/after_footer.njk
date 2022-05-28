@@ -1,22 +1,22 @@
 <!-- Scripts -->
 <!-- Cookie -->
-<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
 <!-- build:js build/js/main.js -->
 {{ js('js/lang_select') }}
 {{ js('js/mobile_nav') }}
 <!-- endbuild -->
 {% if page.layout === 'plugins' %}
 <!-- Plugin search -->
-<script src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/lunr.js/2.3.9/lunr.min.js"></script>
 <!-- Lazy load -->
-<script async src="https://cdn.jsdelivr.net/lazysizes/3.0.0/lazysizes.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/lazysizes/3.0.0/lazysizes.min.js"></script>
 <!-- build:js build/js/plugins.js -->
 {{ js('js/plugins') }}
 <!-- endbuild -->
 {% endif %}
 <!-- Algolia -->
 {% if config.algolia[page.lang] %}
-<script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/1/docsearch.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/docsearch.js/1.5.0/docsearch.min.js"></script>
 <script type="text/javascript">
 document.getElementById('search-input-wrap').classList.add('on');
 docsearch({
