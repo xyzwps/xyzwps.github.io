@@ -92,7 +92,6 @@ golang:
     指针: pointer.html
     数组和 slice: array-slice.html
     map: map.html
-    nil: nil.html
   自定义数据类型:
     struct: struct.html
     type 关键字: type.html
@@ -102,6 +101,9 @@ golang:
   错误处理:
     error: error.html
     panic-recover: panic.html
+  常见问题:
+    不相等的 nil: notes-nil.html
+    深复制: notes-deep-clone.html
   其他:
     并发: concurrency.html
     包和导入: pkg-import.html
