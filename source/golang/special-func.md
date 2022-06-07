@@ -88,9 +88,69 @@ delete(m, k) // 从 map m 中移除元素 map[k]
 
 ## `panic` 和 `recover`
 
+见 [panic 和 recover](./panic.html)
+# 特殊函数
+
+## `main`
+
+在 `main` 包下的 `main` 函数是程序执行的入口。这个 `main` 函数不接受任何参数，也没有任何返回值。
+
+如果你学过 Java 的话，能看出一个很重要的差别：Java 的 `main` 方法是接受一个字符串数组作为参数的，这个数组里存放的是命令行参数。在 Go 中，如果你想获取命令行参数的话，可以通过 `os.Args` 来访问。比如:
+
+```go
+// args.go
+package main
+
+import (
+    "fmt"
+    "os"
+)
+
+func main() {
+    argsWithProg := os.Args
+    argsWithoutProg := os.Args[1:]
+    arg := os.Args[3]
+
+    fmt.Println(argsWithProg)
+    fmt.Println(argsWithoutProg)
+    fmt.Println(arg)
+}
+```
+
+下面是我在我本地执行的一个示例：
+
+```console
+➜ go run args.go 1 2 3
+[/var/folders/7w/b0jcv_c16qvbjqc0998w9_zm0000gn/T/go-build37639907/b001/exe/args 1 2 3]
+[1 2 3]
+3
+```
 
 
-TODO: main
-TODO: init
-TODO: panic
-TODO: recover
+## `init`
+
+每个包下都可以定义一些 `init` 函数，它也不接受任何参数，也没有任何返回值。`init` 函数的功能如其名，主要作用就是进行一些初始化工作。它在包被导入时执行一次。一个包下可以定义很多个 `init` 函数，甚至在同一个文件里，也可以定义很多个。在同一个文件中的多个 `init` 函数按出现的顺序依次执行；在同一个包下不同文件中的多个 `init` 按文件名的字母表顺序依次执行。在 main 包下，`init` 函数先于 `main` 函数执行。比如:
+
+```go
+package main
+
+import "fmt"
+
+func init() {
+	fmt.Println("1")
+}
+
+func init() {
+	fmt.Println("2")
+}
+
+func main() {
+	fmt.Println("4")
+}
+
+func init() {
+	fmt.Println("3")
+}
+```
+
+在指定包下，标识符 `init` 只能用来定义 `init` 函数，所以不可以在别的地方引用它。
