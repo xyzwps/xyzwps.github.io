@@ -154,3 +154,8 @@ func init() {
 ```
 
 在指定包下，标识符 `init` 只能用来定义 `init` 函数，所以不可以在别的地方引用它。
+
+# 参考
+
+- [Go by Example: Command-Line Arguments](https://gobyexample.com/command-line-arguments)
+- [The Go Programming Language Specification](https://go.dev/ref/spec)
