@@ -1,11 +1,11 @@
 title: Hexo
-subtitle: "A fast, simple & powerful blog framework powered by Node.js."
-description: "Hexo is a fast, simple & powerful blog framework powered by Node.js."
+subtitle: "TODO:"
+description: "TODO:"
 author: Hexo
 language: en
 timezone: UTC
 
-url: https://hexo.io
+url: https://xyzwps.com
 root: /
 permalink: post/:year/:month/:day/:title/
 archive_dir: post
@@ -24,17 +24,19 @@ highlight:
   line_number: false
 
 disqus_shortname: hexojs
-google_analytics: UA-48498357-3
-fb_admins: 100000247608790
-algolia:
+google_analytics: UA-135358050-1
+fb_admins: 100000247608790  # TODO:
+algolia:                    # TODO:
   en:
     api_key: c3d5d4c995b5e0c2ffb5623900279a66
     index_name: hexo
-  zh-tw:
-    api_key: c83d2ec3440f40aec6d0e695ecec7ef3
-    index_name: hexo_zh-tw
   zh-cn:
     api_key: cdea7d4e47d84f6145b77e7f68689f35
     index_name: hexo_zh-cn
-twitter: hexojs
-github: hexojs/hexo
+twitter: hexojs             # TODO:
+github: hexojs/hexo         # TODO:
+
+deploy:
+  type: git
+  repo: git@github.com:xyzwps/xyzwps.github.io.git
+  branch: deploy

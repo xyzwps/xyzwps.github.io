@@ -7,6 +7,7 @@
   },
   "scripts": {
     "build": "hexo generate",
+    "deploy": "hexo clean && hexo deploy",
     "start": "hexo server",
     "eslint": "eslint .",
     "prepare": "husky install"
@@ -15,6 +16,7 @@
     "cheerio": "^0.22.0",
     "hexo": "hexojs/hexo",
     "hexo-clean-css": "^2.0.0",
+    "hexo-deployer-git": "^3.0.0",
     "hexo-filter-nofollow": "^2.0.2",
     "hexo-fs": "^3.1.0",
     "hexo-generator-archive": "^1.0.0",
