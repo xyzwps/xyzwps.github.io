@@ -1,5 +1,6 @@
 ---
 title: 变量
+comments: false
 ---
 
 ## 声明变量

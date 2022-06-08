@@ -1,5 +1,6 @@
 ---
 title: 函数
+comments: false
 ---
 
 ## 函数定义

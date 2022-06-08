@@ -1,5 +1,6 @@
 ---
 title: 特殊函数
+comments: false
 ---
 
 # 内置函数

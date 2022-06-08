@@ -1,5 +1,6 @@
 ---
 title: 基本类型
+comments: false
 ---
 
 ## 基本类型

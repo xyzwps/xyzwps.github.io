@@ -1,5 +1,6 @@
 ---
 title: Struct
+comments: false
 ---
 
 `struct` 是一组字段的集合。

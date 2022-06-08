@@ -1,5 +1,6 @@
 ---
 title: for 语句
+comments: false
 ---
 
 ## for 语句

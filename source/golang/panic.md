@@ -1,5 +1,6 @@
 ---
 title: panic 和 recover
+comments: false
 ---
 
 函数在执行过程中，如果主动调用 `panic` 函数，或者发生了运行时 panic，那么这个函数的执行就会终止。不过 defer 部分还会照常执行。于是我们就可以在 defer 部分调用 `recover` 函数来处理这些 panic 了。

@@ -1,5 +1,6 @@
 ---
 title: 数组和 Slice
+comments: false
 ---
 
 ## 数组

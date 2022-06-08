@@ -1,5 +1,6 @@
 ---
 title: 指针
+comments: false
 ---
 
 Go 语言有指针类型。惊不惊喜？

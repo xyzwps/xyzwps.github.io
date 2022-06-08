@@ -1,5 +1,6 @@
 ---
 title: 深复制
+comments: false
 ---
 
 Go 语言在赋值时，总是对 struct 进行深复制。观察下面的例子：

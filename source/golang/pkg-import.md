@@ -1,5 +1,6 @@
 ---
 title: package 和 import
+comments: false
 ---
 
 类似于 Java，Go 语言的代码是以 package 的方式组织起来的。

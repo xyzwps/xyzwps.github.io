@@ -1,5 +1,6 @@
 ---
 title: 突击学点 Go 语言
+comments: false
 ---
 
 突击学点 Go 语言。

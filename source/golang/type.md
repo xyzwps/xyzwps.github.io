@@ -1,5 +1,6 @@
 ---
 title: type 关键字
+comments: false
 ---
 
 `type` 关键字有两个作用：**声明类型别名**和**定义类型**。

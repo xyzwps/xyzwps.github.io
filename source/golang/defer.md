@@ -1,5 +1,6 @@
 ---
 title: defer 语句
+comments: false
 ---
 
 ## 基本用法

@@ -1,5 +1,6 @@
 ---
 title: 并发
+comments: false
 ---
 
 ## Goroutine

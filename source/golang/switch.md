@@ -1,5 +1,6 @@
 ---
 title: switch 语句
+comments: false
 ---
 
 `switch` 语句是一种简洁地写 `if - else` 的方式。

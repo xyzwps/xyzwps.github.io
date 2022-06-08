@@ -1,5 +1,6 @@
 ---
 title: 不相等的 nil
+comments: false
 ---
 
 观察下面代码：

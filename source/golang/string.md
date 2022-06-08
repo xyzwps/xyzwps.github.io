@@ -1,5 +1,6 @@
 ---
 title: 字符串
+comments: false
 ---
 
 Go 语言字符串是一个不可变的**字节**数组，类型是 `string`。

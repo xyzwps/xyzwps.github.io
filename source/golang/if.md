@@ -1,5 +1,6 @@
 ---
 title: if 语句
+comments: false
 ---
 
 ## 基本 if 语句

@@ -1,5 +1,6 @@
 ---
 title: 接口
+comments: false
 ---
 
 ## 接口的定义与实现

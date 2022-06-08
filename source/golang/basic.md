@@ -1,5 +1,6 @@
 ---
 title: 杂项
+comments: false
 ---
 
 ## 代码格式化
