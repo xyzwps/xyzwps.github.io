@@ -3,13 +3,15 @@ title: 突击学点 Go 语言
 comments: false
 ---
 
-突击学点 Go 语言。
+学点 Go 语言。
 
 Go dev 网站集合：
 
 * https://go.dev/（曾经的 https://golang.org）
 * https://golang.google.cn/
 * https://go-zh.org/
+
+The Go Blog，推荐阅读: https://go.dev/blog/
 
 Go 国内加速镜像：
 
