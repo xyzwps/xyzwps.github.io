@@ -7,7 +7,7 @@ const cheerio = require('cheerio');
 const lunr = require('lunr');
 const full_url_for = hexo.extend.helper.get('full_url_for').bind(hexo);
 
-const localizedPath = ['docs', 'java', 'redis'];
+const localizedPath = ['java', 'redis'];
 
 hexo.extend.helper.register('page_nav', function() {
   const type = this.page.canonical_path.split('/')[0];
