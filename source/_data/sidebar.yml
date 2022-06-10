@@ -72,6 +72,7 @@ golang:
   常见问题:
     不相等的 nil: notes-nil.html
     深复制: notes-deep-clone.html
+    instanceof: instanceof.html
   其他:
     并发: concurrency.html
     包和导入: pkg-import.html
