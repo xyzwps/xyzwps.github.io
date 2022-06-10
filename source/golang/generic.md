@@ -108,7 +108,39 @@ func Map[F any, T any](from []F, mapper func(F) T) []T {
 }
 ```
 
+# 泛型库
+
 网上应该也有人写了一些处理集合的一些库，比如 [samber/lo](https://github.com/samber/lo)。可以编程过程中的痛苦少了一大半~
+
+# 常见问题
+
+## 如何返回 T 类型的零值
+
+比如有这么一个函数:
+
+```go
+func A[T any]() (T, error) {
+	if result, err := doSomething(); err != nil {
+		return ${T的零值}, err
+	} else {
+		return result, nil
+	}
+}
+```
+
+`${}` 部分应该写什么？如果写 `nil` 会产生一个编译时错误。Go 中也没有类似 C# 中的默认值表达式。该怎么办？这里只能绕一下了，比如写成下面这样：
+
+```go
+func A[T any]() (T, error) {
+	if result, err := doSomething(); err != nil {
+		var zeroValue T  // 这里声明一个 T 类型的变量
+		return zeroValue, err
+	} else {
+		return result, nil
+	}
+}
+```
+
 
 # 参考
 
