@@ -1,6 +1,6 @@
 # Baal
 
-- [ ] 学习 nebula
+- [ ] 学习 neo4j
 - [ ] 学习 tls1.2
   * https://www.rfc-editor.org/info/rfc5246
   * https://www.ibm.com/docs/en/sdk-java-technology/7.1?* topic=handshake-tls-12-protocol
