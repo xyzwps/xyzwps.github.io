@@ -19,6 +19,9 @@ pretty_urls:
 
 theme: navy
 
+katex:
+  stylesheet_fragment: '<link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.0/katex.min.css" rel="stylesheet">'
+
 highlight:
   enable: true
   line_number: false
