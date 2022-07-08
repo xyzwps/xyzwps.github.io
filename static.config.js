@@ -1,11 +1,9 @@
-import path from 'path'
-import axios from 'axios'
+import path from 'path';
+import axios from 'axios';
 
-export default {
+const config = {
   getRoutes: async () => {
-    const { data: posts } = await axios.get(
-      'https://jsonplaceholder.typicode.com/posts'
-    )
+    const { data: posts } = await axios.get('https://jsonplaceholder.typicode.com/posts');
 
     return [
       {
@@ -13,7 +11,7 @@ export default {
         getData: () => ({
           posts,
         }),
-        children: posts.map(post => ({
+        children: posts.map((post) => ({
           path: `/post/${post.id}`,
           template: 'src/containers/Post',
           getData: () => ({
@@ -21,7 +19,7 @@ export default {
           }),
         })),
       },
-    ]
+    ];
   },
   plugins: [
     [
@@ -32,5 +30,8 @@ export default {
     ],
     require.resolve('react-static-plugin-reach-router'),
     require.resolve('react-static-plugin-sitemap'),
+    'react-static-plugin-mdx',
   ],
-}
+};
+
+export default config;

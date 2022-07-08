@@ -18,6 +18,7 @@ function App() {
         <Link to="/blog">Blog</Link>
         <Link to="/dynamic">Dynamic</Link>
         <Link to="/jsxgraph">JSXGraph</Link>
+        <Link to="/mdx">MDX</Link>
       </nav>
       <div className="content">
         <React.Suspense fallback={<em>Loading...</em>}>
