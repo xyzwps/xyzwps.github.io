@@ -1,26 +1,33 @@
 import path from 'path';
-import axios from 'axios';
+import _ from 'lodash';
+
+import anthologyRedis from './src/anthology/redis';
+
+const getAnthology = (anthology) => {
+  const anthologyPath = '/a/' + anthology.path;
+  return [
+    {
+      path: anthologyPath,
+      template: 'src/containers/AnthologyPreface',
+      getData: () => ({ anthology }),
+    },
+    ..._(anthology.toc)
+      .map('children')
+      .flatten()
+      .map(({ title, path }) => ({
+        path: `${anthologyPath}/${path}`,
+        template: 'src/containers/Anthology',
+        getData: () => ({ epigram: { title, path }, anthology }),
+      }))
+      .value(),
+  ];
+};
 
 const config = {
   getRoutes: async () => {
-    const { data: posts } = await axios.get('https://jsonplaceholder.typicode.com/posts');
-
-    return [
-      {
-        path: '/blog',
-        getData: () => ({
-          posts,
-        }),
-        children: posts.map((post) => ({
-          path: `/post/${post.id}`,
-          template: 'src/containers/Post',
-          getData: () => ({
-            post,
-          }),
-        })),
-      },
-    ];
+    return [...getAnthology(anthologyRedis)];
   },
+
   plugins: [
     [
       require.resolve('react-static-plugin-source-filesystem'),
@@ -30,7 +37,7 @@ const config = {
     ],
     require.resolve('react-static-plugin-reach-router'),
     require.resolve('react-static-plugin-sitemap'),
-    'react-static-plugin-mdx',
+    'my-mdx',
   ],
 };
 
