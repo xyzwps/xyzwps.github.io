@@ -1,6 +1,3 @@
-import React from 'react';
-import JXGBoard from '@sswatson/jsxgraph-react-js';
-
 const logicJS = (brd) => {
   brd.suspendUpdate();
   var a = brd.create(

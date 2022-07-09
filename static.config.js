@@ -14,10 +14,10 @@ const getAnthology = (anthology) => {
     ..._(anthology.toc)
       .map('children')
       .flatten()
-      .map(({ title, path }) => ({
+      .map(({ title, path, meta }) => ({
         path: `${anthologyPath}/${path}`,
         template: 'src/containers/Anthology',
-        getData: () => ({ epigram: { title, path }, anthology }),
+        getData: () => ({ epigram: { title, path, meta }, anthology }),
       }))
       .value(),
   ];
@@ -35,7 +35,7 @@ const config = {
         location: path.resolve('./src/pages'),
       },
     ],
-    require.resolve('react-static-plugin-reach-router'),
+    'my-router',
     require.resolve('react-static-plugin-sitemap'),
     'my-mdx',
   ],

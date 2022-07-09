@@ -1,7 +1,16 @@
-import redisRoutes from './redis/routes';
+import redisRoutes from "./redis/routes";
 
 const data = {
   redis: redisRoutes,
 };
 
-export default data;
+const routes = {};
+
+for (const anthologyPath in data) {
+  const epigrams = data[anthologyPath];
+  for (const epigramPath in epigrams) {
+    routes[`${anthologyPath}/${epigramPath}`] = epigrams[epigramPath];
+  }
+}
+
+export default routes;

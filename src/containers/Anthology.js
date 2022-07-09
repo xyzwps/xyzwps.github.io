@@ -1,22 +1,22 @@
-import React from 'react';
-import { useRouteData } from 'react-static';
-import { Link } from 'components/Router';
-import anthologyRoutes from '../anthology/routes';
-import _ from 'lodash';
+import React from "react";
+import { useRouteData } from "react-static";
+import { Link } from "components/Router";
+import anthologyRoutes from "../anthology/routes";
+import _ from "lodash";
+import AnthologyToc from "../components/AnthologyToc";
 
 export default function Anthology() {
   const { epigram, anthology } = useRouteData();
-
-  const route = `${anthology.path}/${epigram.path}`.replace(/\//g, '.').replace(/-/g, '_');
-
-  const Content = _.get(anthologyRoutes, route);
+  const route = `${anthology.path}/${epigram.path}`;
+  const { Content, meta } = anthologyRoutes[route];
 
   return (
     <div>
-      <Link to={`/a/${anthology.path}`}>{'<'} Back</Link>
+      <Link to={`/a/${anthology.path}`}>{"<"} Back</Link>
+      <AnthologyToc anthology={anthology} />
       <br />
-      <h3>{epigram.title}</h3>
-      <p>{epigram.path}</p>
+      <pre>{JSON.stringify(epigram, null, "  ")}</pre>
+      <pre>{JSON.stringify(meta, null, "  ")}</pre>
       <Content />
     </div>
   );
