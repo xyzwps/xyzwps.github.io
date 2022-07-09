@@ -1,22 +1,22 @@
-import path from 'path';
-import _ from 'lodash';
+import path from "path";
+import _ from "lodash";
 
-import anthologyRedis from './src/anthology/redis';
+import anthologyRedis from "./src/anthology/redis";
 
 const getAnthology = (anthology) => {
-  const anthologyPath = '/a/' + anthology.path;
+  const anthologyPath = "/a/" + anthology.path;
   return [
     {
       path: anthologyPath,
-      template: 'src/containers/AnthologyPreface',
+      template: "src/containers/AnthologyPreface",
       getData: () => ({ anthology }),
     },
     ..._(anthology.toc)
-      .map('children')
+      .map("children")
       .flatten()
       .map(({ title, path, meta }) => ({
         path: `${anthologyPath}/${path}`,
-        template: 'src/containers/Anthology',
+        template: "src/containers/Epigram",
         getData: () => ({ epigram: { title, path, meta }, anthology }),
       }))
       .value(),
@@ -29,15 +29,17 @@ const config = {
   },
 
   plugins: [
+    "react-static-plugin-css-modules",
+    "react-static-plugin-sass",
     [
-      require.resolve('react-static-plugin-source-filesystem'),
+      require.resolve("react-static-plugin-source-filesystem"),
       {
-        location: path.resolve('./src/pages'),
+        location: path.resolve("./src/pages"),
       },
     ],
-    'my-router',
-    require.resolve('react-static-plugin-sitemap'),
-    'my-mdx',
+    "my-router",
+    require.resolve("react-static-plugin-sitemap"),
+    "my-mdx",
   ],
 };
 

@@ -1,0 +1,10 @@
+.epigram-layout {
+  display: flex;
+
+  .toc {
+    flex-basis: 240px;
+  }
+  .content {
+    flex: 1 1;
+  }
+}
