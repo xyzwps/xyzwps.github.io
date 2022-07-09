@@ -1,10 +1,13 @@
+@import "~@csstools/normalize.css";
+
 * {
   scroll-behavior: smooth;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue',
-    Helvetica, Arial, 'Lucida Grande', sans-serif;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial,
+    "Lucida Grande", sans-serif;
   font-weight: 300;
   font-size: 16px;
   margin: 0;
@@ -34,4 +37,5 @@ nav a {
 
 .content {
   padding: 1rem;
+  overflow-x: auto;
 }

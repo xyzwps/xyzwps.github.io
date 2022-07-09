@@ -1,7 +1,9 @@
+import golangRoutes from "./golang/routes";
 import redisRoutes from "./redis/routes";
 
 const data = {
   redis: redisRoutes,
+  golang: golangRoutes,
 };
 
 const routes = {};

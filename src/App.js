@@ -18,7 +18,8 @@ function App() {
         <Link to="/dynamic">Dynamic</Link>
         <Link to="/jsxgraph">JSXGraph</Link>
         <Link to="/mdx">MDX</Link>
-        <Link to="/a/redis">redis</Link>
+        <Link to="/a/redis">Redis</Link>
+        <Link to="/a/golang">Go</Link>
       </nav>
       <div className="content">
         <React.Suspense fallback={<em>Loading...</em>}>

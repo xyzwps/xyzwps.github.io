@@ -1,6 +1,7 @@
 import path from "path";
 import _ from "lodash";
 
+import anthologyGolang from "./src/anthology/golang";
 import anthologyRedis from "./src/anthology/redis";
 
 const getAnthology = (anthology) => {
@@ -25,7 +26,7 @@ const getAnthology = (anthology) => {
 
 const config = {
   getRoutes: async () => {
-    return [...getAnthology(anthologyRedis)];
+    return [...getAnthology(anthologyGolang), ...getAnthology(anthologyRedis)];
   },
 
   plugins: [
