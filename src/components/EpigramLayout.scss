@@ -1,12 +1,14 @@
 .epigram-layout {
   display: flex;
   .toc {
-    flex-basis: 240px;
+    flex-basis: 200px;
     flex-shrink: 0;
   }
   .content {
     flex-grow: 1;
+    padding: 1rem;
     min-width: 0;
+    line-height: 1.5;
     pre {
       border: 1px solid gray;
       overflow-x: auto;
@@ -14,6 +16,11 @@
       line-height: 1.5;
       code {
         width: max-content;
+      }
+    }
+    ul, ol {
+      li {
+        margin-bottom: 0.5rem;
       }
     }
     table {

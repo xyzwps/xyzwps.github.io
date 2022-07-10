@@ -15,7 +15,6 @@
     "@sswatson/jsxgraph-react-js": "^1.0.10",
     "gray-matter": "^4.0.2",
     "lodash": "^4.17.21",
-    "mdx.macro": "^0.2.9",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-hot-loader": "^4.13.0",

@@ -1,0 +1,13 @@
+.web-site-list {
+  dl {
+    dt {
+      margin: 0.5rem 0 0.25rem;
+      &::before {
+        content: "• ";
+      }
+    }
+    dd {
+      margin: 0 0.8rem 0.8rem;
+    }
+  }
+}
