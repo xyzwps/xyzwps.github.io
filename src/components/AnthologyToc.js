@@ -7,7 +7,7 @@ function TocSection({ section, parentPath }) {
     <div className="anthology-toc-section">
       <div>{section.section}</div>
       <ul className="anthology-toc-section-epigram">
-        {_.map(section.children, (epigram) => (
+        {section.children.map((epigram) => (
           <li key={epigram.path}>
             <Link to={`${parentPath}/${epigram.path}`}>{epigram.title}</Link>
           </li>
