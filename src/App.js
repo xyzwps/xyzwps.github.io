@@ -30,6 +30,12 @@ function App() {
           </Router>
         </React.Suspense>
       </div>
+      <div>
+        <img
+          alt="又拍云联盟"
+          src="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral"
+        />
+      </div>
     </Root>
   );
 }
