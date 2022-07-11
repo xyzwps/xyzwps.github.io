@@ -1,8 +1,8 @@
 ---
 title: Ambassador Pattern
+translateFrom: https://docs.microsoft.com/en-us/azure/architecture/patterns/ambassador
 ---
 
-[戳此处查看原文](https://docs.microsoft.com/en-us/azure/architecture/patterns/ambassador)
 
 创建帮助器服务，来代表使用者服务或应用程序发送网络请求。
 可以将 ambassador 服务看作是与客户机同处一地的进程外代理。
@@ -33,7 +33,7 @@ title: Ambassador Pattern
 代理可以监视性能指标，比如延迟或资源使用情况，
 这种监视与应用程序发生在同一个主机环境中。
 
-![Ambassador](./ambassador.png)
+![Ambassador](/asset/img/ambassador.png)
 
 卸载到 ambassador 的特性可以独立于应用程序进行管理。
 您可以在不干扰应用程序遗留功能的情况下更新和修改大使。
@@ -73,3 +73,5 @@ Ambassador 服务可以部署为伴随使用应用程序或服务的生命周期
 
 下图显示应用程序通过 ambassador 代理向远程服务发出请求。Ambassador 提供路由、断路和日志记录。
 它调用远程服务，然后将响应返回给客户端应用程序:
+
+![Ambassador](/asset/img/ambassador-example.png)
