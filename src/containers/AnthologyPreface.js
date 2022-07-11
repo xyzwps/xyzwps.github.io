@@ -1,7 +1,6 @@
 import React from "react";
 import { useRouteData } from "react-static";
 import { Link } from "components/Router";
-import _ from "lodash";
 import AnthologyToc from "../components/AnthologyToc";
 
 export default function AnthologyPreface() {

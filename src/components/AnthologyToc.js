@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "components/Router";
-import _ from "lodash";
 import './AnthologyToc.scss'
 
 function TocSection({ section, parentPath }) {
@@ -26,7 +25,7 @@ function AnthologyToc({ anthology }) {
       <h2>
         <Link to={anthologyPath}>{anthology.title}</Link>
       </h2>
-      {_.map(toc, (section) => (
+      {toc.map((section) => (
         <TocSection section={section} parentPath={anthologyPath} key={section.section} />
       ))}
     </div>
