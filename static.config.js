@@ -4,7 +4,20 @@ import _ from "lodash";
 import anthologyGolang from "./src/anthology/golang";
 import anthologyRedis from "./src/anthology/redis";
 
-const getAnthology = (anthology) => {
+import blogs from "./src/blog";
+
+const blogRoutes = () =>
+  blogs.map(({ path }) => {
+    return {
+      path: `/blogs/${path}`,
+      template: "src/blog/template",
+      getData: () => ({ path }),
+    };
+  });
+
+const blogRootRoute = () => ({ path: `/blogs`, template: "src/blog/blogs" });
+
+const getAnthologyRoutes = (anthology) => {
   const anthologyPath = "/a/" + anthology.path;
   return [
     {
@@ -26,7 +39,12 @@ const getAnthology = (anthology) => {
 
 const config = {
   getRoutes: async () => {
-    return [...getAnthology(anthologyGolang), ...getAnthology(anthologyRedis)];
+    return [
+      ...getAnthologyRoutes(anthologyGolang),
+      ...getAnthologyRoutes(anthologyRedis),
+      ...blogRoutes(),
+      blogRootRoute(),
+    ];
   },
 
   plugins: [

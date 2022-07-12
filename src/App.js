@@ -21,6 +21,7 @@ function App() {
         <Link to="/collection/frontend">前端</Link>
         <Link to="/a/redis">Redis</Link>
         <Link to="/a/golang">Go</Link>
+        <Link to="/blogs">Blogs</Link>
       </nav>
       <div className="content">
         <React.Suspense fallback={<em>Loading...</em>}>
