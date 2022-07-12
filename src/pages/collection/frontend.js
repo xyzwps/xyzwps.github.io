@@ -105,13 +105,38 @@ const List = [
     ],
   },
   {
-    section: "一些库",
+    section: "图形库",
     items: [
       {
         title: "JSXGraph",
         href: "https://jsxgraph.uni-bayreuth.de/wp/",
         desc: "Dynamic Mathematics with JavaScript",
       },
+      {
+        title: "Paper.js",
+        href: "http://paperjs.org/",
+        desc: "The Swiss Army Knife of Vector Graphics Scripting.",
+      },
+      {
+        title: "Fabric.js",
+        href: "http://fabricjs.com/",
+        desc: "A powerful and simple Javascript HTML5 canvas library",
+      },
+      {
+        title: "Konva.js",
+        href: "https://konvajs.org/",
+        desc: "HTML5 2d canvas js library for desktop and mobile applications",
+      },
+      {
+        title: "PixiJS",
+        href: "https://pixijs.com/",
+        desc: "The HTML5 Creation Engine. Create beautiful digital content with the fastest, most flexible 2D WebGL renderer.",
+      },
+    ],
+  },
+  {
+    section: "一些库",
+    items: [
       {
         title: "MathJax",
         href: "https://www.mathjax.org/",
