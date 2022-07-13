@@ -11,6 +11,14 @@ const list = [
     path: "async-request-reply",
     title: "Asynchronous Request-Reply Pattern",
   },
+  {
+    path: 'backends-for-frontends',
+    title: 'Backends for Frontends Pattern'
+  },
+  {
+    path: 'bulkhead',
+    title: 'Bulkhead Pattern'
+  }
 ];
 
 export default list;
