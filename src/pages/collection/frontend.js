@@ -166,17 +166,6 @@ const List = [
   },
 ];
 
-function Item({ title, href, desc }) {
-  return (
-    <>
-      <dt>
-        <a href={href}>{title}</a>
-      </dt>
-      {desc && <dd>{desc}</dd>}
-    </>
-  );
-}
-
 function Frontend() {
   return (
     <BlogLayout>

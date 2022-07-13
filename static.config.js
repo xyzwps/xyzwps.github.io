@@ -5,6 +5,7 @@ import anthologyGolang from "./src/anthology/golang";
 import anthologyRedis from "./src/anthology/redis";
 
 import blogs from "./src/blog";
+import cloudDesignPatterns from "./src/design-patterns/cloud";
 
 const blogRoutes = () =>
   blogs.map(({ path }) => {
@@ -16,6 +17,22 @@ const blogRoutes = () =>
   });
 
 const blogRootRoute = () => ({ path: `/blogs`, template: "src/blog/blogs" });
+
+const desigpPatternsRoute = () => ({
+  path: `/design-patterns`,
+  template: "src/design-patterns/template",
+  children: [
+    {
+      path: "/cloud",
+      template: "src/design-patterns/cloud/overview-template",
+      children: cloudDesignPatterns.map(({ path }) => ({
+        path,
+        template: "src/design-patterns/cloud/template",
+        getData: () => ({ path }),
+      })),
+    },
+  ],
+});
 
 const getAnthologyRoutes = (anthology) => {
   const anthologyPath = "/a/" + anthology.path;
@@ -44,6 +61,7 @@ const config = {
       ...getAnthologyRoutes(anthologyRedis),
       ...blogRoutes(),
       blogRootRoute(),
+      desigpPatternsRoute(),
     ];
   },
 
