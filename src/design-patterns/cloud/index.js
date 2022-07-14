@@ -12,13 +12,17 @@ const list = [
     title: "Asynchronous Request-Reply Pattern",
   },
   {
-    path: 'backends-for-frontends',
-    title: 'Backends for Frontends Pattern'
+    path: "backends-for-frontends",
+    title: "Backends for Frontends Pattern",
   },
   {
-    path: 'bulkhead',
-    title: 'Bulkhead Pattern'
-  }
+    path: "bulkhead",
+    title: "Bulkhead Pattern",
+  },
+  {
+    path: "cache-aside",
+    title: "Cache Aside Pattern",
+  },
 ];
 
 export default list;
