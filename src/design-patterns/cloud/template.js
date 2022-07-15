@@ -9,11 +9,18 @@ export default function CloudDesignPatternTemplate() {
   const { Content, meta } = routeToData[path];
 
   return (
-    <Container>
-      <h1>{meta.title}</h1>
-      <small>{path.substr(0, 10)}</small>
-      <TOC />
-      <Content />
-    </Container>
+    <div>
+      <div style={{ display: "flex" }}>
+        <div style={{ flexBasis: 300, flexShrink: 0 }}>
+          <h1>云设计模式</h1>
+          <TOC />
+        </div>
+        <div style={{ flexGrow: 1, maxWidth: 800 }}>
+          <h1>{meta.title}</h1>
+          <small>{path.substr(0, 10)}</small>
+          <Content />
+        </div>
+      </div>
+    </div>
   );
 }

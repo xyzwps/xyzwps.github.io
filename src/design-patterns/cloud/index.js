@@ -23,6 +23,14 @@ const list = [
     path: "cache-aside",
     title: "Cache Aside Pattern",
   },
+  {
+    path: "choreography",
+    title: "Choreography Pattern",
+  },
+  {
+    path: "circuit-breaker",
+    title: "Circuit Breaker Pattern",
+  },
 ];
 
 export default list;
