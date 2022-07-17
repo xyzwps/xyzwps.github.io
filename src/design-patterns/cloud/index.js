@@ -31,6 +31,18 @@ const list = [
     path: "circuit-breaker",
     title: "Circuit Breaker Pattern",
   },
+  {
+    path: "claim-check",
+    title: 'Claim-Check Pattern'
+  },
+  {
+    path: 'compensating-transaction',
+    title: '补偿事务'
+  },
+  {
+    path:'competing-consumers',
+    title: 'Competing Consumers Pattern'
+  }
 ];
 
 export default list;

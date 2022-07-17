@@ -6,6 +6,9 @@ import C005, { frontMatter as meta005 } from "./bulkhead.mdx";
 import C006, { frontMatter as meta006 } from "./cache-aside.mdx";
 import C007, { frontMatter as meta007 } from "./choreography.mdx";
 import C008, { frontMatter as meta008 } from "./circuit-breaker.mdx";
+import C009, { frontMatter as meta009 } from "./claim-check.mdx";
+import C010, { frontMatter as meta010 } from "./compensating-transaction.mdx";
+import C011, { frontMatter as meta011 } from "./competing-consumers.mdx";
 
 const list = [
   [C001, meta001, "ambassador"],
@@ -16,6 +19,9 @@ const list = [
   [C006, meta006, "cache-aside"],
   [C007, meta007, "choreography"],
   [C008, meta008, "circuit-breaker"],
+  [C009, meta009, "claim-check"],
+  [C010, meta010, "compensating-transaction"],
+  [C011, meta011, "competing-consumers"],
 ];
 
 const pathToData = {};
