@@ -42,6 +42,10 @@ const list = [
   {
     path:'competing-consumers',
     title: 'Competing Consumers Pattern'
+  },
+  {
+    path: 'compute-resource-consolidation',
+    title: 'Compute Resource Consolidation Pattern'
   }
 ];
 

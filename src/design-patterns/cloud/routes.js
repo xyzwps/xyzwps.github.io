@@ -9,6 +9,7 @@ import C008, { frontMatter as meta008 } from "./circuit-breaker.mdx";
 import C009, { frontMatter as meta009 } from "./claim-check.mdx";
 import C010, { frontMatter as meta010 } from "./compensating-transaction.mdx";
 import C011, { frontMatter as meta011 } from "./competing-consumers.mdx";
+import C012, { frontMatter as meta012 } from "./compute-resource-consolidation.mdx";
 
 const list = [
   [C001, meta001, "ambassador"],
@@ -22,6 +23,7 @@ const list = [
   [C009, meta009, "claim-check"],
   [C010, meta010, "compensating-transaction"],
   [C011, meta011, "competing-consumers"],
+  [C012, meta012, "compute-resource-consolidation"],
 ];
 
 const pathToData = {};
