@@ -26,6 +26,9 @@ blockquote {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
+li {
+  margin-bottom: 0.5rem;
+}
 
 .content {
   padding: 1rem;

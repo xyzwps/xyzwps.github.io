@@ -33,20 +33,24 @@ const list = [
   },
   {
     path: "claim-check",
-    title: 'Claim-Check Pattern'
+    title: "Claim-Check Pattern",
   },
   {
-    path: 'compensating-transaction',
-    title: '补偿事务'
+    path: "compensating-transaction",
+    title: "补偿事务",
   },
   {
-    path:'competing-consumers',
-    title: 'Competing Consumers Pattern'
+    path: "competing-consumers",
+    title: "Competing Consumers Pattern",
   },
   {
-    path: 'compute-resource-consolidation',
-    title: 'Compute Resource Consolidation Pattern'
-  }
+    path: "compute-resource-consolidation",
+    title: "Compute Resource Consolidation Pattern",
+  },
+  {
+    path: "cqrs",
+    title: "CQRS",
+  },
 ];
 
 export default list;
