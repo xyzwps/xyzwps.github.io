@@ -4,6 +4,7 @@ import routeToData from "./routes";
 import ClassicBlogLayout from "../../components/ClassicBlogLayout";
 import TOC from "./toc";
 
+
 export default function CloudDesignPatternTemplate() {
   const { path } = useRouteData();
   const { Content, meta } = routeToData[path];

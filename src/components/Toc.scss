@@ -1,0 +1,13 @@
+.xn-toc1 {
+  list-style-type: "· ";
+  padding-left: 0.5rem;
+  .xn-toc1-item {
+    font-size: 0.9rem;
+    * {
+      color: #24292d;
+    }
+    a {
+      text-decoration: none;
+    }
+  }
+}
