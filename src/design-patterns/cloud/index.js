@@ -51,6 +51,18 @@ const list = [
     path: "cqrs",
     title: "CQRS",
   },
+  {
+    path: "deployment-stamp",
+    title: "Deployment Stamps Pattern",
+  },
+  {
+    path: "edge-workload-configuration",
+    title: "Edge Workload Configuration Pattern",
+  },
+  {
+    path: "event-sourcing",
+    title: "事件溯源",
+  },
 ];
 
 export default list;

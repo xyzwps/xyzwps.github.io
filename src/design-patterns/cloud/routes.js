@@ -11,6 +11,9 @@ import C010, { frontMatter as meta010 } from "./compensating-transaction.mdx";
 import C011, { frontMatter as meta011 } from "./competing-consumers.mdx";
 import C012, { frontMatter as meta012 } from "./compute-resource-consolidation.mdx";
 import C013, { frontMatter as meta013 } from "./cqrs.mdx";
+import C014, { frontMatter as meta014 } from "./deployment-stamp.mdx";
+import C015, { frontMatter as meta015 } from "./edge-workload-configuration.mdx";
+import C016, { frontMatter as meta016 } from "./event-sourcing.mdx";
 
 const list = [
   [C001, meta001, "ambassador"],
@@ -26,6 +29,9 @@ const list = [
   [C011, meta011, "competing-consumers"],
   [C012, meta012, "compute-resource-consolidation"],
   [C013, meta013, "cqrs"],
+  [C014, meta014, "deployment-stamp"],
+  [C015, meta015, "edge-workload-configuration"],
+  [C016, meta016, "event-sourcing"],
 ];
 
 const pathToData = {};

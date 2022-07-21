@@ -1,6 +1,7 @@
 .xn-toc1 {
   list-style-type: "· ";
-  padding-left: 0.5rem;
+  padding: 1rem;
+  border-right: 1px solid rgba($color: #8f8f8f, $alpha: 0.3);
   .xn-toc1-item {
     font-size: 0.9rem;
     * {

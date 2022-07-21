@@ -1,0 +1,13 @@
+.xn-alert {
+  border: 1px solid #6cc800;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: rgba($color: #6cc800, $alpha: 0.1);
+
+  .xn-alert-title {
+    font-size: 1.4rem;
+  }
+
+  .xn-alert-content {
+  }
+}
