@@ -1,0 +1,12 @@
+.xn-btn {
+  background-color: white;
+  border: solid 1px rgba($color: #0000ee, $alpha: 0.1);
+  border-radius: 4px;
+  padding: 4px 12px;
+  margin: 4px;
+}
+
+.xn-btn-active {
+  background-color: rgba($color: #0000ee, $alpha: 0.1);
+  cursor: not-allowed;
+}
