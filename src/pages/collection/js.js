@@ -12,6 +12,11 @@ const List = [
         href: "https://joi.dev/",
         desc: "The most powerful schema description language and data validator for JavaScript.",
       },
+      {
+        title: 'ow',
+        href: 'https://www.npmjs.com/package/ow',
+        desc: 'Function argument validation for humans.'
+      }
     ],
   },
   {

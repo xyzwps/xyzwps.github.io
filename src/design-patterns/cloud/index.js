@@ -63,6 +63,10 @@ const list = [
     path: "event-sourcing",
     title: "事件溯源",
   },
+  {
+    path:'external-configuration-store',
+    title: 'External Configuration Store'
+  }
 ];
 
 export default list;
