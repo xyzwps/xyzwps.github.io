@@ -64,9 +64,17 @@ const list = [
     title: "事件溯源",
   },
   {
-    path:'external-configuration-store',
-    title: 'External Configuration Store'
-  }
+    path: "external-configuration-store",
+    title: "External Configuration Store",
+  },
+  {
+    path: "federated-identity",
+    title: "Federated Identity",
+  },
+  {
+    path: "gatekeeper",
+    title: "Gatekeeper",
+  },
 ];
 
 export default list;
