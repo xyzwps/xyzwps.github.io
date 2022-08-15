@@ -17,6 +17,9 @@ import C016, { frontMatter as meta016 } from "./event-sourcing.mdx";
 import C017, { frontMatter as meta017 } from "./external-configuration-store.mdx";
 import C018, { frontMatter as meta018 } from "./federated-identity.mdx";
 import C019, { frontMatter as meta019 } from "./gatekeeper.mdx";
+import C020, { frontMatter as meta020 } from "./gateway-aggregation.mdx";
+import C021, { frontMatter as meta021 } from "./gateway-offloading.mdx";
+import C022, { frontMatter as meta022 } from "./gateway-routing.mdx";
 
 const list = [
   [C001, meta001, "ambassador"],
@@ -38,6 +41,9 @@ const list = [
   [C017, meta017, "external-configuration-store"],
   [C018, meta018, "federated-identity"],
   [C019, meta019, "gatekeeper"],
+  [C020, meta020, "gateway-aggregation"],
+  [C021, meta021, "gateway-offloading"],
+  [C022, meta022, "gateway-routing"],
 ];
 
 const pathToData = {};

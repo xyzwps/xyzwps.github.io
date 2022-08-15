@@ -75,6 +75,18 @@ const list = [
     path: "gatekeeper",
     title: "Gatekeeper",
   },
+  {
+    path: "gateway-aggregation",
+    title: "网关聚合",
+  },
+  {
+    path: "gateway-offloading",
+    title: "Gateway Offloading",
+  },
+  {
+    path: "gateway-routing",
+    title: "网关路由",
+  },
 ];
 
 export default list;
