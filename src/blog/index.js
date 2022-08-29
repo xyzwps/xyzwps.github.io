@@ -1,5 +1,17 @@
 const list = [
   {
+    path: "2022-08-25-fp",
+    title: "函数式编程",
+  },
+  {
+    path: "2022-08-22-authn",
+    title: "Authentication",
+  },
+  {
+    path: "2022-08-18-id",
+    title: "ID 生成算法",
+  },
+  {
     path: "2022-08-02-pagination",
     title: "一个跨服务分页示例",
   },

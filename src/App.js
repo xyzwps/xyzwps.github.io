@@ -21,6 +21,7 @@ const navItems = [
   ["/a/golang", "Go"],
   ["/blogs", "Blogs"],
   ["/design-patterns", "设计模式"],
+  ["/tools/hash", "Hash"],
 ];
 
 function App() {
