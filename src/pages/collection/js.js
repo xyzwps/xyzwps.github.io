@@ -13,10 +13,10 @@ const List = [
         desc: "The most powerful schema description language and data validator for JavaScript.",
       },
       {
-        title: 'ow',
-        href: 'https://www.npmjs.com/package/ow',
-        desc: 'Function argument validation for humans.'
-      }
+        title: "ow",
+        href: "https://www.npmjs.com/package/ow",
+        desc: "Function argument validation for humans.",
+      },
     ],
   },
   {
@@ -26,6 +26,11 @@ const List = [
         title: "table",
         href: "https://www.npmjs.com/package/table",
         desc: "Formats data into a string table.",
+      },
+      {
+        title: "thunky",
+        href: "https://www.npmjs.com/package/thunky",
+        desc: "Delay the evaluation of a paramless async function and cache the result",
       },
       {
         title: "yn",

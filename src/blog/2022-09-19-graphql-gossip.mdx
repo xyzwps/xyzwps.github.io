@@ -1,0 +1,18 @@
+---
+title: GraphQL 碎碎念
+---
+
+
+## 概要和详情
+
+有时，查询概要和详情所付出的代价差别巨大。
+
+在 UI 上，有时会有一个列表页面查询每项业务数据的概要，然后通过点击这些项再去查看每一项的详情数据。如果在设计 GraphQL schema 时，把详情相关字段挂到摘要 schema 中，就会出现管不住 API 使用者的情况，一不小心查出了当前页面的非必要数据，导致查询性能极差。
+
+比如查询资产时
+比如查询好友列表和好友详情
+
+## 限流
+
+* [graphql-rate-limit-directive](https://www.npmjs.com/package/graphql-rate-limit-directive): 固定窗口的 GraphQL 限流指令
+* [graphql-rate-limit](https://www.npmjs.com/package/graphql-rate-limit): 灵活的 GraphQL 限流库（似乎不太更新了??）
