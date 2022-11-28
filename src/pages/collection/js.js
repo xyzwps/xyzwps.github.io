@@ -40,6 +40,41 @@ const List = [
     ],
   },
   {
+    section: "日志",
+    items: [
+      {
+        title: "tslog",
+        href: "https://tslog.js.org/",
+        desc: "Expressive TypeScript Logger for Node.js: Pretty errors, stack traces, code frames, and JSON output to attachable transports.",
+      },
+      {
+        title: 'winston',
+        href: 'https://www.npmjs.com/package/winston',
+        desc: 'A logger for just about everything.'
+      },
+      {
+        title:"pino",
+        href: 'https://getpino.io/#/',
+        desc: 'super fast, all natural json logger'
+      }
+    ],
+  },
+  {
+    section: 'Schema',
+    items: [
+      {
+        title:'zod',
+        href: 'https://zod.dev/',
+        desc: 'TypeScript-first schema declaration and validation library with static type inference',
+      },
+      {
+        title: 'joi',
+        href: 'https://joi.dev/',
+        desc: 'Object schema validation'
+      }
+    ]
+  },
+  {
     section: "惊喜",
     items: [
       {

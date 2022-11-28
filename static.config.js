@@ -3,6 +3,7 @@ import _ from "lodash";
 
 import anthologyGolang from "./src/anthology/golang";
 import anthologyRedis from "./src/anthology/redis";
+import anthologyHash from "./src/anthology/hash";
 
 import blogs from "./src/blog";
 import cloudDesignPatterns from "./src/design-patterns/cloud";
@@ -59,6 +60,7 @@ const config = {
     return [
       ...getAnthologyRoutes(anthologyGolang),
       ...getAnthologyRoutes(anthologyRedis),
+      ...getAnthologyRoutes(anthologyHash),
       ...blogRoutes(),
       blogRootRoute(),
       desigpPatternsRoute(),

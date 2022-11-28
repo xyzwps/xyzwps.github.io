@@ -1,9 +1,11 @@
 import golangRoutes from "./golang/routes";
+import hashRoutes from "./hash/routes";
 import redisRoutes from "./redis/routes";
 
 const data = {
   redis: redisRoutes,
   golang: golangRoutes,
+  hash: hashRoutes,
 };
 
 const routes = {};
