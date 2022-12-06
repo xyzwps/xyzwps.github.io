@@ -7,6 +7,9 @@ import Blog006, { frontMatter as meta006 } from "./2022-08-02-pagination.mdx";
 import Blog00S, { frontMatter as meta00S } from "./2022-08-18-id.mdx";
 import Blog007, { frontMatter as meta007 } from "./2022-08-22-authn.mdx";
 import Blog008, { frontMatter as meta008 } from "./2022-08-25-fp.mdx";
+import Blog009, { frontMatter as meta009 } from "./2022-09-19-graphql-gossip.mdx";
+import Blog010, { frontMatter as meta010 } from "./2022-10-17-password-strength.mdx";
+import Blog011, { frontMatter as meta011 } from "./2022-12-06-soft-link.mdx";
 
 const list = [
   [Blog001, meta001, "2022-06-06-go-http-client-use-self-siged-ca"],
@@ -18,6 +21,9 @@ const list = [
   [Blog00S, meta00S, "2022-08-18-id"],
   [Blog007, meta007, "2022-08-22-authn"],
   [Blog008, meta008, "2022-08-25-fp"],
+  [Blog009, meta009, "2022-09-19-graphql-gossip"],
+  [Blog010, meta010, "2022-10-17-password-strength"],
+  [Blog011, meta011, "2022-12-06-soft-link"],
 ];
 
 const routeToData = {};

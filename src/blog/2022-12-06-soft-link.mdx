@@ -1,0 +1,28 @@
+---
+title: 软连接
+---
+
+创建软连接：
+
+```
+ln -s [源文件/目录] [目标文件/目录]
+```
+
+软连接的源文件：
+
+```
+ls -l
+```
+
+输出结果示例：
+
+```console
+total 8
+-rw-r--r--  1 keqing  staff  418 Dec  4 13:17 application.conf
+drwxr-xr-x  3 keqing  staff   96 Dec  4 19:49 config
+drwxr-xr-x  3 keqing  staff   96 Dec  4 13:03 mysql
+lrwxr-xr-x  1 keqing  staff   17 Dec  4 22:31 public -> ../../front/dist/
+drwxr-xr-x  3 keqing  staff   96 Dec  4 09:50 zxcvbn
+```
+
+其中文件/目录 `public` 连接到了相对目录 `../../front/dist/` 上。

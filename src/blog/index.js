@@ -1,5 +1,17 @@
 const list = [
   {
+    path: "2022-12-06-soft-link",
+    title: "软连接",
+  },
+  {
+    path: "2022-10-17-password-strength",
+    title: "密码强度",
+  },
+  {
+    path: "2022-09-19-graphql-gossip",
+    title: "Graphql 碎碎念",
+  },
+  {
     path: "2022-08-25-fp",
     title: "函数式编程",
   },
