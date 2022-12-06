@@ -71,6 +71,11 @@ const List = [
         title: 'joi',
         href: 'https://joi.dev/',
         desc: 'Object schema validation'
+      },
+      {
+        title: 'yup',
+        href: 'https://www.npmjs.com/package/yup',
+        desc: 'Dead simple Object schema validation'
       }
     ]
   },
