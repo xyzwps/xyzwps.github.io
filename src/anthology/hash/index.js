@@ -9,6 +9,12 @@ const meta = {
         { title: "SipHash", path: "sip" },
       ],
     },
+    {
+      section: "实践",
+      children: [
+        { title: '如何安全存储密码', path: 'how-to-securely-store-password-in-db' }
+      ]
+    }
   ],
 };
 export default meta;
