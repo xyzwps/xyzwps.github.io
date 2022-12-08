@@ -6,6 +6,7 @@ import Dynamic from "containers/Dynamic";
 
 import "./app.css";
 import { NavItem, Nav, NavLink } from "./components/Nav";
+import MusicLoading from "./components/Loading/MusicLoading";
 
 // Any routes that start with 'dynamic' will be treated as non-static routes
 addPrefetchExcludes(["dynamic"]);
@@ -21,7 +22,9 @@ const navItems = [
   ["/a/golang", "Go"],
   ["/blogs", "Blogs"],
   ["/design-patterns", "设计模式"],
-  ["/tools/hash", "Hash"],
+  ["/tools/hash", "Hash Tools"],
+  ["/a/hash", "Hash"],
+  ["/loading", "Loading"],
 ];
 
 function App() {
@@ -35,7 +38,21 @@ function App() {
         ))}
       </Nav>
       <div className="content">
-        <React.Suspense fallback={<em>Loading...</em>}>
+        <React.Suspense
+          fallback={
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                height: 200,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <MusicLoading />
+            </div>
+          }
+        >
           <Router>
             <Dynamic path="dynamic" />
             <Routes path="*" />
