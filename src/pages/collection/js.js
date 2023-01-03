@@ -40,6 +40,21 @@ const List = [
     ],
   },
   {
+    section: "Parser",
+    items: [
+      {
+        title: "pegjs",
+        href: "https://github.com/pegjs",
+        desc: "Parser generator for Javascript",
+      },
+      {
+        title: "nearley",
+        href: "https://nearley.js.org/",
+        desc: "Simple, fast, powerful parser toolkit for JavaScript.",
+      },
+    ],
+  },
+  {
     section: "日志",
     items: [
       {
@@ -48,36 +63,36 @@ const List = [
         desc: "Expressive TypeScript Logger for Node.js: Pretty errors, stack traces, code frames, and JSON output to attachable transports.",
       },
       {
-        title: 'winston',
-        href: 'https://www.npmjs.com/package/winston',
-        desc: 'A logger for just about everything.'
+        title: "winston",
+        href: "https://www.npmjs.com/package/winston",
+        desc: "A logger for just about everything.",
       },
       {
-        title:"pino",
-        href: 'https://getpino.io/#/',
-        desc: 'super fast, all natural json logger'
-      }
+        title: "pino",
+        href: "https://getpino.io/#/",
+        desc: "super fast, all natural json logger",
+      },
     ],
   },
   {
-    section: 'Schema',
+    section: "Schema",
     items: [
       {
-        title:'zod',
-        href: 'https://zod.dev/',
-        desc: 'TypeScript-first schema declaration and validation library with static type inference',
+        title: "zod",
+        href: "https://zod.dev/",
+        desc: "TypeScript-first schema declaration and validation library with static type inference",
       },
       {
-        title: 'joi',
-        href: 'https://joi.dev/',
-        desc: 'Object schema validation'
+        title: "joi",
+        href: "https://joi.dev/",
+        desc: "Object schema validation",
       },
       {
-        title: 'yup',
-        href: 'https://www.npmjs.com/package/yup',
-        desc: 'Dead simple Object schema validation'
-      }
-    ]
+        title: "yup",
+        href: "https://www.npmjs.com/package/yup",
+        desc: "Dead simple Object schema validation",
+      },
+    ],
   },
   {
     section: "惊喜",

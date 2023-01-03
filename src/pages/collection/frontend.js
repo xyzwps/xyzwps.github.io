@@ -18,6 +18,11 @@ const List = [
     section: "React UI",
     items: [
       {
+        title: "Mantine",
+        href: "https://mantine.dev/",
+        desc: "A full featured react components library.",
+      },
+      {
         title: "Onsen UI",
         href: "https://onsen.io/",
         desc: "The most beautiful and efficient way to develop HTML5 hybrid and mobile web apps.",
@@ -105,14 +110,14 @@ const List = [
     ],
   },
   {
-    section:'表单',
+    section: "表单",
     items: [
       {
         title: "Formix",
         href: "https://formik.org/",
         desc: "Build forms in React, without the tears",
       },
-    ]
+    ],
   },
   {
     section: "图形库",
