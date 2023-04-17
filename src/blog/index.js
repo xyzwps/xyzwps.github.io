@@ -47,6 +47,10 @@ const list = [
     path: "2022-06-06-go-http-client-use-self-siged-ca",
     title: "Go 语言 https 客户端如何使用自签名 CA",
   },
+  {
+    path: "2023-04-17-mirrors",
+    title: "国内开源软件镜像",
+  },
 ];
 
 export default list;
