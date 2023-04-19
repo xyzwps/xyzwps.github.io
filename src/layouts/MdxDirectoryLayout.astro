@@ -1,0 +1,27 @@
+---
+import type { MDXLayoutProps } from 'astro';
+
+type Props = MDXLayoutProps<{
+  // 在这里定义 frontmatter 属性
+  title: string;
+  author: string;
+  date: string;
+}>;
+
+// 现在，`frontmatter`、`url` 和其他 Markdown 布局属性
+// 可以通过 TypeScript 类型安全地访问
+const { frontmatter, url } = Astro.props;
+---
+
+<html lang="zh-CN">
+  <head>
+    <link rel="canonical" href={url} />
+    <meta charset="utf-8" />
+    <title>{frontmatter.title}</title>
+  </head>
+  <body>
+    <h1>{frontmatter.title} by {frontmatter.author}</h1>
+    <slot />
+    <p>写于: {frontmatter.date}</p>
+  </body>
+</html>
