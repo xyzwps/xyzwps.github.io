@@ -1,9 +1,5 @@
-import React from "react";
-
-import BlogLayout from "../../components/BlogLayout";
-import WebSiteList from "../../components/WebSiteList";
-
-const List = [
+---
+const list = [
   {
     section: "Node.js 版本管理器",
     items: [
@@ -116,12 +112,16 @@ const List = [
   },
 ];
 
-function JS() {
-  return (
-    <BlogLayout>
-      <WebSiteList title="常用 JS 库" list={List} />
-    </BlogLayout>
-  );
-}
+---
 
-export default JS;
+<ul>
+  {list.map(s => (
+    <>{s.section}
+    <ul>
+      {s.items.map(it => (
+        <li><a href={it.href} target="_blank">{it.title}</a> {it.desc}</li>
+      ))}
+    </ul>
+    </>
+  ))}
+</ul>

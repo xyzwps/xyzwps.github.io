@@ -1,9 +1,6 @@
-import React from "react";
+---
 
-import BlogLayout from "../../components/BlogLayout";
-import WebSiteList from "../../components/WebSiteList";
-
-const List = [
+const list = [
   {
     section: "Fullstack",
     items: [
@@ -181,12 +178,16 @@ const List = [
   },
 ];
 
-function Frontend() {
-  return (
-    <BlogLayout>
-      <WebSiteList title="前端学习" list={List} />
-    </BlogLayout>
-  );
-}
+---
 
-export default Frontend;
+<ul>
+  {list.map(s => (
+    <>{s.section}
+    <ul>
+      {s.items.map(it => (
+        <li><a href={it.href} target="_blank">{it.title}</a> {it.desc}</li>
+      ))}
+    </ul>
+    </>
+  ))}
+</ul>
