@@ -24,10 +24,12 @@ const { frontmatter, url, headings } = Astro.props;
   <body>
     <div class="container">
       <div class="grid">
-        <div>dd</div>
+        <div>
+          <slot name="left" />
+        </div>
         <div>
           <Post title={frontmatter.title}>
-            <slot />
+            <slot name="center" />
           </Post>
         </div>
         <div>
@@ -53,6 +55,7 @@ const { frontmatter, url, headings } = Astro.props;
     display: grid;
     grid-template-columns: 1fr 800px 1fr;
     column-gap: 8px;
+    min-height: calc(100vh - 80px);
 
     div {
       border: 1px solid #ced4da;

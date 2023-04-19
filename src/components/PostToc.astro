@@ -1,0 +1,51 @@
+---
+const { links } = Astro.props;
+---
+
+<ul class="post-toc">
+  {
+    links.map((it) => (
+      <li class={`toc-li toc-h${it.depth}`}>
+        <a href={it.link}>{it.title}</a>
+      </li>
+    ))
+  }
+</ul>
+
+<style lang="scss">
+  .post-toc {
+    padding: 0px;
+    margin: 16px 0px;
+
+    .toc-li {
+      font-size: 13px;
+      list-style: none;
+      padding: 4px 13px;
+      &:hover {
+        background-color: #ced4da;
+      }
+      a {
+        text-decoration: none;
+        color: #111;
+      }
+    }
+    .toc-h1 {
+      font-weight: bold;
+    }
+    .toc-h2 {
+      padding: 4px 12px;
+    }
+    .toc-h3 {
+      padding: 4px 26px;
+    }
+    .toc-h4 {
+      padding: 4px 39px;
+    }
+    .toc-h5 {
+      padding: 4px 52px;
+    }
+    .toc-h6 {
+      padding: 4px 65px;
+    }
+  }
+</style>
