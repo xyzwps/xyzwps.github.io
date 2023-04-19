@@ -1,9 +1,10 @@
----
-title: 分页
----
+import ClassicPagination from "./example.pagination-classic.jsx";
+import InfinitePagination from "./example.pagination-infinite.jsx";
 
-import ClassicPagination from "../demo/pagination-classic";
-import InfinitePagination from "../demo/pagination-infinite";
+import Title from "../../components/Title.astro";
+export const components = { h1: Title };
+
+# 分页
 
 把一个（潜在）长的数据列表渲染到 UI 中时，通常会进行分页展示。分页展示每次只展示全部数据的一部分。
 如果希望展示更多的数据，那就要求用户需要进行额外的操作。
@@ -20,7 +21,7 @@ import InfinitePagination from "../demo/pagination-infinite";
 
 下面是一个可以交互的传统分页的例子：
 
-<ClassicPagination />
+<ClassicPagination client:idle/>
 
 ## 后端实现
 
@@ -84,7 +85,7 @@ limit ${(pageNo - 1) * pageSize}, ${pageSize}
 
 下面是一个通过点击”加载更多“按钮进行无限下拉的分页示例：
 
-<InfinitePagination />
+<InfinitePagination client:idle/>
 
 ## 后端实现
 

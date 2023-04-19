@@ -1,7 +1,6 @@
 import React from "react";
-import Button from "../components/Button";
-import List from "../components/List";
-import Table from "../components/Table";
+import Button from "../../components/Button";
+import Table from "../../components/Table";
 
 import GENSHIN_CHARACTERS from "./data.genshin-characters";
 

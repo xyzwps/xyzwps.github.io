@@ -2,8 +2,8 @@ import React from "react";
 
 import GENSHIN_CHARACTERS from "./data.genshin-characters";
 
-import Table from "../components/Table";
-import Pagination from "../components/Pagination";
+import Table from "../../components/Table";
+import Pagination from "../../components/Pagination";
 
 const PAGE_SIZE = 3;
 

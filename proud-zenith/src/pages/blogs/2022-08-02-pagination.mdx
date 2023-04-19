@@ -1,9 +1,10 @@
----
-title: 一个跨服务分页示例
----
+import ClassicPagination from "./example.pagination-classic.jsx";
+import InfinitePagination from "./example.pagination-infinite.jsx";
+import Title from "../../components/Title.astro";
+export const components = { h1: Title };
 
-import ClassicPagination from "../demo/pagination-classic";
-import InfinitePagination from "../demo/pagination-infinite";
+
+# 一个跨服务分页示例
 
 把一个（潜在）长的数据列表渲染到 UI 中时，通常会进行分页展示。分页展示每次只展示全部数据的一部分。
 如果希望展示更多的数据，那就要求用户需要进行额外的操作。
