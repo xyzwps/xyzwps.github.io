@@ -20,8 +20,35 @@ const { frontmatter, url } = Astro.props;
     <title>{frontmatter.title}</title>
   </head>
   <body>
-    <h1>{frontmatter.title} by {frontmatter.author}</h1>
-    <slot />
-    <p>写于: {frontmatter.date}</p>
+    <div class="container">
+      <div class="grid">
+        <div>dd</div>
+        <div>
+          <h1>{frontmatter.title} by {frontmatter.author}</h1>
+          <slot />
+          <p>写于: {frontmatter.date}</p>
+        </div>
+        <div>dd</div>
+      </div>
+    </div>
   </body>
 </html>
+
+<style lang="scss">
+  body {
+    padding: 0px;
+    margin: 0px;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0px auto;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 800px 1fr;
+
+    div {
+      border: 1px solid red;
+    }
+  }
+</style>
