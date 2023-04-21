@@ -1,0 +1,163 @@
+---
+layout: ./BlogLayout.astro
+title: Levenshtein 距离
+---
+
+## 简介
+
+Levenshtein 距离用于衡量两个字符串之间的相似度。简单地说，
+两个单词之间的莱文斯坦距离，是指将一个字符串变成另一个字符串所需的最小单字符编辑次数。
+这里的编辑是指三种操作：
+
+- 插入一个字符
+- 删除一个字符
+- 进行一次字符替换
+
+此算法由苏联数学家 Vladimir Levenshtein 在 1965 年提出。Levenshtein 距离也被称为编辑距离。
+
+## 算法描述
+
+这里需要指出，在比较两个字符串 $a$ 和 $b$ 时，往 $a$ 中指定位置插入一个字符，与往 $b$ 中对应位置删除一个字符，
+它们之间的距离变化一样。这是理解下面算法的关键。
+
+算法描述为：
+
+$$
+{\rm lev}(a,b)= \begin{cases}
+  |a| & \text{if} \enspace |b| = 0
+\\
+  |b| & \text{if} \enspace |a| = 0
+\\
+  \text{lev}( \text{tail}(a), \text{tail}(b) ) & \text{if} \enspace a[0] = b[0]
+\\
+  1 + \text{min} \begin{cases}
+    \text{lev}( \text{tail}(a), b )
+  \\
+    \text{lev}( a, \text{tail}(b) )
+  \\
+    \text{lev}( \text{tail}(a), \text{tail}(b) )
+  \end{cases} & otherwise
+\end{cases}
+$$
+
+其中，$\text{tail}(s) := s.\text{subString}(1)$，即去除第一个字符的子串。
+
+这是一个递归的公式。如果两字符串
+
+- 其中有一个是空串，那么其距离就是另一个字符串的长度。
+- 开头一样，那么它们的距离就是其子串的距离。
+- 开头不一样，那么就是其距离就是下列三者中最小的那个加一（要进行一次操作）
+  1. $a$ 的子串和 $b$ 的距离
+  1. $a$ 和 $b$ 的子串的距离
+  1. $a$ 的子串和 $b$ 的子串的距离
+
+## 算法实现
+
+### 递归实现
+
+上面的代码很容易就能改写成递归实现。因为太过容易，所以就不写了。
+
+### 非递归实现
+
+我们可以把算法改写成下面形式：
+
+$$
+{\rm lev}(a,b)= \begin{cases}
+  |a| & \text{if} \enspace |b| = 0
+\\
+  |b| & \text{if} \enspace |a| = 0
+\\
+  \text{lev}( \text{head}(a), \text{head}(b) ) & \text{if} \enspace a[m-1] = b[n-1]
+\\
+  1 + \text{min} \begin{cases}
+    \text{lev}( \text{head}(a), b )
+  \\
+    \text{lev}( a, \text{head}(b) )
+  \\
+    \text{lev}( \text{head}(a), \text{head}(b) )
+  \end{cases} & otherwise
+\end{cases}
+$$
+
+其中，
+
+- $\text{head}(s) := s.\text{subString}(0, s.\text{length-1})$，即去除最后一个字符的子串。
+- $m$ 是 $a$ 的长度
+- $n$ 是 $b$ 的长度
+
+我们构造一张表格：
+
+| $_a\backslash ^b$ | **_0_**  | **_1_**  | **_2_**  | **_3_**  | **_4_**  | $\cdots$ | **_n_**  |
+| :---------------: | :------: | :------: | :------: | :------: | :------: | :------: | :------: |
+|      **_0_**      |    0     |    1     |    2     |    3     |    4     | $\cdots$ |    n     |
+|      **_1_**      |    1     |          |          |          |          | $\cdots$ |          |
+|      **_2_**      |    2     |          |          |          |          | $\cdots$ |          |
+|      **_3_**      |    3     |          |          |          |          | $\cdots$ |          |
+|      **_4_**      |    4     |          |          |          |          | $\cdots$ |          |
+|     $\vdots$      | $\vdots$ | $\vdots$ | $\vdots$ | $\vdots$ | $\vdots$ | $\ddots$ | $\vdots$ |
+|      **_m_**      |    m     |          |          |          |          |          |    ?     |
+
+上表中第 $i$ 行第 $j$ 列的含义是，字符串 $a$ 前 $i$ 个字符构成的子串，和字符串 $b$ 前 $j$ 个字符构成的子串的距离。
+第 0 行和第 0 列的值——即两者中有一个是空串的情况——很容易就能计算出来。下面要做的事情，就是根据公式填表，直到填到第 $m$
+行第 $n$ 列，即右下角。右下角的值即是字符串 $a$ 和 $b$ 的距离。
+
+这是一个典型的动态规划问题。
+
+代码如下：
+
+```java
+public static int lev(String a, String b) {
+    a = a == null ? "" : a;
+    b = b == null ? "" : b;
+
+    if (a.isEmpty()) return b.length();
+    if (b.isEmpty()) return a.length();
+
+    int[][] m = new int[a.length() + 1][b.length() + 1];
+
+    for (int i = 0; i <= a.length(); i++) {
+        m[i][0] = i;
+    }
+
+    for (int j = 0; j <= b.length(); j++) {
+        m[0][j] = j;
+    }
+
+    for (int i = 1; i <= a.length(); i++) {
+        int ca = a.charAt(i - 1);
+        for (int j = 1; j <= b.length(); j++) {
+            int cb = b.charAt(j - 1);
+            if (ca == cb) {
+                m[i][j] = m[i - 1][j - 1];
+            } else {
+                m[i][j] = 1 + min(m[i - 1][j - 1], m[i - 1][j], m[i][j - 1]);
+            }
+        }
+    }
+    return m[a.length()][b.length()];
+}
+
+public static int min(int i1, int i2, int i3) {
+    return Math.min(i1, Math.min(i2, i3));
+}
+```
+
+本算法的时间复杂度是 $O(mn)$。
+
+因为申请了一个二维数组，所以空间复杂度也是 $O(mn)$。
+
+### 优化
+
+我们注意到，那两个嵌套的 for 循环中，每次总是使用当前行和上一行数据，更早行的数据就没用了，
+更晚行的数据用不到，所以可以把空间复杂度降低为 $O(\text{min}(m, n))$。改完之后，
+代码会变得不那么清晰，所以这里就不把优化后的代码贴出来了。
+
+## 用途
+
+我在看 Elastic Search 时，看到 fuzzy query 使用此算法判断字符串的相似度。所以来考古一下此算法的实现。
+
+在网上可以搜到此算法的其他用途，不过我并没有遇到过，就不放在这里了。感兴趣可以自行搜索。
+
+## 参考
+
+- [Levenshtein distance - Wikipedia](https://en.wikipedia.org/wiki/Levenshtein_distance)

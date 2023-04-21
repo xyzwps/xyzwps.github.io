@@ -1,0 +1,15 @@
+---
+const { style } = Astro.props;
+---
+
+<div class="card" style={style}>
+  <slot />
+</div>
+
+<style lang="scss">
+  .card {
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+</style>

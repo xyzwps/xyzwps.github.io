@@ -2,6 +2,7 @@
 import type { MDXLayoutProps } from 'astro';
 import HeadingsToc from '../components/HeadingsToc.astro';
 import Post from '../components/Post.astro';
+import Card from '../components/Card.astro';
 
 type Props = MDXLayoutProps<{
   // 在这里定义 frontmatter 属性
@@ -19,26 +20,53 @@ const { frontmatter, url, headings } = Astro.props;
   <head>
     <link rel="canonical" href={url} />
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{frontmatter.title}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container">
+      <Card style="margin: 8px 8px 0px;"><slot name="breadcrumb" /></Card>
       <div class="grid">
-        <div>
-          <slot name="left" />
+        <div class="left">
+          <Card>
+            <slot name="left" />
+          </Card>
         </div>
-        <div>
-          <Post title={frontmatter.title}>
-            <slot name="center" />
-          </Post>
+
+        <div class="center">
+          <Card>
+            <Post title={frontmatter.title}>
+              <slot name="center" />
+            </Post>
+          </Card>
         </div>
-        <div>
-          <HeadingsToc headings={headings} />
+
+        <div class="right">
+          <Card>
+            <HeadingsToc headings={headings} />
+          </Card>
         </div>
       </div>
     </div>
   </body>
 </html>
+
+<style lang="scss" is:global>
+  table {
+    border: 1px solid #ced4da;
+    border-collapse: collapse;
+
+    tr {
+      border-top: 1px solid #ced4da;
+      td,
+      th {
+        border-left: 1px solid #ced4da;
+        padding: 8px 16px;
+      }
+    }
+  }
+</style>
 
 <style lang="scss">
   body {
@@ -50,17 +78,49 @@ const { frontmatter, url, headings } = Astro.props;
     max-width: 1400px;
     margin: 0px auto;
   }
+
   .grid {
     padding: 8px;
     display: grid;
     grid-template-columns: 1fr 800px 1fr;
+    background-color: cyan;
     column-gap: 8px;
     min-height: calc(100vh - 80px);
+  }
 
-    div {
-      border: 1px solid #ced4da;
-      border-radius: 8px;
-      background-color: #fff;
+  @media (max-width: 1000px) {
+    .grid {
+      background-color: green;
+      grid-template-columns: 1fr 700px 0fr;
+
+      .right {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      background-color: red;
+      grid-template-columns: 1fr 600px 0fr;
+
+      .right {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 800px) {
+    .grid {
+      background-color: blue;
+      grid-template-columns: 0fr 1fr 0fr;
+
+      .left {
+        display: none;
+      }
+      .right {
+        display: none;
+      }
     }
   }
 </style>

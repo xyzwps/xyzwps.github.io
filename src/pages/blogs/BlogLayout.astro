@@ -29,9 +29,22 @@ const list = [
   },
   { depth: 2, title: '国内开源软件镜像', link: '/blogs/2023-04-17-mirrors' },
 ];
+
+const { frontmatter, url } = Astro.props;
 ---
 
 <MdxLayout {...Astro.props}>
+  <div slot="breadcrumb" style="padding: 8px 16px;">
+    {
+      url == '/blogs' ? (
+        <span>博客列表</span>
+      ) : (
+        <>
+          <a href="/blogs">博客列表</a> / <span>{frontmatter.title}</span>
+        </>
+      )
+    }
+  </div>
   <PostToc slot="left" links={list} />
   <slot slot="center" />
 </MdxLayout>

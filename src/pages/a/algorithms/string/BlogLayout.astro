@@ -1,0 +1,34 @@
+---
+import PostToc from '../../../../components/PostToc.astro';
+import MdxLayout from '../../../../layouts/MdxLayout.astro';
+import type { MDXLayoutProps } from 'astro';
+
+type Props = MDXLayoutProps<{
+  // 在这里定义 frontmatter 属性
+  title: string;
+  author: string;
+  date: string;
+}>;
+
+const list = [{ depth: 2, title: 'Levenshtein 距离', link: '/a/algorithms/string/levenshtein-distance' }];
+
+const { frontmatter, url } = Astro.props;
+
+// TODO: 实现面包屑导航
+---
+
+<MdxLayout {...Astro.props}>
+  <div slot="breadcrumb" style="padding: 8px 16px;">
+    {
+      url == '/blogs' ? (
+        <span>博客列表</span>
+      ) : (
+        <>
+          <a href="/blogs">博客列表</a> / <span>{frontmatter.title}</span>
+        </>
+      )
+    }
+  </div>
+  <PostToc slot="left" links={list} />
+  <slot slot="center" />
+</MdxLayout>
