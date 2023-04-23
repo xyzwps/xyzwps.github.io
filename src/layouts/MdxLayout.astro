@@ -66,6 +66,12 @@ const { frontmatter, url, headings } = Astro.props;
       }
     }
   }
+
+  img {
+    width: 100%;
+    border: 1px solid #eef;
+    border-radius: 4px;
+  }
 </style>
 
 <style lang="scss">
@@ -88,7 +94,7 @@ const { frontmatter, url, headings } = Astro.props;
     min-height: calc(100vh - 80px);
   }
 
-  @media (max-width: 1000px) {
+  @media (max-width: 1100px) {
     .grid {
       background-color: green;
       grid-template-columns: 1fr 700px 0fr;

@@ -1,38 +1,59 @@
 ---
-
 const list = [
   {
-    section: "Performance",
+    section: 'Performance',
     items: [
       {
-        title: "Openjdk JMH",
-        href: "https://github.com/openjdk/jmh",
-        desc: "JMH is a Java harness for building, running, and analysing nano/micro/milli/macro benchmarks written in Java and other languages targeting the JVM.",
+        title: 'Openjdk JMH',
+        href: 'https://github.com/openjdk/jmh',
+        desc: 'JMH is a Java harness for building, running, and analysing nano/micro/milli/macro benchmarks written in Java and other languages targeting the JVM.',
       },
     ],
   },
   {
-    section: "Http Client",
+    section: 'Web Frameworks',
+    items: [
+      {
+        title: 'Dropwizard',
+        href: 'https://www.dropwizard.io/',
+        desc: 'Dropwizard is a Java framework for developing ops-friendly, high-performance, RESTful web services.',
+      },
+      {
+        title: 'Micronaut',
+        href: 'https://micronaut.io/',
+        desc: 'A modern, JVM-based, full-stack framework for building modular, easily testable microservice and serverless applications',
+      },
+    ],
+  },
+  {
+    section: 'Http Client',
     items: [
       {
         title: 'Retrofit',
         href: 'https://github.com/square/retrofit',
-        desc: 'A type-safe HTTP client for Android and Java.'
-      }
-    ]
-  }
+        desc: 'A type-safe HTTP client for Android and Java.',
+      },
+    ],
+  },
 ];
-
 ---
 
 <ul>
-  {list.map(s => (
-    <>{s.section}
-    <ul>
-      {s.items.map(it => (
-        <li><a href={it.href} target="_blank">{it.title}</a> {it.desc}</li>
-      ))}
-    </ul>
-    </>
-  ))}
+  {
+    list.map((s) => (
+      <>
+        {s.section}
+        <ul>
+          {s.items.map((it) => (
+            <li>
+              <a href={it.href} target="_blank">
+                {it.title}
+              </a>{' '}
+              {it.desc}
+            </li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
 </ul>
