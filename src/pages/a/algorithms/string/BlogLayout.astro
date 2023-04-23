@@ -1,4 +1,5 @@
 ---
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
 import PostToc from '../../../../components/PostToc.astro';
 import MdxLayout from '../../../../layouts/MdxLayout.astro';
 import type { MDXLayoutProps } from 'astro';
@@ -10,25 +11,25 @@ type Props = MDXLayoutProps<{
   date: string;
 }>;
 
-const list = [{ depth: 2, title: 'Levenshtein 距离', link: '/a/algorithms/string/levenshtein-distance' }];
+const list = [
+  { depth: 2, title: 'Levenshtein 距离', link: '/a/algorithms/string/levenshtein-distance' },
+  { depth: 2, title: 'BM25', link: '/a/algorithms/string/bm25' },
+];
 
 const { frontmatter, url } = Astro.props;
 
-// TODO: 实现面包屑导航
+const INDEX_PATH = '/a/algorithms/string';
 ---
 
 <MdxLayout {...Astro.props}>
-  <div slot="breadcrumb" style="padding: 8px 16px;">
-    {
-      url == '/blogs' ? (
-        <span>博客列表</span>
-      ) : (
-        <>
-          <a href="/blogs">博客列表</a> / <span>{frontmatter.title}</span>
-        </>
-      )
-    }
-  </div>
+  <Breadcrumb
+    slot="breadcrumb"
+    items={[
+      { title: '算法', path: '/a/algorithms' },
+      { title: '字符串算法', path: INDEX_PATH },
+      url == INDEX_PATH ? null : { title: frontmatter.title, path: url },
+    ]}
+  />
   <PostToc slot="left" links={list} />
   <slot slot="center" />
 </MdxLayout>

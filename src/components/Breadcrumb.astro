@@ -1,0 +1,19 @@
+---
+import List from './List';
+
+const { items } = Astro.props;
+---
+
+<div style="padding: 8px 16px;">
+  {
+    (items || [])
+      .filter((it) => it)
+      .map((it, i, list) => <> / {i + 1 == list.length ? it.title : <a href={it.path}>{it.title}</a>}</>)
+  }
+</div>
+
+<style lang="scss">
+  .post {
+    padding: 16px;
+  }
+</style>

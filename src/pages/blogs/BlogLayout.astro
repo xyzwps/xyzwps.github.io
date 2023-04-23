@@ -1,4 +1,5 @@
 ---
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import PostToc from '../../components/PostToc.astro';
 import MdxLayout from '../../layouts/MdxLayout.astro';
 import type { MDXLayoutProps } from 'astro';
@@ -31,20 +32,15 @@ const list = [
 ];
 
 const { frontmatter, url } = Astro.props;
+
+const INDEX_PATH = '/blogs';
 ---
 
 <MdxLayout {...Astro.props}>
-  <div slot="breadcrumb" style="padding: 8px 16px;">
-    {
-      url == '/blogs' ? (
-        <span>博客列表</span>
-      ) : (
-        <>
-          <a href="/blogs">博客列表</a> / <span>{frontmatter.title}</span>
-        </>
-      )
-    }
-  </div>
+  <Breadcrumb
+    slot="breadcrumb"
+    items={[{ title: '博客列表', path: INDEX_PATH }, url == INDEX_PATH ? null : { title: frontmatter.title }]}
+  />
   <PostToc slot="left" links={list} />
   <slot slot="center" />
 </MdxLayout>
