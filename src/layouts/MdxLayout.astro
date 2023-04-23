@@ -27,14 +27,14 @@ const { frontmatter, url, headings } = Astro.props;
   <body>
     <div class="container">
       <Card style="margin: 8px 8px 0px;"><slot name="breadcrumb" /></Card>
-      <div class="grid">
-        <div class="left">
+      <div class="xy-post">
+        <div class="xy-post-left">
           <Card>
             <slot name="left" />
           </Card>
         </div>
 
-        <div class="center">
+        <div class="xy-post-center">
           <Card>
             <Post title={frontmatter.title}>
               <slot name="center" />
@@ -42,7 +42,7 @@ const { frontmatter, url, headings } = Astro.props;
           </Card>
         </div>
 
-        <div class="right">
+        <div class="xy-post-right">
           <Card>
             <HeadingsToc headings={headings} />
           </Card>
@@ -72,6 +72,11 @@ const { frontmatter, url, headings } = Astro.props;
     border: 1px solid #eef;
     border-radius: 4px;
   }
+
+  .math {
+    max-width: 100%;
+    overflow-y: auto;
+  }
 </style>
 
 <style lang="scss">
@@ -80,52 +85,57 @@ const { frontmatter, url, headings } = Astro.props;
     margin: 0px;
     background-color: #f8f9fa;
   }
-  .container {
-    max-width: 1400px;
-    margin: 0px auto;
-  }
 
-  .grid {
+  .xy-post {
     padding: 8px;
-    display: grid;
-    grid-template-columns: 1fr 800px 1fr;
-    background-color: cyan;
-    column-gap: 8px;
-    min-height: calc(100vh - 80px);
+    display: flex;
+    gap: 8px;
   }
 
-  @media (max-width: 1100px) {
-    .grid {
-      background-color: green;
-      grid-template-columns: 1fr 700px 0fr;
+  @media only screen and (max-width: 719px) {
+    .xy-post {
+      .xy-post-left {
+        display: none;
+      }
 
-      .right {
+      .xy-post-center {
+        width: 100%;
+      }
+
+      .xy-post-right {
         display: none;
       }
     }
   }
 
-  @media (max-width: 960px) {
-    .grid {
-      background-color: red;
-      grid-template-columns: 1fr 600px 0fr;
+  @media only screen and (min-width: 720px) and (max-width: 1279px) {
+    .xy-post {
+      .xy-post-left {
+        width: 25%;
+      }
 
-      .right {
+      .xy-post-center {
+        width: 75%;
+      }
+
+      .xy-post-right {
         display: none;
       }
     }
   }
 
-  @media (max-width: 800px) {
-    .grid {
-      background-color: blue;
-      grid-template-columns: 0fr 1fr 0fr;
-
-      .left {
-        display: none;
+  @media only screen and (min-width: 1280px) {
+    .xy-post {
+      .xy-post-left {
+        width: 20%;
       }
-      .right {
-        display: none;
+
+      .xy-post-center {
+        width: 60%;
+      }
+
+      .xy-post-right {
+        width: 20%;
       }
     }
   }
