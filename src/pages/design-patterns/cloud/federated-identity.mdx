@@ -3,7 +3,6 @@ title: Federated Identity pattern
 translateFrom: https://docs.microsoft.com/en-us/azure/architecture/patterns/federated-identity
 ---
 
-import { Alert } from "../../components/Alert";
 
 将身份验证委托给外部标识提供程序。这可以简化开发，减少对用户管理的需求，并改善应用程序的用户体验。
 
@@ -44,11 +43,11 @@ import { Alert } from "../../components/Alert";
 STS 可以根据预定义的规则转换和增加令牌中的索赔，然后再将其返回给客户机。
 然后，客户端应用程序可以将此令牌作为其标识的证明传递给服务。
 
-<Alert title="Note" size="small">
-在某些情况下，信任链中可能存在额外的 STS。例如，在后面描述的 Microsoft Azure 场景中，
-内部 STS 信任另一个 STS，该 STS 负责访问身份提供者以验证用户。
-这种方法在企业场景中很常见，在这些场景中有一个内部 STS 和目录。
-</Alert>
+> 注意:
+>
+> 在某些情况下，信任链中可能存在额外的 STS。例如，在后面描述的 Microsoft Azure 场景中，
+> 内部 STS 信任另一个 STS，该 STS 负责访问身份提供者以验证用户。
+> 这种方法在企业场景中很常见，在这些场景中有一个内部 STS 和目录。
 
 联合身份验证提供了一种基于标准的解决方案，用于解决跨不同域的信任身份问题，并支持单点登录。
 它在所有类型的应用程序中变得越来越普遍，特别是云托管应用程序，因为它支持单点登录，
