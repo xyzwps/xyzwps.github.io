@@ -1,7 +1,7 @@
-import Title from "../../../components/Title.astro";
-export const components = { h1: Title };
-
-# Hash
+---
+layout: ./_BlogLayout.astro
+title: 哈希算法
+---
 
 ## 目录
 
@@ -10,3 +10,26 @@ export const components = { h1: Title };
   - [SipHash](/a/hash/sip)
 - 实践
   - [如何安全存储密码](/a/hash/how-to-securely-store-password-in-db)
+
+
+
+    DJB2
+    DJB2a (variant using xor rather than +)
+    FNV-1 (32-bit)
+    FNV-1a (32-bit)
+    SDBM
+    CRC32
+    Murmur2 (32-bit)
+    SuperFastHash
+
+    DJB2 (32-bit)
+    SDBM (32-bit)
+    LoseLose (32-bit)
+    FNV-1/FNV-1a (32-bit)
+    CRC16 (16-bit)
+    Murmur2/Murmur3 (32-bit).
+
+## 参考
+
+- [Which hashing algorithm is best for uniqueness and speed? - Software Engineering Stack Exchange](https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed)
+- [Choosing a hash function to solve a data sharding problem | by MiroTech | Medium](https://medium.com/miro-engineering/choosing-a-hash-function-to-solve-a-data-sharding-problem-c656259e2b54)
