@@ -52,7 +52,7 @@ Java 虚拟机(JVM)的所有实现都保证支持标准选项。
 g 或 G 表示千 GB。例如，要将大小设置为8GB，可以指定8g、8192m、8388608k 或8589934592作为参数。
 如果需要指定百分比，请使用0到1之间的数字(例如，为25% 指定0.25)。
 
-## 常见的重要选项
+## 常见选项
 
 ### 指定堆内存大小
 
@@ -73,8 +73,12 @@ g 或 G 表示千 GB。例如，要将大小设置为8GB，可以指定8g、8192
 -XX:+UseZGC
 ```
 
-这里插一嘴，在 Java 14 中，已经移除了 CMS 收集器，见
-[JEP 363: Remove the Concurrent Mark Sweep (CMS) Garbage Collector](https://openjdk.org/jeps/363)。
+这里插一嘴：
+
+- 在 Java 9 中，G1 已经是默认 GC 了，见
+  [JEP 248: Make G1 the Default Garbage Collector](https://openjdk.org/jeps/248)。
+- 在 Java 14 中，已经移除了 CMS 收集器，见
+  [JEP 363: Remove the Concurrent Mark Sweep (CMS) Garbage Collector](https://openjdk.org/jeps/363)。
 
 ### 输出日志
 
@@ -83,10 +87,16 @@ JVM 的日志输出方式已经被统一，现在可以使用单一选项 `-Xlog
 
 相关背景见 [JEP 158: Unified JVM Logging](https://openjdk.org/jeps/158) 和
 [JEP 271: Unified GC Logging](https://openjdk.org/jeps/271)。
+如果你在 Java 9 之后使用 `-XX:+PrintGC` 和 `-XX:+PrintGCDetails`，大概会看到这样的提示：
+
+```
+...[warning] -XX:+PrintGC is deprecated. Will use -Xlog:gc instead.
+...[warning] -XX:+PrintGCDetails is deprecated. Will use -Xlog:gc* instead.
+```
 
 ## 参考
 
-- [java 命令](https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html)
+- [The `java` Command](https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html)
 - [VM Options Explorer - OpenJDK11 HotSpot](https://chriswhocodes.com/vm-options-explorer.html)
 - [Java - Print list of all -XX JVM options](https://www.logicbig.com/how-to/java-command/jvm-option-list.html)
 - [Guide to the Most Important JVM Parameters | Baeldung](https://www.baeldung.com/jvm-parameters)

@@ -53,6 +53,10 @@ const { frontmatter, url, headings } = Astro.props;
 </html>
 
 <style lang="scss" is:global>
+  * {
+    line-height: 1.8;
+  }
+
   table {
     border: 1px solid #ced4da;
     border-collapse: collapse;
@@ -79,6 +83,11 @@ const { frontmatter, url, headings } = Astro.props;
   }
   .katex {
     font-size: 1rem;
+  }
+
+  .astro-code {
+    padding: 16px;
+    border-radius: 6px;
   }
 </style>
 
