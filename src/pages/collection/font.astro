@@ -1,0 +1,39 @@
+---
+const list = [
+  {
+    section: '等宽字体',
+    items: [
+      {
+        title: 'Intel One Mono',
+        href: 'https://github.com/intel/intel-one-mono',
+        desc: '',
+      },
+      {
+        title: 'Cascadia Code',
+        href: 'https://github.com/microsoft/cascadia-code',
+        desc: 'a fun, new monospaced font that includes programming ligatures and is designed to enhance the modern look and feel of the Windows Terminal',
+      },
+    ],
+  },
+];
+---
+
+<ul>
+  {
+    list.map((s) => (
+      <>
+        {s.section}
+        <ul>
+          {s.items.map((it) => (
+            <li>
+              <a href={it.href} target="_blank">
+                {it.title}
+              </a>{' '}
+              {it.desc}
+            </li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
+</ul>

@@ -1,106 +1,17 @@
 ---
-layout: ../_BlogLayout.astro
+layout: ./_BlogLayout.astro
 title: CMS
 ---
 
-并发标记扫描（_Concurrent Mark Sweep_，_CMS_）收集器(也称为并发低暂停收集器)收集老年代（_tenured generation_）。
-它的目标是尽可能最小化 GC 带来的暂停，方式是尽可能让 GC 过程和应用程序现成并发执行。
-通常，CMS 不复制或压缩活对象（_live object_），在不移动活对象的情况下完成垃圾收集。
-如果碎片成为一个问题，就分配一个更大的堆。
+CMS 收集器的全称是并发标记扫描（_Concurrent Mark Sweep_）收集器。
 
-在 JDK 14 中，它被移除了~
+在 Java 9 中，它已经被标记为弃用状态了，详情见 [JEP 291](https://openjdk.org/jeps/291)。
+也是在这个版本中，G1 成了默认收集器（见 [JEP 248](https://openjdk.org/jeps/248)）。
 
-注意: 年轻一代的 CMS 收集器使用与并行收集器相同的算法。
+在 JDK 14 中，它被移除了。大致情况是，在 Java 9 之后，又引入了 ZGC 和 Shenandoah GC，
+此后也没有人愿意维护 CMS 了，干脆删除之。详情见 [JEP 363](https://openjdk.org/jeps/363)。
 
-## CMS 收集阶段
+总之，别在这上面浪费时间了。
 
-下面的阶段在堆的老年代上执行：
-
-- (1) 初始化标记阶段 (产生停止世界事件) Initial Mark
-
-  老年代的对象被“标记”为可达的对象，还包括那些从老年代中可达的年轻代对象。
-  暂停时间通常比 Minor collection 短 TODO: 什么是 Minor
-
-- (2) 并发标记阶段 Concurrent Marking
-
-  在 Java 应用程序线程执行的同时，并发遍历老年代对象图寻找可达对象。
-  从被标记的对象开始扫描，从根开始遍历所有可达对象。在并发阶段 (2)、(3) 和(5)期间执行 mutator，TODO: 什么是 mutator
-  任何在在这些阶段中分配的对象（(包括提升的对象)）都会被立刻标记为活对象。
-
-- (3) Remark (停止世界事件)
-
-  查找阶段(2)遗漏的对象，这些对象是在并发收集器完成对该对象的跟踪之后 Java 应用程序线程对对象的更新造成的。
-
-- (4) 并发扫描 Concurrent Sweep
-
-  收集标记阶段期间标识为不可访问的对象。死对象的集合将该对象的空间添加到空闲列表中，以便以后进行分配。
-  死对象的聚合（TODO: 这是什么东西）可能在这一点上发生。请注意，活动对象不会被移动。
-
-- (5) 5) Resetting
-
-  清除数据结构为下一次并发收集做好准备。
-
-## 回顾 GC 步骤
-
-### CMS 收集器的堆结构
-
-堆被分成三个空间。
-
-![CMS 堆结构](/asset/img/java/jvm/cms-heap-structure.png)
-
-年轻代被分为 Eden 和 Survivor 空间。老年代是一个相邻的空间。
-对象集合就地完成。除非有一个完整的 GC，否则不会进行压缩。
-
-### Young GC 如何工作
-
-年轻代是浅绿色，老年代是蓝色。如果您的应用程序已经运行了一段时间，那么 CMS 可能就是这样的。
-对象散布在老年代区域中。
-
-![CMS 堆结构](/asset/img/java/jvm/how-young-gc-work.png)
-
-使用 CMS，老一代对象就地释放。它们不会四处移动。除非有一个完整的 GC，否则空间不会被压缩。
-
-### 收集年轻代
-
-活的对象从 Eden 空间和幸存者空间复制到另一个幸存者空间。任何已经达到老化阈值的旧对象都被提升到老一代。
-
-
-![CMS 堆结构](/asset/img/java/jvm/young-generation-collection.png)
-
-### Young GC 之后
-
-在一个年轻的 GC 之后，伊甸园空间被清空，一个幸存者空间被清空。
-
-![CMS 堆结构](/asset/img/java/jvm/after-young-gc.png)
-
-新提升的对象在图表中以深蓝色显示。绿色对象是尚未提升到老一代的年轻一代对象的幸存者。
-
-### CMS 收集老年代
-
-两个停止世界事件发生: 初始标记和注释。当老一代达到一定的入住率时，CMS 就开始了。
-
-![CMS 堆结构](/asset/img/java/jvm/old-gen-collection-in-cms.png)
-
-(1)初始标记是一个短暂的暂停阶段，其中活的(可到达的)对象被标记。
-(2)当应用程序继续执行时，并发标记查找活动对象。
-最后，在(3)注意阶段，发现在前一阶段的(2)并发标记过程中遗漏的对象。
-
-### Old Generation Collection - Concurrent Sweep
-
-在前一阶段中没有标记的对象将在适当的位置释放。
-
-![CMS 堆结构](/asset/img/java/jvm/old-gen-collection-concurrent-sweep.png)
-
-注意: 未标记对象 == 死对象
-
-### Old Generation Collection - After Sweeping
-
-在(4)扫描阶段之后，您可以看到释放了大量内存。您还将注意到，没有进行任何压缩。
-
-![CMS 堆结构](/asset/img/java/jvm/old-gen-collection-after-sweeping.png)
-
-最后，CMS 收集器将通过(5)重置阶段，等待下一次达到 GC 阈值。
-
-## 参考
-
-- [Getting Started with the G1 Garbage Collector - Oracle](https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/index.html)
+如果你对其念念不忘的话，可以看看
+[Getting Started with the G1 Garbage Collector - Oracle](https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/index.html)。

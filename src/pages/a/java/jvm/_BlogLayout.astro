@@ -1,0 +1,39 @@
+---
+import Breadcrumb from '../../../../components/Breadcrumb.astro';
+import PostToc from '../../../../components/PostToc.astro';
+import MdxLayout from '../../../../layouts/MdxLayout.astro';
+import type { MDXLayoutProps } from 'astro';
+
+type Props = MDXLayoutProps<{
+  // 在这里定义 frontmatter 属性
+  title: string;
+  author: string;
+  date: string;
+}>;
+
+const list = [
+  { depth: 2, title: 'JVM', link: '/a/java/jvm' },
+  { depth: 2, title: 'JVM 规范', link: '/a/java/jvm/spec' },
+  { depth: 2, title: 'JVM 选项', link: '/a/java/jvm/option' },
+  { depth: 2, title: 'GC 算法', link: '/a/java/jvm/gc-algorithms' },
+  { depth: 3, title: 'CMS', link: '/a/java/jvm/cms' },
+  { depth: 3, title: 'G1', link: '/a/java/jvm/g1' },
+];
+
+const { frontmatter, url } = Astro.props;
+
+const INDEX_PATH = '/a/java/jvm';
+---
+
+<MdxLayout {...Astro.props}>
+  <Breadcrumb
+    slot="breadcrumb"
+    items={[
+      { title: 'Java', path: '/a/java' },
+      { title: 'JVM', path: INDEX_PATH },
+      url == INDEX_PATH ? null : { title: frontmatter.title, path: url },
+    ]}
+  />
+  <PostToc slot="left" links={list} />
+  <slot slot="center" />
+</MdxLayout>

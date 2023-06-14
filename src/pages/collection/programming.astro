@@ -1,0 +1,39 @@
+---
+const list = [
+  {
+    section: '入门',
+    items: [
+      {
+        title: 'Composing Programs',
+        href: 'https://composingprograms.com/',
+        desc: 'a free online introduction to programming and computer science.',
+      },
+      {
+        title: 'System Design',
+        href: 'https://systemdesign.one/',
+        desc: 'xxx',
+      },
+    ],
+  },
+];
+---
+
+<ul>
+  {
+    list.map((s) => (
+      <>
+        {s.section}
+        <ul>
+          {s.items.map((it) => (
+            <li>
+              <a href={it.href} target="_blank">
+                {it.title}
+              </a>{' '}
+              {it.desc}
+            </li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
+</ul>
