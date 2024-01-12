@@ -1,0 +1,514 @@
+# 思路一：基于链表
+
+在很多函数式语言中，列表是通过链表来实现的。在 scheme 中，通过 `cons` 来构造列表。
+比较新的语言 moonbit 也是这么处理的。
+
+## 第一版
+
+我们定义一个 `Sequence` 接口来描述这个东西：
+
+```java
+public sealed interface Sequence<T> {
+    record Cons<T>(T value, Sequence<T> rest) implements Sequence<T> {
+    }
+
+    @SuppressWarnings("rawtypes")
+    enum Nil implements Sequence {
+        INSTANCE
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> Sequence<T> nil() {
+        return Nil.INSTANCE;
+    }
+}
+```
+
+有了这个接口，我们就可以构造列表了：
+
+```java
+var seq = new Cons<>(1, new Cons<>(2, new Cons<>(3, new Cons<>(4, nil()))));
+```
+
+
+我们可以定义一些操作：
+
+```java
+seal interface Sequence<T> {
+    // ...
+
+    default Optional<T> first() {
+        return switch (this) {
+            case Sequence.Nil ignored -> Optional.empty();
+            case Sequence.Cons<T> cons -> Optional.ofNullable(cons.value);
+        };
+    }
+
+    default <R> Sequence<R> map(Function<T, R> mapper) {~
+        Objects.requireNonNull(mapper);
+        return switch (this) {
+            case Nil nil -> nil;
+            case Cons<T> cons -> new Cons<>(mapper.apply(cons.value), cons.rest().map(mapper));
+        };
+    }
+
+    default Sequence<T> filter(Predicate<T> predicate) {
+        Objects.requireNonNull(predicate);
+        return switch (this) {
+            case Nil nil -> nil;
+            case Cons<T> cons -> predicate.test(cons.value)
+                    ? new Cons<>(cons.value, cons.rest().filter(predicate))
+                    : cons.rest().filter(predicate);
+        };
+    }
+
+    default Sequence<T> take(int n) {
+        if (n < 1) return nil();
+        return switch (this) {
+            case Nil nil -> nil;
+            case Cons<T> cons -> new Cons<>(cons.value, cons.rest().take(n - 1));
+        };
+    }
+
+
+    default void forEach(Consumer<T> consumer) {
+        Objects.requireNonNull(consumer);
+        for (var curr = this; curr instanceof Sequence.Cons<T> cons; curr = cons.rest()) {
+            consumer.accept(cons.value);
+        }
+    }
+}
+```
+
+下面我们写一段代码测试一下：
+
+```java
+static void main(String[] args) {
+    var seq = new Cons<>(1, new Cons<>(2, new Cons<>(3, new Cons<>(4, nil()))));
+    var handledSeq = seq
+            .map(i -> {
+                System.out.printf("=> map: %d + 4 = %d\n", i, i + 4);
+                return i + 4;
+            })
+            .take(3);
+    System.out.println("============");
+    handledSeq.forEach(it -> System.out.printf("=> forEach %d\n", it));
+}
+```
+
+这段代码输出如下：
+
+```
+=> map: 1 + 4 = 5
+=> map: 2 + 4 = 6
+=> map: 3 + 4 = 7
+=> map: 4 + 4 = 8
+============
+=> forEach 5
+=> forEach 6
+=> forEach 7
+```
+
+可以看到 `handledSeq` 在被初始化后就已经被计算出来了，这说明它不是 lazy 的。
+另外，我们注意到 `Cons` 类的结构无法实现无限列表。
+
+## 第二版：修改 `Cons`
+
+因为 `Cons` 类的结构无法实现无限列表，我们可以修改一下它的结构：
+
+```java
+final class Cons<T> implements Sequence<T> {
+    private final T value;
+    private final Supplier<Sequence<T>> getRest;
+
+    Cons(T value, Sequence<T> rest) {
+        Objects.requireNonNull(rest);
+        this.value = value;
+        this.getRest = () -> rest;
+    }
+
+    Cons(T value, Supplier<Sequence<T>> restSupplier) {
+        this.value = value;
+        this.getRest = Objects.requireNonNull(restSupplier);
+    }
+
+    public T value() {
+        return value;
+    }
+
+    public Sequence<T> rest() {
+        return getRest.get();
+    }
+}
+```
+
+修改后的版本中，`rest()` 返回值是由一个函数生成的，这样我们就可以对其动手脚了。
+无限列表可以这样实现：
+
+```java
+static <T> Sequence<Long> infinite(long start) {
+    return new Cons<>(start, () -> infinite(start + 1));
+}
+```
+
+我们测试一下：
+
+```java
+static void main(String[] args) {
+    var seq = infinite(0L);
+    var handledSeq = seq
+            .map(i -> {
+                System.out.printf("=> map: %d + 4 = %d\n", i, i + 4);
+                return i + 4;
+            })
+            .take(3);
+    System.out.println("============");
+    handledSeq.forEach(it -> System.out.printf("=> forEach %d\n", it));
+}
+```
+
+可以看到，这次程序 `StackOverflowError` 了，原因是 `map` 不是 lazy 的，`take(3)` 之前要把 `map` 结果全部计算出来，而这是不可能的。
+
+我们碰巧写了一个测试线程栈深度的程序 😂。
+
+下面我们想办法把它变成 lazy 的。
+
+## 第三版：`LazySequence`
+
+lazy 的要点在于，在需要时才从 `Sequence` 中要一个元素，也就是说，上面的代码中，变量 `handledSeq`
+在被初始化后，`map` 和 `take` 不应发生任何计算，只有在 `forEach` 遍历时才应该计算。
+
+为此，我们增加一个类 `LazySequence`:
+
+```java
+public interface LazySequence<T> {
+    Sequence<T> get();
+
+    static <T> LazySequence<T> create(Sequence<T> sequence) {
+        Objects.requireNonNull(sequence);
+        return () -> sequence;
+    }
+}
+```
+
+我们把刚才的几个函数也实现一遍：
+
+```java
+public interface LazySequence<T> {
+    // ...
+
+    default LazySequence<T> filter(Predicate<T> predicate) {
+        Objects.requireNonNull(predicate);
+        return () -> this.get().filter(predicate);
+    }
+
+    default <R> LazySequence<R> map(Function<T, R> mapper) {
+        Objects.requireNonNull(mapper);
+        return () -> this.get().map(mapper);
+    }
+
+    default LazySequence<T> take(int n) {
+        return () -> this.get().take(n);
+    }
+
+    default void forEach(Consumer<T> consumer) {
+        this.get().forEach(Objects.requireNonNull(consumer));
+    }
+}
+```
+
+现在我们测试一下代码：
+
+```java
+static void main(String[] args) {
+    var seq = new Sequence.Cons<>(1, new Sequence.Cons<>(2, new Sequence.Cons<>(3, new Sequence.Cons<>(4, Sequence.nil()))));
+    var lazy = create(seq);
+    var handled = lazy
+            .map(i -> {
+                System.out.printf("=> map: %d + 4 = %d\n", i, i + 4);
+                return i + 4;
+            })
+            .take(2);
+    System.out.println("============");
+    handled.forEach(it -> System.out.printf("=> forEach %d\n", it));
+    System.out.println("============");
+    create(Sequence.infinite(0)).take(4).forEach(System.out::println);
+}
+```
+
+输出如下：
+
+```
+============
+=> map: 1 + 4 = 5
+=> map: 2 + 4 = 6
+=> map: 3 + 4 = 7
+=> map: 4 + 4 = 8
+=> forEach 5
+=> forEach 6
+============
+0
+1
+2
+3
+```
+
+可以看到，这里计算真的 “lazy” 了，“好像”也能处理无限列表了。但是有一些问题：在 `take(2)` 之前的 `map` 步骤中，我们希望它只执行两次，但是它执行了四次。
+这意味着，下面的代码还是会 `StackOverflowError`:
+
+```java
+create(Sequence.infinite(0)).map(it -> it * 2).take(4).forEach(System.out::println);
+```
+
+这。。。
+
+看来 `LazySequence` 不大行呀。我们再改一改：
+
+## 第四版：升级 `LazySequence`
+
+我们希望在最后 `forEach` 时，需要一个元素，就从上面要一个，这个元素把上面的步骤都执行完之后，再要一个，直到结束。我们把 `LazySequence` 改成这样：
+
+```java
+public interface LazySequence<T> {
+    Current<T> popCurrent();
+
+    static <T> LazySequence<T> create(Sequence<T> sequence) {
+        Objects.requireNonNull(sequence);
+        return new LazySequence<>() {
+            private Sequence<T> current = sequence;
+
+            @Override
+            public Current<T> popCurrent() {
+                return switch (current) {
+                    case Sequence.Nil ignored -> Current.end();
+                    case Sequence.Cons<T> cons -> {
+                        var value = new Current.Value<>(cons.value());
+                        current = cons.rest();
+                        yield value;
+                    }
+                };
+            }
+        };
+    }
+
+    static <T> LazySequence<T> empty() { return Current::end; }
+}
+
+sealed interface Current<T> {
+    record Value<T>(T value) implements Current<T> { }
+
+    @SuppressWarnings("rawtypes")
+    enum End implements Current { INSTANCE }
+
+    @SuppressWarnings("unchecked")
+    static <T> Current<T> end() { return End.INSTANCE; }
+}
+```
+
+我们把刚才的几个函数也实现一遍：
+
+```java
+public interface LazySequence<T> {
+    default LazySequence<T> filter(Predicate<T> predicate) {
+        Objects.requireNonNull(predicate);
+        return () -> {
+            while (true) {
+                switch (this.popCurrent()) {
+                    case Current.End ignored -> {
+                        return Current.end();
+                    }
+                    case Current.Value<T> value -> {
+                        if (predicate.test(value.value())) {
+                            return value;
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    default <R> LazySequence<R> map(Function<T, R> mapper) {
+        Objects.requireNonNull(mapper);
+        return () -> switch (this.popCurrent()) {
+            case Current.End end -> end;
+            case Current.Value<T> value -> new Current.Value<>(mapper.apply(value.value()));
+        };
+    }
+
+    default LazySequence<T> take(int n) {
+        var counter = new Counter(0);
+        return () -> counter.getAndIncr() < n ? this.popCurrent() : Current.end();
+    }
+
+    default void forEach(Consumer<T> consumer) {
+        Objects.requireNonNull(consumer);
+        for (var current = this.popCurrent(); current instanceof Current.Value<T> value; current = this.popCurrent()) {
+            consumer.accept(value.value());
+        }
+    }
+}
+```
+
+下面我们写一段代码测试一下：
+
+```java
+static void main(String[] args) {
+    var seq = new Sequence.Cons<>(1, new Sequence.Cons<>(2, new Sequence.Cons<>(3, new Sequence.Cons<>(4, Sequence.nil()))));
+    var lazy = create(seq);
+    var handled = lazy
+            .filter(i -> {
+                System.out.printf("=> filter: %d > 1\n", i);
+                return i > 1;
+            })
+            .map(i -> {
+                System.out.printf("=> map: %d + 4 = %d\n", i, i + 4);
+                return i + 4;
+            })
+            .take(2);
+    System.out.println("============");
+    handled.forEach(it -> System.out.printf("=> forEach %d \n", it));
+    System.out.println("============");
+    create(Sequence.infinite(0)).map(it -> it * 2).take(3).forEach(System.out::println);
+}
+```
+
+输出如下：
+
+```
+============
+=> filter: 1 > 1
+=> filter: 2 > 1
+=> map: 2 + 4 = 6
+=> forEach 6
+=> filter: 3 > 1
+=> map: 3 + 4 = 7
+=> forEach 7
+============
+0
+2
+4
+```
+
+完美！
+
+注意到，我们的 `LazySequence` 并没有使用 `Sequence` 中的 `map`、`filter`、`take`、`forEach`
+等方法，所以可以在 `Sequence` 中可以把它们删除了。
+
+## 拓展 `LazySequence`
+
+现在我们可以基于 `LazySequence` 实现一些方法了，比如：
+
+### `iteratoer`
+
+```java
+default Iterator<T> iterator() {
+    var self = this;
+    return new Iterator<T>() {
+        private Current<T> current = self.popCurrent();
+
+        @Override
+        public boolean hasNext() {
+            return current instanceof Current.Value<T>;
+        }
+
+        @Override
+        public T next() {
+            return switch (current) {
+                case Current.End ignored -> throw new NoSuchElementException();
+                case Current.Value<T> value -> {
+                    current = self.popCurrent();
+                    yield value.value();
+                }
+            };
+        }
+    };
+}
+```
+
+### `flatMap`
+
+```java
+default <R> LazySequence<R> flatMap(Function<T, Sequence<R>> fn) {
+    Objects.requireNonNull(fn);
+    var holder = new ObjectHolder<LazySequence<R>>(null);
+    return () -> {
+        while (true) {
+            if (holder.value() == null) {
+                switch (this.popCurrent()) {
+                    case Current.End ignore -> {
+                        return Current.end();
+                    }
+                    case Current.Value<T> value -> holder.set(create(fn.apply(value.value())));
+                }
+            }
+
+            var holdLazySeq = holder.value();
+            switch (holdLazySeq.popCurrent()) {
+                case Current.Value<R> value -> {
+                    return value;
+                }
+                case Current.End ignored -> holder.set(null);
+            }
+        }
+    };
+}
+```
+
+### `concat`
+
+```java
+default LazySequence<T> concat(Sequence<T> sequence) {
+    var second = create(sequence);
+    return () -> switch (this.popCurrent()) {
+        case Current.End ignored -> second.popCurrent();
+        case Current.Value<T> value -> value;
+    };
+}
+
+default LazySequence<T> concat(Iterable<T> iterable) {
+    return concat(Sequence.from(iterable));
+}
+```
+
+### `reduce`
+
+```java
+default <R> R reduce(R init, BiFunction<T, R, R> reducer) {
+    Objects.requireNonNull(reducer);
+    R result = init;
+    for (var current = this.popCurrent(); current instanceof Current.Value<T> value; current = this.popCurrent()) {
+        result = reducer.apply(value.value(), result);
+    }
+    return result;
+}
+
+default List<T> toList() {
+    return this.reduce(new ArrayList<>(), (it, li) -> {
+        li.add(it);
+        return li;
+    });
+}
+
+default Set<T> toSet() {
+    return this.reduce(new HashSet<>(), (it, li) -> {
+        li.add(it);
+        return li;
+    });
+}
+```
+
+进一步地
+
+### `reverse`
+
+```java
+default LazySequence<T> reverse() {
+    var list = this.toList();
+    return create(Sequence.from(list.reversed()));
+}
+```
+
+注意，`reverse` 和上面的 `filter`、`map`、`flatMap` 之类的都非常不同。
+原因在于，在一连串的步骤中，如果进行到了 `reverse` 这一步时，它要把上一步骤可以获得的元素都给处理完才行。
+
+其他的诸如 `unique`、`skip`、`orderBy` 之类的就不在这里实现了。总之非常简单。
