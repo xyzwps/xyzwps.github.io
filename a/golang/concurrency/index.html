@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<h2 id="goroutine">Goroutine</h2>
+<p>Goroutine 是一种“轻量级线程”，由 Go 运营时管理。</p>
+<p><code>go f(x, y, z)</code> 启动一个 goroutine 来执行 <code>f(x, y, z)</code>。其中，<code>f</code>、<code>x</code>、<code>y</code>、<code>z</code> 来自当前 goroutine，<code>f</code> 的计算发生在新的 goroutine 中。</p>
+<p>所有的 goroutine 都在同一个地址空间中中允许，所以访问共享内存必须要同步。<code>sync</code> 包提供了很多有用的原语，你可能不会太依赖他们，因为 go 中还提供了一些其他原语。</p>
+<h2 id="channel">Channel</h2>
+<h3 id="基本功能">基本功能</h3>
+<p>Channel 是一种带有类型的通道，使用操作符 <code>&lt;-</code>，你可以向 channel 中发送值，或者从 channel 中接收值。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">ch </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9"> v    </span><span style="color:#8B949E">// 向 channel ch 中发送 v</span></span>
+<span class="line"><span style="color:#C9D1D9">v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">ch  </span><span style="color:#8B949E">// 从 channel ch 中接收值，并赋值给 v</span></span></code></pre>
+<p>在使用 channel 前，必须先创建：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">ch </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#8B949E">// ch 是一个可以向其发送或从其接收 int 值的 channel</span></span></code></pre>
+<p>一般地，发送和接收操作会 block 住，直到另一端准备好了。这使得 goroutine 不用显式的锁或条件变量就能进行同步。</p>
+<p>下面的例子对一个 slice 中的数求和，把工作分配给了两个 goroutine，一旦两个 goroutine 都完成了计算，就把两个 goroutine 的计算结果相加，计算总和：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">sum</span><span style="color:#C9D1D9">(s []</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, c </span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	sum </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> _, v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> s {</span></span>
+<span class="line"><span style="color:#C9D1D9">		sum </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> v</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	c </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9"> sum </span><span style="color:#8B949E">// send sum to c</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	s </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> []</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">8</span><span style="color:#C9D1D9">, </span><span style="color:#FF7B72">-</span><span style="color:#79C0FF">9</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">go</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">sum</span><span style="color:#C9D1D9">(s[:</span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(s)</span><span style="color:#FF7B72">/</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">], c)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">go</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">sum</span><span style="color:#C9D1D9">(s[</span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(s)</span><span style="color:#FF7B72">/</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">:], c)</span></span>
+<span class="line"><span style="color:#C9D1D9">	x, y </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">c, </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">c </span><span style="color:#8B949E">// 从 c 中接收</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(x, y, x</span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9">y) </span><span style="color:#8B949E">// 输出 -5 17 12</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h3 id="缓冲buffered-channel">缓冲（Buffered Channel）</h3>
+<p>Channel 可以缓冲。使用 <code>make</code> 创建 channel 时，可以在第二个参数的位置设置缓冲区长度：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">ch </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">100</span><span style="color:#C9D1D9">) </span><span style="color:#8B949E">// ch 是缓冲区大小为 100 的 channel</span></span></code></pre>
+<p>往缓冲 channel 中发送数据时，只有当缓冲区满了，goroutine 才会被 block。接收者在 channel 的缓冲区空了的时候被 block。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	ch </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	ch </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span></span>
+<span class="line"><span style="color:#C9D1D9">	ch </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">ch)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">ch)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h3 id="关闭-channel">关闭 Channel</h3>
+<p>发送者可以 <code>close</code> channel 来表示没有新值要发送了。接收者可以通过接收表达式返回的第二个参数来判断 channel 是否被关闭了：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">v, ok </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">ch</span></span></code></pre>
+<p>如果 <code>ok == false</code>，那么就意味着 channel 被关闭了，接收者就接收不到更多的值了。</p>
+<p>注意，只有发送者才可以关闭 channel。</p>
+<p>Channel 不像文件，通常你并不需要关闭它，除非你需要明确告诉接收者，不会有更多的值要发过来了，比如终止 <code>for...range</code> 循环。</p>
+<h3 id="forrange-循环"><code>for...range</code> 循环</h3>
+<p><code>for i := range ch</code> 循环可以不断接受 channel <code>ch</code> 发来的值，直到 <code>channel</code> 被关闭。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">fibonacci</span><span style="color:#C9D1D9">(n </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, c </span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	x, y </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">1</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> n; i</span><span style="color:#FF7B72">++</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		c </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9"> x</span></span>
+<span class="line"><span style="color:#C9D1D9">		x, y </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> y, x</span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9">y</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">close</span><span style="color:#C9D1D9">(c)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">go</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">fibonacci</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">cap</span><span style="color:#C9D1D9">(c), c)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> c {</span></span>
+<span class="line"><span style="color:#C9D1D9">		fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(i)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span></code></pre>
+<h2 id="select-语句"><code>select</code> 语句</h2>
+<p><code>select</code> 语句允许 goroutine 等待多个通信操作。<code>select</code> 被阻塞，直到其中一个 <code>case</code> 可以执行为止。如果有多个 <code>case</code> 可以执行，那么就随机选择一个：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">fibonacci</span><span style="color:#C9D1D9">(c, quit </span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	x, y </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">1</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">select</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">case</span><span style="color:#C9D1D9"> c </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9"> x:</span></span>
+<span class="line"><span style="color:#C9D1D9">			x, y </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> y, x</span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9">y</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">case</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">quit:</span></span>
+<span class="line"><span style="color:#C9D1D9">			fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;quit&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">			</span><span style="color:#FF7B72">return</span></span>
+<span class="line"><span style="color:#C9D1D9">		}</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	quit </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">chan</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">go</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">; i</span><span style="color:#FF7B72">++</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">			fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">c)</span></span>
+<span class="line"><span style="color:#C9D1D9">		}</span></span>
+<span class="line"><span style="color:#C9D1D9">		quit </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span></span>
+<span class="line"><span style="color:#C9D1D9">	}()</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">fibonacci</span><span style="color:#C9D1D9">(c, quit)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h3 id="default"><code>default</code></h3>
+<p><code>select</code> 语句可以有个 <code>default</code> 分支。这个分支在其他分支 <code>case</code> 不可执行时执行。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">(&quot;fmt&quot;;</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">time</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	tick </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> time.</span><span style="color:#79C0FF">Tick</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">100</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> time.Millisecond)</span></span>
+<span class="line"><span style="color:#C9D1D9">	boom </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> time.</span><span style="color:#79C0FF">After</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">500</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> time.Millisecond)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">select</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">case</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">tick:</span></span>
+<span class="line"><span style="color:#C9D1D9">			fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;tick.&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">case</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&lt;-</span><span style="color:#C9D1D9">boom:</span></span>
+<span class="line"><span style="color:#C9D1D9">			fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;BOOM!&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">			</span><span style="color:#FF7B72">return</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">default</span><span style="color:#C9D1D9">:</span></span>
+<span class="line"><span style="color:#C9D1D9">			fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;    .&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">			time.</span><span style="color:#79C0FF">Sleep</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">50</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> time.Millisecond)</span></span>
+<span class="line"><span style="color:#C9D1D9">		}</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span></code></pre>
+<h2 id="互斥">互斥</h2>
+<p>如果我们只是想确保，在同一时刻只有一个 goroutine 有权访问一个共享变量，以避免冲突。我们该怎么办呢？</p>
+<p>这里就引入了一个叫做<strong>互斥</strong>（<em>mutual exclusion</em>）的概念了，按照不成文的约定，提供互斥功能的数据结构叫 <em>mutex</em>。</p>
+<p>Go 语言标准库通过 <code>sync.Mutex</code> 来提供互斥功能，它有两个方法：<code>Lock</code> 和 <code>Unlock</code>。我们可以写一个以互斥方式执行的代码块，只需要用 <code>Lock</code> 和 <code>Unlock</code> 把这段代码包住就行了。我们还可以利用 <code>defer</code> 语句来保证函数结束后 mutex 会被解锁。</p>
+<p>下例是一个并发安全的计数器实现：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">(&quot;fmt&quot;;</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">sync</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">; </span><span style="color:#A5D6FF">&quot;time&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E">// SafeCounter is safe to use concurrently.</span></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">SafeCounter</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	v   </span><span style="color:#FF7B72">map</span><span style="color:#C9D1D9">[</span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">	mux sync.Mutex</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E">// Inc increments the counter for the given key.</span></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (c </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">SafeCounter) </span><span style="color:#D2A8FF">Inc</span><span style="color:#C9D1D9">(key </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	c.mux.</span><span style="color:#79C0FF">Lock</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Lock so only one goroutine at a time can access the map c.v.</span></span>
+<span class="line"><span style="color:#C9D1D9">	c.v[key]</span><span style="color:#FF7B72">++</span></span>
+<span class="line"><span style="color:#C9D1D9">	c.mux.</span><span style="color:#79C0FF">Unlock</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E">// Value returns the current value of the counter for the given key.</span></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (c </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">SafeCounter) </span><span style="color:#D2A8FF">Value</span><span style="color:#C9D1D9">(key </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	c.mux.</span><span style="color:#79C0FF">Lock</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Lock so only one goroutine at a time can access the map c.v.</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">defer</span><span style="color:#C9D1D9"> c.mux.</span><span style="color:#79C0FF">Unlock</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> c.v[key]</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> SafeCounter{v: </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">map</span><span style="color:#C9D1D9">[</span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">)}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1000</span><span style="color:#C9D1D9">; i</span><span style="color:#FF7B72">++</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">go</span><span style="color:#C9D1D9"> c.</span><span style="color:#79C0FF">Inc</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;somekey&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	time.</span><span style="color:#79C0FF">Sleep</span><span style="color:#C9D1D9">(time.Second)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(c.</span><span style="color:#79C0FF">Value</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;somekey&quot;</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>

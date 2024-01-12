@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/blogs/2022-12-06-soft-link">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>软连接</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/blogs" class="astro-QAANGHZH">博客列表</a> / 软连接
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-12-06-soft-link" class="astro-UKV4GGCY">软连接</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-10-17-password-strength" class="astro-UKV4GGCY">密码强度</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-09-19-graphql-gossip" class="astro-UKV4GGCY">Graphql 碎碎念</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-25-fp" class="astro-UKV4GGCY">函数式编程</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-22-authn" class="astro-UKV4GGCY">Authentication</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-18-id" class="astro-UKV4GGCY">ID 生成算法</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-02-pagination" class="astro-UKV4GGCY">一个跨服务分页示例</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-01-data-format" class="astro-UKV4GGCY">一些数据格式</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-07-27-pagination" class="astro-UKV4GGCY">分页</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-25-unicode" class="astro-UKV4GGCY">Unicode</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-23-js-return-await" class="astro-UKV4GGCY">记一个 JS return await 问题</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-06-go-http-client-use-self-siged-ca" class="astro-UKV4GGCY">Go 语言 https 客户端如何使用自签名 CA</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2023-04-17-mirrors" class="astro-UKV4GGCY">国内开源软件镜像</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">软连接</h1>
+  
+              <p>创建软连接：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">ln -s [源文件/目录] [目标文件/目录]</span></span></code></pre>
+<p>软连接的源文件：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">ls -l</span></span></code></pre>
+<p>输出结果示例：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">total 8</span></span>
+<span class="line"><span style="color:#c9d1d9">-rw-r--r--  1 keqing  staff  418 Dec  4 13:17 application.conf</span></span>
+<span class="line"><span style="color:#c9d1d9">drwxr-xr-x  3 keqing  staff   96 Dec  4 19:49 config</span></span>
+<span class="line"><span style="color:#c9d1d9">drwxr-xr-x  3 keqing  staff   96 Dec  4 13:03 mysql</span></span>
+<span class="line"><span style="color:#c9d1d9">lrwxr-xr-x  1 keqing  staff   17 Dec  4 22:31 public -&gt; ../../front/dist/</span></span>
+<span class="line"><span style="color:#c9d1d9">drwxr-xr-x  3 keqing  staff   96 Dec  4 09:50 zxcvbn</span></span></code></pre>
+<p>其中文件/目录 <code>public</code> 连接到了相对目录 <code>../../front/dist/</code> 上。</p>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

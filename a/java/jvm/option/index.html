@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/a/java/jvm/option">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JVM 选项</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/a/java" class="astro-QAANGHZH">Java</a> / <a href="/a/java/jvm" class="astro-QAANGHZH">JVM</a> / JVM 选项
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm" class="astro-UKV4GGCY">JVM</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/spec" class="astro-UKV4GGCY">JVM 规范</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/option" class="astro-UKV4GGCY">JVM 选项</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/gc-algorithms" class="astro-UKV4GGCY">GC 算法</a>
+      </li><li class="toc-li toc-h3 astro-UKV4GGCY">
+        <a href="/a/java/jvm/cms" class="astro-UKV4GGCY">CMS</a>
+      </li><li class="toc-li toc-h3 astro-UKV4GGCY">
+        <a href="/a/java/jvm/g1" class="astro-UKV4GGCY">G1</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">JVM 选项</h1>
+  
+              <h2 id="jvm-选项的用法">JVM 选项的用法</h2>
+<p>启动一个 Java 程序可以使用以下两种方式：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">java [options] classname [args]</span></span>
+<span class="line"><span style="color:#c9d1d9">java [options] -jar filename [args]</span></span></code></pre>
+<p>其中 JVM 相关选项（<em>options</em>）直接跟在 <code>java</code> 命令之后。</p>
+<h2 id="jvm-选项的分类">JVM 选项的分类</h2>
+<p>大体上分为三类：</p>
+<h3 id="标准选项">标准选项</h3>
+<p>Java 虚拟机(JVM)的所有实现都保证支持标准选项。
+它们用于常见的操作，例如检查 JRE 的版本
+（<code>-version</code>）、设置类路径（<code>-cp</code>）、启用详细输出（<code>-verbose:[class|module|gc|jni]</code>）等等。</p>
+<p>可以使用 <code>java -h</code> 查看这些选项。</p>
+<h3 id="非标准选项">非标准选项</h3>
+<p>非标准选项是特定于 Java HotSpot 虚拟机的通用选项，因此不能保证所有 JVM 实现都支持它们，并且可能发生更改。
+这些选项以 <code>-X</code> 开头。</p>
+<p>比如常见的 <code>-Xms</code>、<code>-Xmx</code>、<code>-Xlog:&lt;opts&gt;</code> 等等。</p>
+<h3 id="高级选项">高级选项</h3>
+<p>不推荐随意使用高级选项。这些是用于调优 Java HotSpot 虚拟机操作的特定区域的开发人员选项，
+这些区域通常具有特定的系统需求，并且可能需要对系统配置参数的特权访问。
+它们也不能保证得到所有 JVM 实现的支持，并且会受到更改的影响。高级选项以 <code>-XX</code> 开头。</p>
+<p>每个 Java 新版本都可能会增加或者废弃/移除一些选项，<a href="https://chriswhocodes.com/vm-options-explorer.html">可以在这里查看这些选项的适用版本</a>。
+<a href="https://foojay.io/command-line-arguments/openjdk-16/?tab=alloptions">也可以在这里查看</a>。每个
+也可以使用 <code>-XX:+PrintFlagsFinal</code> 查看当前版本 <code>-XX</code> 选项，比如执行 <code>java -XX:+PrintFlagsFinal -version</code>。</p>
+<p>布尔选项用于启用默认禁用的特性，或者禁用默认启用的特性。
+这样的选项不需要参数。使用加号(<code>-XX:+OptionName</code>)启用布尔选项，使用减号(<code>-XX:-OptionName</code>)禁用。</p>
+<p>对于需要参数的选项，参数可以用空格、冒号(:)或等号(=)与选项名分开，
+或者参数可以直接跟在选项后面(每个选项的确切语法不同)。
+如果需要以字节为单位指定大小，则可以不使用后缀，或者使用后缀 k 或 K 表示 KB ，m 或 M 表示 MB，
+g 或 G 表示千 GB。例如，要将大小设置为8GB，可以指定8g、8192m、8388608k 或8589934592作为参数。
+如果需要指定百分比，请使用0到1之间的数字(例如，为25% 指定0.25)。</p>
+<h2 id="常见选项">常见选项</h2>
+<h3 id="指定堆内存大小">指定堆内存大小</h3>
+<ul>
+<li><code>-Xms</code> 指定堆初始大小</li>
+<li><code>-Xmx</code> 指定堆最大大小</li>
+<li><code>-Xmn</code> 指定新生代/年轻代大小（G1不推荐设置）</li>
+</ul>
+<p>比如 <code>-Xms2G -Xmx5G</code> 指定堆初始大小是 2GB，最大大小是 5GB。</p>
+<p><a href="https://docs.oracle.com/en/java/javase/20/gctuning/factors-affecting-garbage-collection-performance.html">可以在此查看更多相关参数</a>。</p>
+<h3 id="指定使用的-gc-算法">指定使用的 GC 算法</h3>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">-XX:+UseSerialGC</span></span>
+<span class="line"><span style="color:#c9d1d9">-XX:+UseParallelGC</span></span>
+<span class="line"><span style="color:#c9d1d9">-XX:+UseG1GC</span></span>
+<span class="line"><span style="color:#c9d1d9">-XX:+UseZGC</span></span></code></pre>
+<p>这里插一嘴：</p>
+<ul>
+<li>在 Java 9 中，G1 已经是默认 GC 了，见
+<a href="https://openjdk.org/jeps/248">JEP 248: Make G1 the Default Garbage Collector</a>。</li>
+<li>在 Java 14 中，已经移除了 CMS 收集器，见
+<a href="https://openjdk.org/jeps/363">JEP 363: Remove the Concurrent Mark Sweep (CMS) Garbage Collector</a>。</li>
+</ul>
+<h3 id="输出日志">输出日志</h3>
+<p>JVM 的日志输出方式已经被统一，现在可以使用单一选项 <code>-Xlog:&lt;opts&gt;</code> 来决定输出哪些日志。
+可以使用 <code>-Xlog:help</code> 查看帮助，可输出的东西相当多。</p>
+<p>相关背景见 <a href="https://openjdk.org/jeps/158">JEP 158: Unified JVM Logging</a> 和
+<a href="https://openjdk.org/jeps/271">JEP 271: Unified GC Logging</a>。
+如果你在 Java 9 之后使用 <code>-XX:+PrintGC</code> 和 <code>-XX:+PrintGCDetails</code>，大概会看到这样的提示：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">...[warning] -XX:+PrintGC is deprecated. Will use -Xlog:gc instead.</span></span>
+<span class="line"><span style="color:#c9d1d9">...[warning] -XX:+PrintGCDetails is deprecated. Will use -Xlog:gc* instead.</span></span></code></pre>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://dev.java/learn/jvm/tools/core/java/">Java - Your Application Launcher - Dev.java</a></li>
+<li><a href="https://docs.oracle.com/en/java/javase/20/docs/specs/man/java.html">The <code>java</code> Command</a></li>
+<li><a href="https://chriswhocodes.com/vm-options-explorer.html">VM Options Explorer - OpenJDK11 HotSpot</a></li>
+<li><a href="https://www.logicbig.com/how-to/java-command/jvm-option-list.html">Java - Print list of all -XX JVM options</a></li>
+<li><a href="https://www.baeldung.com/jvm-parameters">Guide to the Most Important JVM Parameters | Baeldung</a></li>
+</ul>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#jvm-选项的用法" class="astro-PUKOXQVJ">JVM 选项的用法</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#jvm-选项的分类" class="astro-PUKOXQVJ">JVM 选项的分类</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#标准选项" class="astro-PUKOXQVJ">标准选项</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#非标准选项" class="astro-PUKOXQVJ">非标准选项</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#高级选项" class="astro-PUKOXQVJ">高级选项</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#常见选项" class="astro-PUKOXQVJ">常见选项</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#指定堆内存大小" class="astro-PUKOXQVJ">指定堆内存大小</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#指定使用的-gc-算法" class="astro-PUKOXQVJ">指定使用的 GC 算法</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#输出日志" class="astro-PUKOXQVJ">输出日志</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#参考" class="astro-PUKOXQVJ">参考</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

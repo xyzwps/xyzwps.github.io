@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<p>Go 语言早期，并没有 <code>recover</code> 函数。调用 <code>panic</code> 函数后，程序就直接结束了，还没有什么办法来避免。这个时候，Go 用值来表示错误，并把错误标在返回值列表里。原则上，你可以用自己随便指定个什么类型来表示错误。不过因为 Go 内置了 <code>error</code> 接口来表示错误，所以我们下面再说错误的时候，就指实现了 <code>error</code> 接口的值。</p>
+<h1 id="error-接口"><code>error</code> 接口</h1>
+<p>它非常简单，长这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">error</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#79C0FF">Error</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h1 id="创建简单错误">创建简单错误</h1>
+<p>如果没有什么追求的话，调用 <code>errors</code> 包中的函数 <code>New</code> 就可以创建一个简单错误了：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">errors.</span><span style="color:#79C0FF">New</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;Some error message.&quot;</span><span style="color:#C9D1D9">)</span></span></code></pre>
+<h1 id="在函数抛出错误">在函数“抛出”错误</h1>
+<p>Go 语言中，并没有类似 Java 中的 <code>throw</code>，函数执行过程中出现的错误，是通过返回值通知到调用者的。比如 os 包中的 <code>ReadFile</code> 函数：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">ReadFile</span><span style="color:#C9D1D9">(name </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">) ([]</span><span style="color:#FF7B72">byte</span><span style="color:#C9D1D9">, </span><span style="color:#FF7B72">error</span><span style="color:#C9D1D9">)</span></span></code></pre>
+<p>如果读取文件成功，就返回文件的字节串表示，返回 <code>err == nil</code>；如果读取失败，就返回 <code>err != nil</code>。</p>
+<p>按照约定，如果函数有多个返回值的话，错误排最后一个，并且不使用具体的错误类型，而是使用 <code>error</code>。</p>
+<p>Go 语言中处理错误的一般方式是写 <code>if</code> 语句:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> fileBytes, err </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> os.</span><span style="color:#79C0FF">ReadFile</span><span style="color:#C9D1D9">(fileName); err </span><span style="color:#FF7B72">!=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#8B949E">// 处理错误</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>这种处理错误的方式呢，有人觉得爽，有人觉得不爽。反正爽不爽也就只能这么着了。</p>
+<h1 id="自定义错误">自定义错误</h1>
+<p>自定义错误的方式是实现 <code>error</code> 接口。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">HttpError</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    Code    </span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">    Body    any</span></span>
+<span class="line"><span style="color:#C9D1D9">    Message </span><span style="color:#FF7B72">string</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (e </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">HttpError) </span><span style="color:#D2A8FF">Error</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> e.Message</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>再比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">CodeError</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (e </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">CodeError) </span><span style="color:#D2A8FF">Error</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;some error message&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h1 id="stack-trace">Stack Trace</h1>
+<p>你可能已经注意到了，<code>error</code> 接口十分简陋。如何在发生错误时，按需输出 stack trace 呢？</p>
+<p>在 <code>runtime/debug</code> 包下，有一个 <code>Stack</code> 函数，它返回当前 goroutine 的 stack trace 的字节串表示。还有一个 <code>PrintStack</code> 函数，把 stack trace 输出到标准错误中。</p>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://go.dev/blog/go1.13-errors">Working with Errors in Go 1.13</a>: 在 1.13 版本中，Go 语言对 error 的使用体验做了一点提升。</li>
+<li><a href="https://go.dev/blog/errors-are-values">Errors are values</a>: 本文似乎在说，Go 中的 error 和别的类型的值之间并没有本质的区别。</li>
+<li><a href="https://go.dev/blog/error-handling-and-go">Error handling and Go</a>: 这是一个教程，演示 Go 语言处理 error 的哲学。</li>
+</ul>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/a/java/jvm/g1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>G1</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/a/java" class="astro-QAANGHZH">Java</a> / <a href="/a/java/jvm" class="astro-QAANGHZH">JVM</a> / G1
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm" class="astro-UKV4GGCY">JVM</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/spec" class="astro-UKV4GGCY">JVM 规范</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/option" class="astro-UKV4GGCY">JVM 选项</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/gc-algorithms" class="astro-UKV4GGCY">GC 算法</a>
+      </li><li class="toc-li toc-h3 astro-UKV4GGCY">
+        <a href="/a/java/jvm/cms" class="astro-UKV4GGCY">CMS</a>
+      </li><li class="toc-li toc-h3 astro-UKV4GGCY">
+        <a href="/a/java/jvm/g1" class="astro-UKV4GGCY">G1</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">G1</h1>
+  
+              <h1 id="介绍">介绍</h1>
+<p>Garbage-First (G1)收集器是一个服务器风格的垃圾收集器，针对具有大内存、多处理器的机器。
+从 OracleJDK7 update 4 之后就完全支持 G1 垃圾收集器了。
+它试图以较高的概率满足垃圾收集暂停时间目标，同时在不需要配置的情况下实现高吞吐量。
+G1 旨在利用当前的目标应用程序和环境，在延迟和吞吐量之间实现最佳平衡，这些目标应用程序和环境的特性包括:</p>
+<ul>
+<li>堆的大小可以达到数十 GB 甚至更大，其中超过 50% 的 Java 堆被活数据占据。</li>
+<li>对象分配和跨代提升的速率随时间变化很大。</li>
+<li>堆中有大量碎片。</li>
+<li>有可预测的暂停时间目标，不超过几百毫秒，避免长时间的垃圾收集暂停。</li>
+</ul>
+<p>从 JDK 9 开始，G1 就是默认的收集器（见 <a href="https://openjdk.org/jeps/248">JEP 248</a>）。</p>
+<h2 id="如何配置和使用-g1">如何配置和使用 G1</h2>
+<p>可以用 <code>-XX:+UseG1GC</code> 选项显示指定使用它。</p>
+<p>可以通过 <code>-XX:MaxGCPauseMillis</code> 设置最大暂停目标，默认值是 200，单位是毫秒。
+注意，此值不是说 GC 的暂停时间一定是小于此值，而是说绝大部分情况下会小于此值。</p>
+<p>一般来说，你再指定一下 <code>-Xmx</code>，剩下的就交给 JVM 就可以了，JVM 会根据当前环境自动选择合适的缺省值。
+如果这些缺省值无法满足需求，可以查看 Oracle 提供的调优手册
+<a href="https://docs.oracle.com/en/java/javase/11/gctuning/garbage-first-g1-garbage-collector1.html">HotSpot Virtual Machine Garbage Collection Tuning Guide - 9 Garbage-First Garbage Collector</a>。
+连接中是 Java 11 的手册，在使用使，请注意选择版本。</p>
+<p>使用 G1 时，请不要设置年轻代的大小。</p>
+<h2 id="参考">参考</h2>
+<p>对于 G1 的改进一直在进行，可以在 <a href="https://openjdk.org/jeps/0">JEP 列表中查看相关信息</a>。</p>
+<p>有一些关于 G1 的视频或文章可供参考：</p>
+<ul>
+<li><a href="https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/G1GettingStarted/index.html">Getting Started with the G1 Garbage Collector - Oracle</a></li>
+<li><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/g1_gc.html">Garbage-First Garbage Collector - Oracle</a></li>
+<li><a href="https://blogs.oracle.com/java/post/g1-from-garbage-collector-to-waste-management-consultant">G1: from garbage collector to waste management consultant</a></li>
+<li><a href="https://www.bilibili.com/video/BV15B4y1972U">G1GC最初的设计思路（上）</a></li>
+<li><a href="https://www.bilibili.com/video/BV1n3411P78a/?share_source=copy_web&#38;vd_source=e391a20134a420e1b92880962eb2f77c">G1GC最初的设计思路（下）</a></li>
+</ul>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h1 astro-PUKOXQVJ">
+        <a href="#介绍" class="astro-PUKOXQVJ">介绍</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#如何配置和使用-g1" class="astro-PUKOXQVJ">如何配置和使用 G1</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#参考" class="astro-PUKOXQVJ">参考</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

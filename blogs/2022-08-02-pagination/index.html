@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/blogs/2022-08-02-pagination">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>一个跨服务分页示例</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/index.849a9792.css" />
+<link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" />
+<link rel="stylesheet" href="/_astro/2022-07-27-pagination.90e83321.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/blogs" class="astro-QAANGHZH">博客列表</a> / 一个跨服务分页示例
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-12-06-soft-link" class="astro-UKV4GGCY">软连接</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-10-17-password-strength" class="astro-UKV4GGCY">密码强度</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-09-19-graphql-gossip" class="astro-UKV4GGCY">Graphql 碎碎念</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-25-fp" class="astro-UKV4GGCY">函数式编程</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-22-authn" class="astro-UKV4GGCY">Authentication</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-18-id" class="astro-UKV4GGCY">ID 生成算法</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-02-pagination" class="astro-UKV4GGCY">一个跨服务分页示例</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-01-data-format" class="astro-UKV4GGCY">一些数据格式</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-07-27-pagination" class="astro-UKV4GGCY">分页</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-25-unicode" class="astro-UKV4GGCY">Unicode</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-23-js-return-await" class="astro-UKV4GGCY">记一个 JS return await 问题</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-06-go-http-client-use-self-siged-ca" class="astro-UKV4GGCY">Go 语言 https 客户端如何使用自签名 CA</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2023-04-17-mirrors" class="astro-UKV4GGCY">国内开源软件镜像</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">一个跨服务分页示例</h1>
+  
+              <p>把一个（潜在）长的数据列表渲染到 UI 中时，通常会进行分页展示。分页展示每次只展示全部数据的一部分。
+如果希望展示更多的数据，那就要求用户需要进行额外的操作。</p>
+<p>常见的分页大致有两种模式：</p>
+<ul>
+<li>传统分页：通常会有一个页数页码导航条在 UI 的下方，显示当前是第几页，总共有多少页，甚至还会显示有多少数据。</li>
+<li>无限下拉：通常是首先展示前面的一组数据，然后用通过点击下方的“加载更多”按钮，或者在触摸设备屏幕上用手指上划，
+或者页面检测到用户看到最后几条数据后自动加载，来加载更多数据。新加载的数据通常放在已显示数据的后面。</li>
+</ul>
+<h2 id="传统分页">传统分页</h2>
+<h3 id="前端示例">前端示例</h3>
+<p>下面是一个可以交互的传统分页的例子：</p>
+<div style="max-width:400px;margin:4px auto"><table class="xn-table"><thead><tr><th style="width:90px">名字</th><th style="width:60px">性别</th><th style="width:90px">元素属性</th><th>地区</th></tr></thead><tbody></tbody></table><div style="text-align:right;margin:8px 0"><div>共<!-- -->0<!-- -->页 </div></div></div>
+<h2 id="后端实现">后端实现</h2>
+<p>如果数据被存放在关系型数据库中，那么，查询总页数/总数只需要一个 <code>count</code>，
+查询当前页数据只需要一个 <code>limit</code> 就可以做到了。</p>
+<p>查询 API 可能长这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GET /api/v1/playable-characters?pageNo=${pageNo}&amp;pageSize=${pageSize}</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">- pageNo:   页号，从 1 开始</span></span>
+<span class="line"><span style="color:#c9d1d9">- pageSize: 每页大小，至少为 1，最大为 100</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">返回数据示例:</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">{</span></span>
+<span class="line"><span style="color:#c9d1d9">  &quot;pageNo&quot;:     1,  // 本页页号</span></span>
+<span class="line"><span style="color:#c9d1d9">  &quot;pageSize&quot;:   3,  // 每页大小</span></span>
+<span class="line"><span style="color:#c9d1d9">  &quot;pageCount&quot;:  6,  // 总共多少页</span></span>
+<span class="line"><span style="color:#c9d1d9">  &quot;totalCount&quot;: 17, // 总共多少数据</span></span>
+<span class="line"><span style="color:#c9d1d9">  &quot;data&quot;:[</span></span>
+<span class="line"><span style="color:#c9d1d9">    { &quot;id&quot;: 100, &quot;name&quot;: &quot;钟离&quot;, ...  },</span></span>
+<span class="line"><span style="color:#c9d1d9">    ...</span></span>
+<span class="line"><span style="color:#c9d1d9">  ]</span></span>
+<span class="line"><span style="color:#c9d1d9">}</span></span></code></pre>
+<p>查询的 SQL 可能长这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">-- 查询总数</span></span>
+<span class="line"><span style="color:#c9d1d9">select count(*) from playable_characters;</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">-- 查询本页数据</span></span>
+<span class="line"><span style="color:#c9d1d9">select * from playable_characters</span></span>
+<span class="line"><span style="color:#c9d1d9">order by id desc</span></span>
+<span class="line"><span style="color:#c9d1d9">limit ${(pageNo - 1) * pageSize}, ${pageSize}</span></span></code></pre>
+<p>然后根据 SQL 查询结果，来计算总页数之类的数据。</p>
+<h3 id="优点">优点</h3>
+<ul>
+<li>能够在分页条的位置展示总数据量。</li>
+<li>适合 PC 端。这种方式在企业应用中非常常见。</li>
+<li>用户可以自己去改变分页大小，以便在一屏中展示更多数据。</li>
+</ul>
+<h3 id="缺点">缺点</h3>
+<p>这里的问题在于：</p>
+<ul>
+<li>当数据量较大时，<code>count</code> 和 <code>limit</code> 可能消耗的数据库的计算资源稍多一点。</li>
+<li>因为通常大家都是按时间逆序排列，所以在翻页时，或者修改本页数据并刷新本页数据时，会出现数据被往后挤的情况。
+不过大家都接受这种情况。</li>
+<li>如果遇到数据删除，在往最后一页翻页时，可能会出现最后一页没有数据的情况。这时需要后端和前端开发人员注意处理一下。</li>
+</ul>
+<h2 id="无限下拉">无限下拉</h2>
+<h3 id="前端示例-1">前端示例</h3>
+<p>下面是一个通过点击”加载更多“按钮进行无限下拉的分页示例：</p>
+<div style="max-width:400px;margin:4px auto"><table class="xn-table"><thead><tr><th style="width:90px">名字</th><th style="width:60px">性别</th><th style="width:90px">元素属性</th><th>地区</th></tr></thead><tbody></tbody></table><div style="text-align:center;margin:8px"><span style="cursor:pointer;color:gray;font-size:0.8rem">示例已到底了。再体验一次？</span></div></div>
+<h3 id="后端实现-1">后端实现</h3>
+<p>如果数据被存放在关系型数据库中，那么通常来说，只需要按递增的 ID 往前查即可。相比于传统分页，
+这种方式不需要查询总页数/总数，而且是一个范围查询，查询效率会传统分页高一些。如果没有递增 ID，
+那么通常也可通过创建时间+主键/唯一键的方式来排序。</p>
+<p>查询 API 可能长这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GET /api/v1/playable-characters?offset=${offset}&amp;size=${size}</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">- offset: 偏移量。这里填入一个数据的 id，查询此数据之前的数据。缺省时查询最新数据</span></span>
+<span class="line"><span style="color:#c9d1d9">- size:   从 offset 往前查 size 个数据</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">返回数据示例：</span></span>
+<span class="line"><span style="color:#c9d1d9">[</span></span>
+<span class="line"><span style="color:#c9d1d9">  { &quot;id&quot;: 100, &quot;name&quot;: &quot;钟离&quot;, ...  },</span></span>
+<span class="line"><span style="color:#c9d1d9">  ...</span></span>
+<span class="line"><span style="color:#c9d1d9">]</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">- 前端在使用此 API 查询第一页数据时，offset 不设。</span></span>
+<span class="line"><span style="color:#c9d1d9">- 查询下一页的话，就把前一页的最后一条数据的 id 用作下一页的 offset。</span></span></code></pre>
+<p>查询 SQL 更加简单，只有一条：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">select * from playable_characters</span></span>
+<span class="line"><span style="color:#c9d1d9">where id &lt; ${offset}</span></span>
+<span class="line"><span style="color:#c9d1d9">order by id desc limit ${size}</span></span></code></pre>
+<p>前端需要判断翻页是否到底了，有几种办法：</p>
+<ol>
+<li>如果查询某一页时，返回数据数量小于 <code>size</code>，或者直接返回个空数组，则认为是到底了。
+这样的话，如果最后一页恰好返回的是空数组，那么就会出现加载更多时，确什么都没有加载到的情况。
+如果不吹毛求疵的话，这种做法是没问题的。</li>
+<li>前端每次都查询 <code>size + 1</code> 条数据，但是展示 <code>size</code> 条数据。
+如果也返回了 <code>size + 1</code> 条数据，那么就是还有下一页（下一页至少有一条数据）。</li>
+<li>后端直接告诉前端是否还有更多数据。这时要修改返回数据格式，比如成这样：
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">{</span></span>
+<span class="line"><span style="color:#c9d1d9">  &quot;hasMore&quot;: true,  // 是否还有下一页</span></span>
+<span class="line"><span style="color:#c9d1d9">  &quot;data&quot;:[</span></span>
+<span class="line"><span style="color:#c9d1d9">    { &quot;id&quot;: 100, &quot;name&quot;: &quot;钟离&quot;, ...  },</span></span>
+<span class="line"><span style="color:#c9d1d9">    ...</span></span>
+<span class="line"><span style="color:#c9d1d9">  ]</span></span>
+<span class="line"><span style="color:#c9d1d9">}</span></span></code></pre>
+后端计算 <code>hasMore</code> 的方式，也是每次查询 <code>size + 1</code> 条数据。</li>
+</ol>
+<h3 id="优点-1">优点</h3>
+<ul>
+<li>查询 SQL 减少了一个，而且更加简单。</li>
+<li>较为适合移动端。</li>
+</ul>
+<h3 id="缺点-1">缺点</h3>
+<ul>
+<li>使用者没法估计数据总量。</li>
+<li>使用者没法设置翻页大小（移动端也没人在意这种事）</li>
+<li>发生数据删除时，判断是否有下一页的做法可能是不准的。这个也没办法。大家应该都能接受这种情况。</li>
+<li>前端需要额外处理加载最新数据的逻辑。要么是加载最近数据，把它们展示在列表的前面，要么就毁掉全部已加载数据，再来一遍。</li>
+</ul>
+<h2 id="更复杂的情况">更复杂的情况</h2>
+<h3 id="在前端展示的同一个列表中的数据来自两张不同的表">在前端展示的同一个列表中的数据来自两张不同的表</h3>
+<p>这时可以简单对这两张表做 <code>union</code>。这时，传统分页和无限分页的模式都还适用，只是后端写的查询可能会复杂一点。</p>
+<h3 id="在前端展示的同一个列表中的数据来自两个不同的子系统">在前端展示的同一个列表中的数据来自两个不同的子系统</h3>
+<p>这里有一个例子。见：TODO:</p>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#传统分页" class="astro-PUKOXQVJ">传统分页</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#前端示例" class="astro-PUKOXQVJ">前端示例</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#后端实现" class="astro-PUKOXQVJ">后端实现</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#优点" class="astro-PUKOXQVJ">优点</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#缺点" class="astro-PUKOXQVJ">缺点</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#无限下拉" class="astro-PUKOXQVJ">无限下拉</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#前端示例-1" class="astro-PUKOXQVJ">前端示例</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#后端实现-1" class="astro-PUKOXQVJ">后端实现</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#优点-1" class="astro-PUKOXQVJ">优点</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#缺点-1" class="astro-PUKOXQVJ">缺点</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#更复杂的情况" class="astro-PUKOXQVJ">更复杂的情况</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#在前端展示的同一个列表中的数据来自两张不同的表" class="astro-PUKOXQVJ">在前端展示的同一个列表中的数据来自两张不同的表</a>
+      </li><li class="toc-li toc-h3 astro-PUKOXQVJ">
+        <a href="#在前端展示的同一个列表中的数据来自两个不同的子系统" class="astro-PUKOXQVJ">在前端展示的同一个列表中的数据来自两个不同的子系统</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

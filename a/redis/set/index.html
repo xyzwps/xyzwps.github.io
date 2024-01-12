@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<h2 id="redis-set">Redis Set</h2>
+<p>Redis set 是无序的字符串集合。命令 <code>SADD</code> 把新元素添加到 set 中。Set 上还有一些其他操作，比如判断一个给定的元素是否存在，在多个集合间执行交集、并集、或者差集运算，等等。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; sadd myset 1 2 3</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 3</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; smembers myset</span></span>
+<span class="line"><span style="color:#c9d1d9">1. 3</span></span>
+<span class="line"><span style="color:#c9d1d9">2. 1</span></span>
+<span class="line"><span style="color:#c9d1d9">3. 2</span></span></code></pre>
+<p>这里我们往 <code>myset</code> 中添加了 3 个元素，然后告诉 redis 把所有元素返回。如你所见，它们是无序的——在每次调用时 Redis 返回元素的顺序都可能是不同的，因为 set 不向用户保证元素顺序。</p>
+<p>Redis 有命令来测试成员关系。比如，检查一个元素是否存在：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; sismember myset 3</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; sismember myset 30</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 0</span></span></code></pre>
+<p>“3” 是 set 的成员，而 ”30“ 不是。</p>
+<p>Set 非常适用于表达对象之间的关系。比如我们可以用 set 轻易地实现标签功能。这个问题的一个简单的建模方式是，用一个 set 来存储所有我们想打标签的对象。这个 set 内含有与此标签相关的对象的 ID。</p>
+<p>一个例子是对新闻文章打标签。如果文章的 ID 是 1000，要对它打上标签 1、2、5和77，可以用一个集合把这些标签 ID 和新闻关联起来：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; sadd news:1000:tags 1 2 5 77</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 4</span></span></code></pre>
+<p>我们也可以把这个关系翻转过来：把所有的新闻和一个标签关联起来：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; sadd tag:1:news 1000</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; sadd tag:2:news 1000</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; sadd tag:5:news 1000</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; sadd tag:77:news 1000</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1</span></span></code></pre>
+<p>要获取给定对象的所有标签就很简单：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; smembers news:1000:tags</span></span>
+<span class="line"><span style="color:#c9d1d9">1. 5</span></span>
+<span class="line"><span style="color:#c9d1d9">2. 1</span></span>
+<span class="line"><span style="color:#c9d1d9">3. 77</span></span>
+<span class="line"><span style="color:#c9d1d9">4. 2</span></span></code></pre>
+<p>注：在这个例子中，我们假定你有另一个数据结构，比如 Redis hash，来把标签 ID 映射到标签名。</p>
+<p>还有很多不那么简单的操作可以使用适当的 Redis 命令很容易地实现。比如我们想列出所有同时包含标签 1、2、10 和 27 的对象，就可以使用 <code>SINTER</code> 命令，它在不同的集合之间求交集。我们可以这样用：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; sinter tag:1:news tag:2:news tag:10:news tag:27:news</span></span>
+<span class="line"><span style="color:#c9d1d9">... results here ...</span></span></code></pre>
+<p>除了交集，你还可以求并集、差集、随机分离一个元素，等等。</p>
+<p>从集合中分离一个元素的命令叫 <code>SPOP</code>，它适用于对特定问题建模。比如，为了实现一个 web 版的扑克游戏，你可能想用一个集合来表示你的牌。假设我们使用单字符前缀来表示梅花-(C)lubs, 方块-(D)iamonds, 红桃-(H)earts, 黑桃-(S)pades：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt;  sadd deck C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 CJ CQ CK</span></span>
+<span class="line"><span style="color:#c9d1d9">   D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 DJ DQ DK H1 H2 H3</span></span>
+<span class="line"><span style="color:#c9d1d9">   H4 H5 H6 H7 H8 H9 H10 HJ HQ HK S1 S2 S3 S4 S5 S6</span></span>
+<span class="line"><span style="color:#c9d1d9">   S7 S8 S9 S10 SJ SQ SK</span></span>
+<span class="line"><span style="color:#c9d1d9">   (integer) 52</span></span></code></pre>
+<p>现在我们给每个玩家发 5 张牌。通过命令 <code>SPOP</code> 随机移除一个元素，并返回给客户端，所以它非常适用于此场景。</p>
+<p>不过，如果我们直接对牌组使用此命令，那么在下一局游戏里，我们需要再次填充牌组，这可能并不理想。所以为了开始，我们先把 <code>deck</code> key 中的牌复制一份存到 <code>game:1:deck</code> key 中。</p>
+<p>This is accomplished using <code>SUNIONSTORE</code>, which normally performs the union between multiple sets, and stores the result into another set. However, since the union of a single set is itself, I can copy my deck with:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; sunionstore game:1:deck deck</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 52</span></span></code></pre>
+<p>Now I’m ready to provide the first player with five cards:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; spop game:1:deck</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;C6&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; spop game:1:deck</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;CQ&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; spop game:1:deck</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;D1&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; spop game:1:deck</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;CJ&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; spop game:1:deck</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;SJ&quot;</span></span></code></pre>
+<p>One pair of jacks, not great…</p>
+<p>This is a good time to introduce the set command that provides the number of elements inside a set. This is often called the <em>cardinality</em> of a set in the context of set theory, so the Redis command is called <code>SCARD</code>.</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; scard game:1:deck</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 47</span></span></code></pre>
+<p>The math works: 52 - 5 = 47.</p>
+<p>When you need to just get random elements without removing them from the set, there is the <code>SRANDMEMBER</code> command suitable for the task. It also features the ability to return both repeating and non-repeating elements.</p>
+<h2 id="相关命令">相关命令</h2>
+<ul>
+<li><code>SADD key member [member ...]</code><br/>
+<small>Add one or more members to a set</small></li>
+<li><code>SCARD key</code><br/>
+<small>Get the number of members in a set</small></li>
+<li><code>SDIFF key [key ...]</code><br/>
+<small>Subtract multiple sets</small></li>
+<li><code>SDIFFSTORE destination key [key ...]</code><br/>
+<small>Subtract multiple sets and store the resulting set in a key</small></li>
+<li><code>SINTER key [key ...]</code><br/>
+<small>Intersect multiple sets</small></li>
+<li><code>SINTERCARD numkeys key [key ...] [LIMIT limit]</code><br/>
+<small>Intersect multiple sets and return the cardinality of the result</small></li>
+<li><code>SINTERSTORE destination key [key ...]</code><br/>
+<small>Intersect multiple sets and store the resulting set in a key</small></li>
+<li><code>SISMEMBER key member</code><br/>
+<small>Determine if a given value is a member of a set</small></li>
+<li><code>SMEMBERS key</code><br/>
+<small>Get all the members in a set</small></li>
+<li><code>SMISMEMBER key member [member ...]</code><br/>
+<small>Returns the membership associated with the given elements for a set</small></li>
+<li><code>SMOVE source destination member</code><br/>
+<small>Move a member from one set to another</small></li>
+<li><code>SPOP key [count]</code><br/>
+<small>Remove and return one or multiple random members from a set</small></li>
+<li><code>SRANDMEMBER key [count]</code><br/>
+<small>Get one or multiple random members from a set</small></li>
+<li><code>SREM key member [member ...]</code><br/>
+<small>Remove one or more members from a set</small></li>
+<li><code>SSCAN key cursor [MATCH pattern] [COUNT count]</code><br/>
+<small>Incrementally iterate Set elements</small></li>
+<li><code>SUNION key [key ...]</code><br/>
+<small>Add multiple sets</small></li>
+<li><code>SUNIONSTORE destination key [key ...]</code><br/>
+<small>Add multiple sets and store the resulting set in a key</small></li>
+</ul>

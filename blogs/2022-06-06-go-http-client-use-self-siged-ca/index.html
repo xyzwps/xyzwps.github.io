@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/blogs/2022-06-06-go-http-client-use-self-siged-ca">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Go 语言 https 客户端如何使用自签名 CA</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/blogs" class="astro-QAANGHZH">博客列表</a> / Go 语言 https 客户端如何使用自签名 CA
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-12-06-soft-link" class="astro-UKV4GGCY">软连接</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-10-17-password-strength" class="astro-UKV4GGCY">密码强度</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-09-19-graphql-gossip" class="astro-UKV4GGCY">Graphql 碎碎念</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-25-fp" class="astro-UKV4GGCY">函数式编程</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-22-authn" class="astro-UKV4GGCY">Authentication</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-18-id" class="astro-UKV4GGCY">ID 生成算法</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-02-pagination" class="astro-UKV4GGCY">一个跨服务分页示例</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-01-data-format" class="astro-UKV4GGCY">一些数据格式</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-07-27-pagination" class="astro-UKV4GGCY">分页</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-25-unicode" class="astro-UKV4GGCY">Unicode</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-23-js-return-await" class="astro-UKV4GGCY">记一个 JS return await 问题</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-06-go-http-client-use-self-siged-ca" class="astro-UKV4GGCY">Go 语言 https 客户端如何使用自签名 CA</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2023-04-17-mirrors" class="astro-UKV4GGCY">国内开源软件镜像</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">Go 语言 https 客户端如何使用自签名 CA</h1>
+  
+              <p><a href="https://forfuncsake.github.io/post/2017/08/trust-extra-ca-cert-in-go-app/">戳这里见原文</a>。本文把代码部分复制过来备份，因为代码部分足够清楚明了了。</p>
+<p>代码如下：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">crypto/x509</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">flag</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">io/ioutil</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">log</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">net/http</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	localCertFile </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;/usr/local/internal-ca/ca.crt&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	insecure </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> flag.</span><span style="color:#79C0FF">Bool</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;insecure-ssl&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">false</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&quot;Accept/Ignore all server SSL certificates&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	flag.</span><span style="color:#79C0FF">Parse</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Get the SystemCertPool, continue with an empty pool on error</span></span>
+<span class="line"><span style="color:#C9D1D9">	rootCAs, _ </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> x509.</span><span style="color:#79C0FF">SystemCertPool</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> rootCAs </span><span style="color:#FF7B72">==</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		rootCAs </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> x509.</span><span style="color:#79C0FF">NewCertPool</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Read in the cert file</span></span>
+<span class="line"><span style="color:#C9D1D9">	certs, err </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> ioutil.</span><span style="color:#79C0FF">ReadFile</span><span style="color:#C9D1D9">(localCertFile)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> err </span><span style="color:#FF7B72">!=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		log.</span><span style="color:#79C0FF">Fatalf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;Failed to append </span><span style="color:#79C0FF">%q</span><span style="color:#A5D6FF"> to RootCAs: </span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, localCertFile, err)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Append our cert to the system pool</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> ok </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> rootCAs.</span><span style="color:#79C0FF">AppendCertsFromPEM</span><span style="color:#C9D1D9">(certs); </span><span style="color:#FF7B72">!</span><span style="color:#C9D1D9">ok {</span></span>
+<span class="line"><span style="color:#C9D1D9">		log.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;No certs appended, using system certs only&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Trust the augmented cert pool in our client</span></span>
+<span class="line"><span style="color:#C9D1D9">	config </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&amp;</span><span style="color:#C9D1D9">tls.Config{</span></span>
+<span class="line"><span style="color:#C9D1D9">		InsecureSkipVerify: </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">insecure,</span></span>
+<span class="line"><span style="color:#C9D1D9">		RootCAs:            rootCAs,</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	tr </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&amp;</span><span style="color:#C9D1D9">http.Transport{TLSClientConfig: config}</span></span>
+<span class="line"><span style="color:#C9D1D9">	client </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&amp;</span><span style="color:#C9D1D9">http.Client{Transport: tr}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Uses local self-signed cert</span></span>
+<span class="line"><span style="color:#C9D1D9">	req </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> http.</span><span style="color:#79C0FF">NewRequest</span><span style="color:#C9D1D9">(http.MethodGet, </span><span style="color:#A5D6FF">&quot;https://localhost/api/version&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	resp, err </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> client.</span><span style="color:#79C0FF">Do</span><span style="color:#C9D1D9">(req)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Handle resp and err</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Still works with host-trusted CAs!</span></span>
+<span class="line"><span style="color:#C9D1D9">	req </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> http.</span><span style="color:#79C0FF">NewRequest</span><span style="color:#C9D1D9">(http.MethodGet, </span><span style="color:#A5D6FF">&quot;https://example.com/&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	resp, err </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> client.</span><span style="color:#79C0FF">Do</span><span style="color:#C9D1D9">(req)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// Handle resp and err</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// ...</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

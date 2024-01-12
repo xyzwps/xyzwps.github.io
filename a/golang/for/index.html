@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<h2 id="for-语句">for 语句</h2>
+<p>Go 语言只有一种循环语句：<code>for</code> 循环。</p>
+<p>像 Java、C 或 JavaScript 那样，基本的 <code>for</code> 循环有三个部分，用两个分号隔开，其中：</p>
+<ul>
+<li>第一部分是初始化语句，只在 <code>for</code> 循环开始时执行一次。这一部分应该是一个短变量声明，而且这里声明的变量仅在 <code>for</code> 语句作用域内可用。</li>
+<li>第二部分是条件表达式，如果值为 <code>True</code> 就会迭代。一旦值为 <code>False</code>，循环就会结束。</li>
+<li>第三部分是迭代后语句，在每次迭代后执行。</li>
+</ul>
+<p>和 Java、C 或 JavaScript 不同的是，<code>for</code> 循环中的三个部分没有被括号括起来，而且 <code>for</code> 循环后面的花括号不可省略。举个例子：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">sum </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">; i</span><span style="color:#FF7B72">++</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    sum </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> i</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p><code>for</code> 语句的初始化语句和迭代后语句可以省略，如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">sum </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> ; sum </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1000</span><span style="color:#C9D1D9">; {</span></span>
+<span class="line"><span style="color:#C9D1D9">    sum </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> sum</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p><code>for</code> 循环甚至可以像 C 语言中的 <code>while</code> 那样使用，如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">sum </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> sum </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1000</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    sum </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> sum</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>如果你连条件表达式都省了，那么 <code>for</code> 语句就会无限循环，如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#8B949E">// do something forever</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>Go 没有逗号操作符，而且 <code>++</code> 和 <code>--</code> 是语句而非表达式，所以，如果要在 <code>for</code> 语句中使用多个变量，应使用平行命名的方式：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#8B949E">// 反转 a</span></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i, j </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(a)</span><span style="color:#FF7B72">-</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> j; i, j </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> i</span><span style="color:#FF7B72">+</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, j</span><span style="color:#FF7B72">-</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	a[i], a[j] </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> a[j], a[i]</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="forrange">for…range</h2>
+<p>我们可以使用 for…range 来遍历数组、slice、map，甚至可以从 channel 接受数据。具体用法请参见对应的部分，这里不再举例。</p>

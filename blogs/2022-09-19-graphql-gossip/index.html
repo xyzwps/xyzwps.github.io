@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/blogs/2022-09-19-graphql-gossip">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Graphql 碎碎念</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/blogs" class="astro-QAANGHZH">博客列表</a> / Graphql 碎碎念
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-12-06-soft-link" class="astro-UKV4GGCY">软连接</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-10-17-password-strength" class="astro-UKV4GGCY">密码强度</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-09-19-graphql-gossip" class="astro-UKV4GGCY">Graphql 碎碎念</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-25-fp" class="astro-UKV4GGCY">函数式编程</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-22-authn" class="astro-UKV4GGCY">Authentication</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-18-id" class="astro-UKV4GGCY">ID 生成算法</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-02-pagination" class="astro-UKV4GGCY">一个跨服务分页示例</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-01-data-format" class="astro-UKV4GGCY">一些数据格式</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-07-27-pagination" class="astro-UKV4GGCY">分页</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-25-unicode" class="astro-UKV4GGCY">Unicode</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-23-js-return-await" class="astro-UKV4GGCY">记一个 JS return await 问题</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-06-go-http-client-use-self-siged-ca" class="astro-UKV4GGCY">Go 语言 https 客户端如何使用自签名 CA</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2023-04-17-mirrors" class="astro-UKV4GGCY">国内开源软件镜像</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">Graphql 碎碎念</h1>
+  
+              <h2 id="概要和详情">概要和详情</h2>
+<p>有时，查询概要和详情所付出的代价差别巨大。</p>
+<p>在 UI 上，有时会有一个列表页面查询每项业务数据的概要，然后通过点击这些项再去查看每一项的详情数据。如果在设计 GraphQL schema 时，把详情相关字段挂到摘要 schema 中，就会出现管不住 API 使用者的情况，一不小心查出了当前页面的非必要数据，导致查询性能极差。</p>
+<p>比如查询资产时
+比如查询好友列表和好友详情</p>
+<h2 id="限流">限流</h2>
+<ul>
+<li><a href="https://www.npmjs.com/package/graphql-rate-limit-directive">graphql-rate-limit-directive</a>: 固定窗口的 GraphQL 限流指令</li>
+<li><a href="https://www.npmjs.com/package/graphql-rate-limit">graphql-rate-limit</a>: 灵活的 GraphQL 限流库（似乎不太更新了??）</li>
+</ul>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#概要和详情" class="astro-PUKOXQVJ">概要和详情</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#限流" class="astro-PUKOXQVJ">限流</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

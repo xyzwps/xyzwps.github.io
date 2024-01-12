@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<p>Redis Geo 是对地球上按照经纬度定位的点的相关操作的抽象。</p>
+<h2 id="存储模型">存储模型</h2>
+<ul>
+<li>经度的有效范围是 -180 到 180 度。</li>
+<li>纬度的有效分为是 -85.05112878 到 85.05112878 度。</li>
+</ul>
+<p>Redis 中，地理数据被存储在一个 sorted set 中，决定一个地点在 sorted set 中的 score 的方式是 <a href="https://en.wikipedia.org/wiki/Geohash">Geohash</a>，即把纬度和经度的 bit 交错排列构成一个 52 bit 的唯一整数。我们知道，sorted set 的双精度 score 可以容得下 52-bit 整数，所以没有经度丢失。</p>
+<h2 id="使用场景">使用场景</h2>
+<p>TODO:</p>
+<h2 id="基本命令">基本命令</h2>
+<h3 id="geoadd"><code>GEOADD</code></h3>
+<p>把一些带有名称的经纬度点增加到一个 key 中：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GEOADD key [NX|XX] [CH] 经度 纬度 名称 [经度 纬度 名称 ...]</span></span></code></pre>
+<p>其中：</p>
+<ul>
+<li><code>NX</code> 表示仅更新已存在的元素，而不是添加新元素</li>
+<li><code>XX</code> 表示不更新已存在的元素，仅添加新元素</li>
+<li><code>CH</code> 表示返回<em>新增加的元素</em>数量和<em>被修改的已存在的元素</em>数量的和。缺省此项，则仅返回新增加的元素的数量。</li>
+</ul>
+<p>从 3.2.0 版本加入。</p>
+<h3 id="geodist"><code>GEODIST</code></h3>
+<p>计算同一个 key 下的两个地点之间的距离：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GEODIST key 名称1 名称2 [M|KM|FT|MI]</span></span></code></pre>
+<p>后面四个是单位：</p>
+<ul>
+<li><code>M</code> - meter - 米（缺省值）</li>
+<li><code>KM</code> - kilometer - 千米</li>
+<li><code>FT</code> - feet - 英尺</li>
+<li><code>MI</code> - mile - 英里</li>
+</ul>
+<p>从 3.2.0 版本加入。</p>
+<h3 id="geohash"><code>GEOHASH</code></h3>
+<p>获取一些地理位置的 GeoHash 值：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GEOHASH key 名称 [名称 ...]</span></span></code></pre>
+<p>从 3.2.0 版本加入。</p>
+<h3 id="geopos"><code>GEOPOS</code></h3>
+<p>获取一些地理位置的经纬度：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GEOPOS key 名称 [名称 ...]</span></span></code></pre>
+<p>从 3.2.0 版本加入。</p>
+<h3 id="示例">示例</h3>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">redis&gt; GEOADD Sicily 13.361389 38.115556 &quot;Palermo&quot; 15.087269 37.502669 &quot;Catania&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 2</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; GEODIST Sicily Palermo Catania</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;166274.1516&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; GEOHASH Sicily Palermo Catania</span></span>
+<span class="line"><span style="color:#c9d1d9">1) &quot;sqc8b49rny0&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) &quot;sqdtr74hyu0&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; GEOPOS Sicily Palermo Catania NonExisting</span></span>
+<span class="line"><span style="color:#c9d1d9">1) 1) &quot;13.36138933897018433&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;38.11555639549629859&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) 1) &quot;15.08726745843887329&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;37.50266842333162032&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">3) (nil)</span></span></code></pre>
+<h2 id="搜索命令">搜索命令</h2>
+<p>示例数据准备：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">redis&gt; GEOADD Sicily 13.361389 38.115556 &quot;Palermo&quot; 15.087269 37.502669 &quot;Catania&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 2</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; GEOADD Sicily 12.758489 38.788135 &quot;edge1&quot; 17.241510 38.788135 &quot;edge2&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 2</span></span></code></pre>
+<h3 id="geosearch"><code>GEOSEARCH</code></h3>
+<p>查询一个区域内（包括边界上）的地理位置点：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GEOSEARCH key</span></span>
+<span class="line"><span style="color:#c9d1d9">    [FROMMEMBER member] [FROMLONLAT longitude latitude]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [BYRADIUS radius M|KM|FT|MI] [BYBOX width height M|KM|FT|MI]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [ASC|DESC] [COUNT count [ANY]]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [WITHCOORD] [WITHDIST] [WITHHASH]</span></span></code></pre>
+<ul>
+<li>中心点
+<ul>
+<li><code>FROMMEMBER</code> 中心点的名称</li>
+<li><code>FROMLONLAT</code> 中心点的经纬度</li>
+</ul>
+</li>
+<li>区域xingzhuang
+<ul>
+<li><code>BYRADIUS</code> 以中心点为圆心的圆形区域</li>
+<li><code>BYBOX</code> 以中心点位中心的矩形区域</li>
+</ul>
+</li>
+<li>排序
+<ul>
+<li><code>ASC</code> 按照距离中心点从近到远的顺序</li>
+<li><code>DESC</code> 按照距离中心点从远到近的顺序</li>
+</ul>
+</li>
+<li>返回数量
+<ul>
+<li><code>COUNT</code> 表示返回最前面几条。缺省则返回区域内的全部地理位置</li>
+<li><code>ANY</code> 存在时表示，尽可能快地返回指定数量的点，而不是等全部都算出来并排序后取最前面几个点</li>
+</ul>
+</li>
+<li>返回值
+<ul>
+<li><code>WITHDIST</code> 使返回值中带有距离中心点的距离</li>
+<li><code>WITHCOORD</code> 返回结果位置的坐标</li>
+<li><code>WITHHASH</code> 返回结果中带有 GeoHash 值</li>
+</ul>
+</li>
+</ul>
+<p>从版本 6.2.0 引入。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">redis&gt; GEOSEARCH Sicily FROMLONLAT 15 37 BYRADIUS 200 km ASC</span></span>
+<span class="line"><span style="color:#c9d1d9">1) &quot;Catania&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) &quot;Palermo&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; GEOSEARCH Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC WITHCOORD WITHDIST</span></span>
+<span class="line"><span style="color:#c9d1d9">1) 1) &quot;Catania&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;56.4413&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   3) 1) &quot;15.08726745843887329&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">      2) &quot;37.50266842333162032&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) 1) &quot;Palermo&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;190.4424&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   3) 1) &quot;13.36138933897018433&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">      2) &quot;38.11555639549629859&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">3) 1) &quot;edge2&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;279.7403&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   3) 1) &quot;17.24151045083999634&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">      2) &quot;38.78813451624225195&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">4) 1) &quot;edge1&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;279.7405&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   3) 1) &quot;12.7584877610206604&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">      2) &quot;38.78813451624225195&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt;</span></span></code></pre>
+<h3 id="geosearchstore"><code>GEOSEARCHSTORE</code></h3>
+<p>和 <code>GEOSEARCH</code> 类似，它把搜索结果存放到一个目标 key 中：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GEOSEARCHSTORE destination source</span></span>
+<span class="line"><span style="color:#c9d1d9">    [FROMMEMBER member] [FROMLONLAT longitude latitude]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [BYRADIUS radius M|KM|FT|MI] [BYBOX width height M|KM|FT|MI]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [ASC|DESC] [COUNT count [ANY]]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [STOREDIST]</span></span></code></pre>
+<p>使用 <code>STOREDIST</code> 时，存到目标 key 中的数据是以距离中心点的距离作为 score 来排序。</p>
+<p>从版本 6.2.0 引入。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">redis&gt; GEOSEARCHSTORE key1 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 3</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; GEOSEARCH key1 FROMLONLAT 15 37 BYBOX 400 400 km ASC WITHCOORD WITHDIST WITHHASH</span></span>
+<span class="line"><span style="color:#c9d1d9">1) 1) &quot;Catania&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;56.4413&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   3) (integer) 3479447370796909</span></span>
+<span class="line"><span style="color:#c9d1d9">   4) 1) &quot;15.08726745843887329&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">      2) &quot;37.50266842333162032&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) 1) &quot;Palermo&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;190.4424&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   3) (integer) 3479099956230698</span></span>
+<span class="line"><span style="color:#c9d1d9">   4) 1) &quot;13.36138933897018433&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">      2) &quot;38.11555639549629859&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">3) 1) &quot;edge2&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   2) &quot;279.7403&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">   3) (integer) 3481342659049484</span></span>
+<span class="line"><span style="color:#c9d1d9">   4) 1) &quot;17.24151045083999634&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">      2) &quot;38.78813451624225195&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; GEOSEARCHSTORE key2 Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC COUNT 3 STOREDIST</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 3</span></span>
+<span class="line"><span style="color:#c9d1d9">redis&gt; ZRANGE key2 0 -1 WITHSCORES</span></span>
+<span class="line"><span style="color:#c9d1d9">1) &quot;Catania&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) &quot;56.441257870158204&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">3) &quot;Palermo&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">4) &quot;190.44242984775784&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">5) &quot;edge2&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">6) &quot;279.7403417843143&quot;</span></span></code></pre>
+<h3 id="georadius"><code>GEORADIUS</code></h3>
+<p>在 3.2.0 版本引入，在 6.2.0 版本废弃，推荐改用 <code>GEOSEARCH</code>。</p>
+<p>查询一个圆形区域内的地理位置点，算是 <code>GEOSEARCH</code> 的一个弱化版。下面把相关命令也都列出来：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">GEORADIUS key</span></span>
+<span class="line"><span style="color:#c9d1d9">    longitude latitude radius M|KM|FT|MI</span></span>
+<span class="line"><span style="color:#c9d1d9">    [WITHCOORD] [WITHDIST] [WITHHASH]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [COUNT count [ANY]] [ASC|DESC]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [STORE key] [STOREDIST key]</span></span>
+<span class="line"><span style="color:#c9d1d9"></span></span>
+<span class="line"><span style="color:#c9d1d9">GEORADIUSBYMEMBER key</span></span>
+<span class="line"><span style="color:#c9d1d9">    member radius M|KM|FT|MI</span></span>
+<span class="line"><span style="color:#c9d1d9">    [WITHCOORD] [WITHDIST] [WITHHASH]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [COUNT count [ANY]] [ASC|DESC]</span></span>
+<span class="line"><span style="color:#c9d1d9">    [STORE key] [STOREDIST key]</span></span></code></pre>
+<p><code>STORE</code> 是说把搜索结果存放到指定 key 中。</p>
+<p><code>GEORADIUS_RO</code> 和 <code>GEORADIUSBYMEMBER_RO</code> 与不带 <code>_RO</code> 的两个命令的区别是不带有两个 <code>STORE</code> 参数，即只读版。</p>

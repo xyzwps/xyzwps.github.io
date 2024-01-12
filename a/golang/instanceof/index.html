@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<p>Go 中并没有 <code>instanceof</code> 这种操作符。判断一个值是否是某种类型的，用强制类型转换就行：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">MyError</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	Message </span><span style="color:#FF7B72">string</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Messaged</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">GetMessage</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (e </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">MyError) </span><span style="color:#D2A8FF">Error</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> e.Message</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (e </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">MyError) </span><span style="color:#D2A8FF">GetMessage</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> e.Message</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> err </span><span style="color:#FF7B72">error</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&amp;</span><span style="color:#C9D1D9">MyError{</span><span style="color:#A5D6FF">&quot;xxxxx&quot;</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	_, ok </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> err.(</span><span style="color:#FF7B72">error</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(ok)  </span><span style="color:#8B949E">// true</span></span>
+<span class="line"><span style="color:#C9D1D9">	_, ok </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> err.(Messaged)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(ok)  </span><span style="color:#8B949E">// true</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>

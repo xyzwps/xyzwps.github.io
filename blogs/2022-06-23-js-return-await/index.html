@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/blogs/2022-06-23-js-return-await">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>记一个 JS return await 问题</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/blogs" class="astro-QAANGHZH">博客列表</a> / 记一个 JS return await 问题
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-12-06-soft-link" class="astro-UKV4GGCY">软连接</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-10-17-password-strength" class="astro-UKV4GGCY">密码强度</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-09-19-graphql-gossip" class="astro-UKV4GGCY">Graphql 碎碎念</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-25-fp" class="astro-UKV4GGCY">函数式编程</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-22-authn" class="astro-UKV4GGCY">Authentication</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-18-id" class="astro-UKV4GGCY">ID 生成算法</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-02-pagination" class="astro-UKV4GGCY">一个跨服务分页示例</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-01-data-format" class="astro-UKV4GGCY">一些数据格式</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-07-27-pagination" class="astro-UKV4GGCY">分页</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-25-unicode" class="astro-UKV4GGCY">Unicode</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-23-js-return-await" class="astro-UKV4GGCY">记一个 JS return await 问题</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-06-go-http-client-use-self-siged-ca" class="astro-UKV4GGCY">Go 语言 https 客户端如何使用自签名 CA</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2023-04-17-mirrors" class="astro-UKV4GGCY">国内开源软件镜像</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">记一个 JS return await 问题</h1>
+  
+              <p>最开始的时候，我经常会写 <code>return await</code> 这样的代码，比如:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">async</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">function</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">foo</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">await</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">bar</span><span style="color:#C9D1D9">();</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>后来某一天， eslint 提示这里的 <code>await</code> 可以省略掉，依据的是规则 <a href="https://eslint.org/docs/rules/no-return-await">no-return-await</a>。我也没看这个规则的详细描述，想了想这么做确实是对的，确实能省下一些 CPU 开销。学了一手。</p>
+<p>前几天，我写了一段下面那样的代码，意思是尝试执行 <code>doSomething</code> 3 次，如果有一次成功就返回，如果都失败则抛出最后一个错误：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">async</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">function</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">doSomething</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">  </span><span style="color:#FF7B72">throw</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">new</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">Error</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&#39;xxx&#39;</span><span style="color:#C9D1D9">);</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">async</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">function</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">doTry</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">  </span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> (</span><span style="color:#FF7B72">let</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">; i</span><span style="color:#FF7B72">++</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">try</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">      </span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">doSomething</span><span style="color:#C9D1D9">();</span></span>
+<span class="line"><span style="color:#C9D1D9">    } </span><span style="color:#FF7B72">catch</span><span style="color:#C9D1D9"> (err) {</span></span>
+<span class="line"><span style="color:#C9D1D9">      </span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> (i </span><span style="color:#FF7B72">&gt;=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">throw</span><span style="color:#C9D1D9"> err;</span></span>
+<span class="line"><span style="color:#C9D1D9">      </span><span style="color:#FF7B72">else</span><span style="color:#C9D1D9"> console.</span><span style="color:#D2A8FF">log</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&#39;尝试失败&#39;</span><span style="color:#C9D1D9">);</span></span>
+<span class="line"><span style="color:#C9D1D9">    }</span></span>
+<span class="line"><span style="color:#C9D1D9">  }</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D2A8FF">doTry</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">  .</span><span style="color:#D2A8FF">then</span><span style="color:#C9D1D9">(() </span><span style="color:#FF7B72">=&gt;</span><span style="color:#C9D1D9"> process.</span><span style="color:#D2A8FF">exit</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#C9D1D9">  .</span><span style="color:#D2A8FF">catch</span><span style="color:#C9D1D9">((</span><span style="color:#FFA657">err</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">=&gt;</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    console.</span><span style="color:#D2A8FF">log</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&#39;焯&#39;</span><span style="color:#C9D1D9">);</span></span>
+<span class="line"><span style="color:#C9D1D9">    process.</span><span style="color:#D2A8FF">exit</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">);</span></span>
+<span class="line"><span style="color:#C9D1D9">  });</span></span></code></pre>
+<p>结果只输出了一个“焯”。</p>
+<p>焯。</p>
+<p>后来想了想，这段代码确实是写得不对。<code>return doSomething()</code> 这一句直接返回来了一个包着错误的 <code>Promise</code>，所以外面的 <code>try</code> 当然是啥都歘不到。只要改成 <code>return await doSomething()</code>，就可以正常重试了。</p>
+<p>搞定之后，我回头看了看规则 <a href="https://eslint.org/docs/rules/no-return-await">no-return-await</a> 的描述，发现人家已经预料到这种情况了。😂</p>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

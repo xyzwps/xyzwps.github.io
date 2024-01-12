@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<h2 id="接口的定义与实现">接口的定义与实现</h2>
+<p>接口是一组方法签名的集合。一个类型实现了接口，是指它实现了接口中的所有方法。</p>
+<p>一个类型实现接口是隐式的，只需要实现接口中的所有方法即可，并不需要在类型的某个地方标注实现的接口名称（如 Java 中的 <code>implement</code>）。</p>
+<p>这把接口的定义和实现解耦了（也没法方便地查看哪些类型实现了此接口了）。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">(&quot;fmt&quot;;</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">math</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Abser</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">Abs</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">float64</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> a Abser</span></span>
+<span class="line"><span style="color:#C9D1D9">	f </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">MyFloat</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">-</span><span style="color:#C9D1D9">math.Sqrt2)</span></span>
+<span class="line"><span style="color:#C9D1D9">	v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> Vertex{</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> f  </span><span style="color:#8B949E">// MyFloat 实现了 Abser</span></span>
+<span class="line"><span style="color:#C9D1D9">	a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&amp;</span><span style="color:#C9D1D9">v </span><span style="color:#8B949E">// *Vertex 实现了 Abser</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> v </span><span style="color:#8B949E">// 不可以，因为 v 是一个 Vertex（而非 *Vertex），Vertex 没有实现 Abser</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(a.</span><span style="color:#79C0FF">Abs</span><span style="color:#C9D1D9">())</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">MyFloat</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">float64</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (f MyFloat) </span><span style="color:#D2A8FF">Abs</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> f </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">float64</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">-</span><span style="color:#C9D1D9">f)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">float64</span><span style="color:#C9D1D9">(f)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Vertex</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	X, Y </span><span style="color:#FF7B72">float64</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (v </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">Vertex) </span><span style="color:#D2A8FF">Abs</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> math.</span><span style="color:#79C0FF">Sqrt</span><span style="color:#C9D1D9">(v.X</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">v.X </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> v.Y</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">v.Y)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>Go 语言的接口最神奇的地方在于，我可以定义一个新的接口，同时我不需要对已存在的代码做任何改动，就能让已存在的类型实现这个接口。我管这叫倒贴式实现😏</p>
+<h2 id="接口值">接口值</h2>
+<p>在底层，接口的值是一个值和具体类型的二元组——<code>(value, type)</code>。接口值持有一个底层类型的值。
+接口值调用方法，是使用底层的值调用底层类型的方法。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">(</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">; </span><span style="color:#A5D6FF">&quot;math&quot;</span><span style="color:#C9D1D9"> )</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">I</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">M</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">T</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	S </span><span style="color:#FF7B72">string</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (t </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">T) </span><span style="color:#D2A8FF">M</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(t.S)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">F</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">float64</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (f F) </span><span style="color:#D2A8FF">M</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(f)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> i I</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	i </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&amp;</span><span style="color:#C9D1D9">T{</span><span style="color:#A5D6FF">&quot;Hello&quot;</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">describe</span><span style="color:#C9D1D9">(i) </span><span style="color:#8B949E">// 输出 (&amp;{Hello}, *main.T)</span></span>
+<span class="line"><span style="color:#C9D1D9">	i.</span><span style="color:#79C0FF">M</span><span style="color:#C9D1D9">() </span><span style="color:#8B949E">// 输出 Hello</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	i </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">F</span><span style="color:#C9D1D9">(math.Pi)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">describe</span><span style="color:#C9D1D9">(i) </span><span style="color:#8B949E">// 输出 (3.141592653589793, main.F)</span></span>
+<span class="line"><span style="color:#C9D1D9">	i.</span><span style="color:#79C0FF">M</span><span style="color:#C9D1D9">() </span><span style="color:#8B949E">// 输出 3.141592653589793</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">describe</span><span style="color:#C9D1D9">(i I) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;(</span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF">, </span><span style="color:#79C0FF">%T</span><span style="color:#A5D6FF">)</span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, i, i)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>如果接口值内部的值是一个 <code>nil</code>，但是有底层类型，那么接口值调用方法时，会往方法的接受参数中传入一个 <code>nil</code>。在别的语言中，这会抛出一个空指针异常，但是 Go 中不会，因为方法就是函数。</p>
+<h2 id="接口零值">接口零值</h2>
+<p>接口零值既没有值，又没有具体类型。用接口零值调用方法，会跑出一个运行时错误，因为没有具体类型绑定，所以没有函数可以调用。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">I</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">M</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> i I</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">describe</span><span style="color:#C9D1D9">(i) </span><span style="color:#8B949E">// 输出 (&lt;nil&gt;, &lt;nil&gt;)</span></span>
+<span class="line"><span style="color:#C9D1D9">	i.</span><span style="color:#79C0FF">M</span><span style="color:#C9D1D9">() </span><span style="color:#8B949E">// panic: runtime error, balabalabala</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">describe</span><span style="color:#C9D1D9">(i I) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;(</span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF">, </span><span style="color:#79C0FF">%T</span><span style="color:#A5D6FF">)</span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, i, i)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="空接口">空接口</h2>
+<p>空接口没有任何方法声明。就像下面那样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {}</span></span></code></pre>
+<p>空接口可以持有任何类型的值（因为每个类型至少实现了 0 个方法）。空接口通常用来处理类型未知的值，比如 <code>fmt.Print</code> 接受任何数量的 <code>interface{}</code> 参数。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9">{}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">describe</span><span style="color:#C9D1D9">(i) </span><span style="color:#8B949E">// (&lt;nil&gt;, &lt;nil&gt;)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	i </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">42</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">describe</span><span style="color:#C9D1D9">(i) </span><span style="color:#8B949E">// (42, int)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	i </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;hello&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">describe</span><span style="color:#C9D1D9">(i) </span><span style="color:#8B949E">// (hello, string)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">describe</span><span style="color:#C9D1D9">(i </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9">{}) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;(</span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF">, </span><span style="color:#79C0FF">%T</span><span style="color:#A5D6FF">)</span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, i, i)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>在标准库的 <code>log</code> 包里，有这么一个别名：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">any</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9">{}</span></span></code></pre>
+<h2 id="类型断言">类型断言</h2>
+<p>类型断言提供一种方式来访问接口底层 value。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">t </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> i.(T)</span></span></code></pre>
+<p>上面的语句，断言接口值 <code>i</code> 持有一个 <code>T</code> 类型的底层值，并把这个底层值赋值给 <code>t</code>。如果 <code>i</code> 不含有 <code>T</code> 类型的值，那么就会触发一个 panic。</p>
+<p>为了检测接口值是否持有具体类型，接口断言可以返回两个值：底层值和断言是否正确：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">t, ok </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> i.(T)</span></span></code></pre>
+<p>如果 <code>i</code> 持有 <code>T</code> 类型的底层值，那么 <code>ok == true</code> 且 <code>t</code> 被赋值为接口底层值；否则，<code>ok == false</code>，<code>t</code> 被赋值为类型 <code>T</code> 的零值，不会触发 panic。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9">{} </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;hello&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	s </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> i.(</span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(s) </span><span style="color:#8B949E">// 输出 hello</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	s, ok </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> i.(</span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(s, ok) </span><span style="color:#8B949E">// 输出 hello true</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	f, ok </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> i.(</span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(f, ok) </span><span style="color:#8B949E">// 输出 0 false</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	f </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> i.(</span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">) </span><span style="color:#8B949E">// panic</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(f)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="类型-switch">类型 switch</h2>
+<p>类型 switch 允许进行一系列类型断言。类型 switch 和普通 switch 类似，但是 case 后面跟的是类型名称，而不是具体的值：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">switch</span><span style="color:#C9D1D9"> v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> i.(type) { </span><span style="color:#8B949E">// 注意这里括号中是关键字 type</span></span>
+<span class="line"><span style="color:#FF7B72">case</span><span style="color:#C9D1D9"> T:</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#8B949E">// v 是 T 类型的</span></span>
+<span class="line"><span style="color:#FF7B72">case</span><span style="color:#C9D1D9"> S:</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#8B949E">// v 是 S 类型的</span></span>
+<span class="line"><span style="color:#FF7B72">default</span><span style="color:#C9D1D9">:</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#8B949E">// 没匹配，v 和 i 是统一类型</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="常用接口">常用接口</h2>
+<h3 id="stringer">Stringer</h3>
+<p><code>Stringer</code> 是一个很常用的接口，被定义在 <code>fmt</code> 包中：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Stringer</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#79C0FF">String</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p><code>Stringer</code> 用于输出一个对象的字符串描述（类似于 Java 的 <code>toString</code>），<code>fmt</code> 包用这个接口来打印值。</p>
+<h3 id="error">Error</h3>
+<p>Go 语言用 <code>error</code> 值来表达错误状态。<code>error</code> 接口是一个內建接口，大约长下面这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">error</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#79C0FF">Error</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">string</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>函数经常会返回一个 <code>error</code> 值，调用代码需要对此做检查，如果非 <code>nil</code>，就要处理错误：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">i, err </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> strconv.</span><span style="color:#79C0FF">Atoi</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;42&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> err </span><span style="color:#FF7B72">!=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;couldn&#39;t convert number: </span><span style="color:#79C0FF">%v\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, err)</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">return</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;Converted integer:&quot;</span><span style="color:#C9D1D9">, i)</span></span></code></pre>
+<p><code>error</code> 值为 <code>nil</code> 表示成功，否则表示失败。</p>
+<h3 id="ioreader">io.Reader</h3>
+<p>在 <code>io</code> 包中，有一个叫 <code>io.Reader</code> 的接口，表示读到一个流数据的末尾。Go 语言有很多标准库实现了此接口，比如文件、网络连接、压缩、密码等等等等。此接口只有一个方法：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (T) </span><span style="color:#D2A8FF">Read</span><span style="color:#C9D1D9">(b []</span><span style="color:#FF7B72">byte</span><span style="color:#C9D1D9">) (n </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, err </span><span style="color:#FF7B72">error</span><span style="color:#C9D1D9">)</span></span></code></pre>
+<p>这个方法把数据中的字节读到一个切片中，并返回读到的字节数和一个错误。如果到了流的末尾，则会返回一个 <code>io.EOF</code> 错误。</p>

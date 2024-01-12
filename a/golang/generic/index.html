@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<p>Go 1.18 版本引入泛型，而且是比较简单的那种。</p>
+<h1 id="泛型函数">泛型函数</h1>
+<p>下面有两个函数：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">SumInt</span><span style="color:#C9D1D9">(a, b </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> a </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> b</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">SumFloat32</span><span style="color:#C9D1D9">(a, b </span><span style="color:#FF7B72">float32</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">float32</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> a </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> b</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>在没有泛型之前，这样的东西就只能硬写。有了泛型之后，就可以写成这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> Sum[T </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">|</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">float32</span><span style="color:#C9D1D9">](a, b T) T {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> a </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> b</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>注意，函数名 <code>Sum</code> 后面的方括号中 <code>T</code> 是泛型参数，它的取值可以是 <code>int</code> 或者 <code>float32</code>。使用上也很简单：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(Sum[</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">](</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(Sum[</span><span style="color:#FF7B72">float32</span><span style="color:#C9D1D9">](</span><span style="color:#79C0FF">1.2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2.3</span><span style="color:#C9D1D9">))</span></span></code></pre>
+<p>因为 1 和 2 是 <code>int</code> 字面量，所以 <code>Sum[int](1, 2)</code> 中的类型参数可以去掉，简写为 <code>Sum(1, 2)</code>；因为 1.2 和 2.3 是 <code>float64</code> 字面量，所以 <code>Sum[float32](1.2, 2.3)</code> 就不能把类型参数去掉。我们可以通观察 IDE 的只能提示来判断是否可以去掉类型参数😁。</p>
+<h1 id="泛型-struct">泛型 struct</h1>
+<p>就像函数的泛型参数列表要写到函数名后面那样，struct 的泛型参数列表要写到 struct 名称后面，比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Pair</span><span style="color:#C9D1D9">[A any, B any] </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	First  A</span></span>
+<span class="line"><span style="color:#C9D1D9">	Second B</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>在使用时，类型列表也是要放到 struct 名称后面：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(Pair[</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">]{First: </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, Second: </span><span style="color:#A5D6FF">&quot;12&quot;</span><span style="color:#C9D1D9">})</span></span></code></pre>
+<h1 id="类型约束">类型约束</h1>
+<p>从上面的例子可以看到，泛型参数列表要放到函数或者 struct 的名称后面，用方括号括起来；多个参数用逗号分隔。泛型参数名后面是类型约束。</p>
+<p>类型约束一般有这么几种：</p>
+<ul>
+<li>类型元素约束，即一个或多个类型的联合。如果有多个类型的话，用 <code>|</code> 把它们分割开。比如 <code>[T int | float32 | float64]</code> 表示 <code>T</code> 可以是 <code>int</code>、<code>float32</code>、<code>float64</code>，但不可以是别的。</li>
+<li>底层类型约束，即接受底层类型为某个指定类型的参数，用 <code>~</code> 标在底层类型前方。比如 <code>[T ~int]</code> 表示 <code>T</code> 的底层类型必须是 <code>int</code>。</li>
+<li><code>comparable</code> 是一个 interface，所有的可比较类型都实现了它。这些可比较类型有：布尔类型、数字类型、字符串、指针、channel、可比较类型数组，以及所有字段都是可比较类型的 struct。这个接口仅用于类型约束。比如 <code>[T comparable]</code>。</li>
+<li><code>any</code>。</li>
+</ul>
+<p>上面写的泛型约束都是一种简写的方式。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">[T []P]         </span><span style="color:#8B949E">// = [T interface{[]P}]</span></span>
+<span class="line"><span style="color:#C9D1D9">[T ~</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">]        </span><span style="color:#8B949E">// = [T interface{~int}]</span></span>
+<span class="line"><span style="color:#C9D1D9">[T </span><span style="color:#FF7B72">int|</span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">]  </span><span style="color:#8B949E">// = [T interface{int|string}]</span></span></code></pre>
+<p>泛型参数列表里的类型可以相互依赖。比如下例中类型 <code>T</code> 就依赖于类型 <code>F</code>：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> List1[T []F, F </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">|</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">float32</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">|</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">](i F) T {</span></span>
+<span class="line"><span style="color:#C9D1D9">	result </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">(T, </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	result[</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">] </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> i</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> result</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h1 id="示例">示例</h1>
+<p>有了泛型之后，我们就能快乐地做一些以前做不到的事情了。比如写一个 reduce 函数：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> Reduce[T any, R any](list []T, reducer </span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">(T, R) R, init R) (result R) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	result </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> init</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> _, it </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> list {</span></span>
+<span class="line"><span style="color:#C9D1D9">		result </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">reducer</span><span style="color:#C9D1D9">(it, result)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>比如写一个 map 函数:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> Map[F any, T any](from []F, mapper </span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">(F) T) []T {</span></span>
+<span class="line"><span style="color:#C9D1D9">	to </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">([]T, </span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(from))</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i, it </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> from {</span></span>
+<span class="line"><span style="color:#C9D1D9">		to[i] </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">mapper</span><span style="color:#C9D1D9">(it)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> to</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h1 id="泛型库">泛型库</h1>
+<p>网上应该也有人写了一些处理集合的一些库，比如 <a href="https://github.com/samber/lo">samber/lo</a>。可以编程过程中的痛苦少了一大半~</p>
+<h1 id="常见问题">常见问题</h1>
+<h2 id="如何返回-t-类型的零值">如何返回 T 类型的零值</h2>
+<p>比如有这么一个函数:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> A[T any]() (T, </span><span style="color:#FF7B72">error</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> result, err </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">doSomething</span><span style="color:#C9D1D9">(); err </span><span style="color:#FF7B72">!=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> ${T的零值}, err</span></span>
+<span class="line"><span style="color:#C9D1D9">	} </span><span style="color:#FF7B72">else</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> result, </span><span style="color:#79C0FF">nil</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p><code>${}</code> 部分应该写什么？如果写 <code>nil</code> 会产生一个编译时错误。Go 中也没有类似 C# 中的默认值表达式。该怎么办？这里只能绕一下了，比如写成下面这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> A[T any]() (T, </span><span style="color:#FF7B72">error</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> result, err </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">doSomething</span><span style="color:#C9D1D9">(); err </span><span style="color:#FF7B72">!=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> zeroValue T  </span><span style="color:#8B949E">// 这里声明一个 T 类型的变量</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> zeroValue, err</span></span>
+<span class="line"><span style="color:#C9D1D9">	} </span><span style="color:#FF7B72">else</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> result, </span><span style="color:#79C0FF">nil</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://go.dev/ref/spec">The Go Programming Language Specification</a></li>
+</ul>

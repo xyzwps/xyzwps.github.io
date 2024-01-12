@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<p>Go 语言字符串是一个不可变的<strong>字节</strong>数组，类型是 <code>string</code>。</p>
+<h2 id="零值">零值</h2>
+<p>字符串的零值是长度为 0 的字符串，即 <code>&quot;&quot;</code>。</p>
+<h2 id="长度">长度</h2>
+<p>因为字符串是字节数组，所以 <code>len</code> 函数返回的是字符串中的字节数，<code>len(&quot;Hello, 超越&quot;)</code> 的值是 13 而不是 9。</p>
+<p>要求出这个字符串含有的字符数，有两种方式：</p>
+<ol>
+<li>用一种解码器，计算字符串中的字符（<em>rune</em>）的数量</li>
+<li>直接把字符串转成 <code>[]rune</code>，计算这个 slice 的长度</li>
+</ol>
+<p>如下：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">unicode/utf8</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	str </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;Hello, 超越&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;byte len:&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(str)) </span><span style="color:#8B949E">// 13</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;rune count:&quot;</span><span style="color:#C9D1D9">, utf8.</span><span style="color:#79C0FF">RuneCountInString</span><span style="color:#C9D1D9">(str)) </span><span style="color:#8B949E">// 9</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;rune count:&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">([]</span><span style="color:#79C0FF">rune</span><span style="color:#C9D1D9">(str))) </span><span style="color:#8B949E">// 9</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="转义字符">转义字符</h2>
+<p>字符串中可以包含常见的转义字符，比如 <code>\n</code>、<code>\t</code>、<code>\r</code> 等等。</p>
+<p>字符串还可以包含 Unicode 转义字符，这种转义字符以 <code>\u</code> 或 <code>\U</code> 开头。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;</span><span style="color:#79C0FF">\u8d85\u8d8a</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">)         </span><span style="color:#8B949E">// 输出 超越</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;</span><span style="color:#79C0FF">\U00008d85\U00008d8a</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">) </span><span style="color:#8B949E">// 输出 超越</span></span></code></pre>
+<h2 id="原生字符串">原生字符串</h2>
+<p>字符串字面量是用两个双引号括住的，这时遇到诸如换行之类的字符时，只能使用转义字符。如果使用原生字符串，就不用这么麻烦。</p>
+<p>TODO: 这里显示 <code>\`` 有问题 原生字符串字面量使用两个反引号 </code>“ 括起来的字符串，里面忽略任何形式的转义字符。原生字符串支持跨多行。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">`Hello \n</span></span>
+<span class="line"><span style="color:#A5D6FF">\u8d85\u8d8a 可爱`</span><span style="color:#C9D1D9">)</span></span></code></pre>
+<p>输出</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">Hello \n</span></span>
+<span class="line"><span style="color:#c9d1d9">\u8d85\u8d8a 可爱</span></span></code></pre>
+<h2 id="rune"><code>rune</code></h2>
+<p>Go 语言的字符串是 Unicode 字符串，采用 UTF-8 编码（这样字符串的存储上更紧凑）。Unicode 字符 code point 在 Go 中用整数类型 <code>rune</code> 来表示。</p>
+<p><code>rune</code> 是 <code>int32</code> 的等价类型。</p>
+<p>接着上面的例子，请看以下代码：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(str[</span><span style="color:#79C0FF">8</span><span style="color:#C9D1D9">])         </span><span style="color:#8B949E">// 输出 182</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">([]</span><span style="color:#79C0FF">rune</span><span style="color:#C9D1D9">(str)[</span><span style="color:#79C0FF">8</span><span style="color:#C9D1D9">]) </span><span style="color:#8B949E">// 输出 36234</span></span></code></pre>
+<p><code>rune</code> 字面量是用单引号圈起来的字符。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">a, b, c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&#39;</span><span style="color:#79C0FF">超</span><span style="color:#A5D6FF">&#39;</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&#39;</span><span style="color:#79C0FF">\u8d85</span><span style="color:#A5D6FF">&#39;</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&#39;</span><span style="color:#79C0FF">\U00008d85</span><span style="color:#A5D6FF">&#39;</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// a, b, c 是三个 rune</span></span></code></pre>
+<h2 id="取子串">取子串</h2>
+<p>对字符串取子串，可以用 slice 那样的语法，但是得到的是一个字节串，很郁闷。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(str[</span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">]) </span><span style="color:#8B949E">// 输出 超</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(str[</span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">9</span><span style="color:#C9D1D9">])  </span><span style="color:#8B949E">// 输出乱码……</span></span></code></pre>
+<p>我们在取子串的时候，总不能像上面那样先数字节，对吧，所以需要一个办法来取子串。但是很可惜，标准库里没有类似 Java 或者 JavaScript 中那样的 <code>substring</code> 函数（…）。所以，</p>
+<ul>
+<li>要么先把字符串转成 <code>rune</code> slice，然后取子串，最后再构造出字符串</li>
+</ul>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">string</span><span style="color:#C9D1D9">([]</span><span style="color:#79C0FF">rune</span><span style="color:#C9D1D9">(str)[</span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">8</span><span style="color:#C9D1D9">])) </span><span style="color:#8B949E">// 输出 超</span></span></code></pre>
+<ul>
+<li>要么自己写一个 <code>substring</code></li>
+</ul>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#8B949E">// 注意，此代码没有处理错误</span></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">substring</span><span style="color:#C9D1D9">(str </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">, from, to </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    runes </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">([]</span><span style="color:#FF7B72">rune</span><span style="color:#C9D1D9">, to</span><span style="color:#FF7B72">-</span><span style="color:#C9D1D9">from)</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i, c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(str); {</span></span>
+<span class="line"><span style="color:#C9D1D9">        r, size </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> utf8.</span><span style="color:#79C0FF">DecodeRuneInString</span><span style="color:#C9D1D9">(str[i:])</span></span>
+<span class="line"><span style="color:#C9D1D9">        </span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> c </span><span style="color:#FF7B72">&gt;=</span><span style="color:#C9D1D9"> from </span><span style="color:#FF7B72">&amp;&amp;</span><span style="color:#C9D1D9"> c </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> to {</span></span>
+<span class="line"><span style="color:#C9D1D9">            runes[c</span><span style="color:#FF7B72">-</span><span style="color:#C9D1D9">from] </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> r</span></span>
+<span class="line"><span style="color:#C9D1D9">        } </span><span style="color:#FF7B72">else</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> c </span><span style="color:#FF7B72">&gt;=</span><span style="color:#C9D1D9"> to {</span></span>
+<span class="line"><span style="color:#C9D1D9">            </span><span style="color:#FF7B72">break</span></span>
+<span class="line"><span style="color:#C9D1D9">        }</span></span>
+<span class="line"><span style="color:#C9D1D9">        c</span><span style="color:#FF7B72">++</span></span>
+<span class="line"><span style="color:#C9D1D9">        i </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> size</span></span>
+<span class="line"><span style="color:#C9D1D9">    }</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">string</span><span style="color:#C9D1D9">(runes)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">substring</span><span style="color:#C9D1D9">(str, </span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">9</span><span style="color:#C9D1D9">)) </span><span style="color:#8B949E">// 输出 超越</span></span></code></pre>
+<h2 id="遍历字符串中的字符">遍历字符串中的字符</h2>
+<p>看了上面字符串操蛋的一面，都有点怀疑遍历字符串中的是不是也这么麻烦？其实一点都不麻烦……</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">char</span><span style="color:#C9D1D9">(r </span><span style="color:#FF7B72">rune</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">string</span><span style="color:#C9D1D9">([]</span><span style="color:#FF7B72">rune</span><span style="color:#C9D1D9">{r})</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i, v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> str { </span><span style="color:#8B949E">// 注意，这里 v 是 rune，i 是 rune 在数组中第一个字节所在的位置</span></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(i, </span><span style="color:#79C0FF">char</span><span style="color:#C9D1D9">(v))</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="字符串连接符">字符串连接符</h2>
+<p>用 <code>+</code>（字符串连接符）可以把两个字符串连接起来。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;杨&quot;</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;超越&quot;</span><span style="color:#C9D1D9">) </span><span style="color:#8B949E">// 输出 杨超越</span></span></code></pre>
+<p>如果你要把一组字符串 join 起来的话，可以使用 <code>strings</code> 包中的 <code>Join</code> 函数：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">strings.</span><span style="color:#79C0FF">Join</span><span style="color:#C9D1D9">([]</span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">{</span><span style="color:#A5D6FF">&quot;Tom&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&quot;Jerry&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&quot;Adam&quot;</span><span style="color:#C9D1D9">}, </span><span style="color:#A5D6FF">&quot;, &quot;</span><span style="color:#C9D1D9">) </span><span style="color:#8B949E">// 用逗号连接三个人的名字</span></span></code></pre>
+<p>连接字符串，还可以使用 <code>+=</code>：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">s </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;Hello,&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">s </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot; world&quot;</span></span></code></pre>
+<h2 id="strings-包"><code>strings</code> 包</h2>
+<p>Go 语言标准库中的 <code>strings</code> 包中有一些常用的字符串操作函数，这里不做介绍，开发过程中如果要使用字符操作的话，建议先看看 <code>strings</code> 包能不能满足需要。</p>
+<p>这里是 <code>strings</code> 包的 <a href="https://go-zh.org/pkg/strings/">中文文档</a> | <a href="https://golang.org/pkg/strings/">英文文档</a>。</p>
+<h2 id="unicode-包"><code>unicode</code> 包</h2>
+<p><code>unicode</code> 包里主要是一些对 <code>rune</code> 的操作。</p>
+<p>这个包下有两个子包 <code>utf8</code> 和 <code>utf16</code>，用来做 <code>rune</code> 和 <code>byte</code> 之间做转换和对 <code>rune</code> 做编码检查。另外，这两个包中，还有两个函数 <code>DecodeRuneInString</code> 和 <code>DecodeLastRuneInString</code>，可以用来在不把字符串转换成 <code>[]rune</code> 的情况下，对字符串做 <code>rune</code> 遍历。</p>
+<p>可以在这里看到 <a href="https://go-zh.org/pkg/">中文文档</a> | <a href="https://golang.org/pkg/">英文文档</a>。</p>
+<h2 id="字符串转其他类型数据">字符串转其他类型数据</h2>
+<p>字符串和数字之间的转换算是是最常见的操作了，这些操作被可以通过标准库 <code>strconv</code> 包中的函数来做到。<code>strconv</code> 包中还有一些其他的字符串转换函数，如果要用到的话，先来这里看看有没有符合条件的函数可以用。</p>
+<p>这里是 <code>strconv</code> 包的 <a href="https://go-zh.org/pkg/strconv/">中文文档</a> | <a href="https://golang.org/pkg/strconv/">英文文档</a>。</p>

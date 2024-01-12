@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<h2 id="代码格式化">代码格式化</h2>
+<p>很多人因为代码格式化大开嘴炮。Go 语言的开发者觉得这太无聊了，干脆用统一风格别在 Go 这里吵了吧。于是 Go
+的格式化风格就被固定下来了。<code>gofmt</code> 程序会把代码格式化为一种固定风格。其中一些细节比如：</p>
+<ul>
+<li>使用 tab 进行缩进</li>
+<li>不限制一行的长度</li>
+<li>与 C、Java 等语言相比，括号更少</li>
+</ul>
+<h2 id="注释">注释</h2>
+<p>Go 语言支持两种风格的注释：行注释 <code>//</code> 和块注释 <code>/*  */</code>。行注释更常用，块注释主要用做包注释。</p>
+<p><code>godoc</code> 通过提取 API 注释来生成 API 文档。</p>
+<p>函数注释通常是一个行注释，以函数名开头，后面接上一个描述此函数的句子。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#8B949E">// Add 把两个数先加，并返回和</span></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">Add</span><span style="color:#C9D1D9">(i, j </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> j</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="命名">命名</h2>
+<p>包名通常是源码所在的目录名称。</p>
+<p>对于属性的获取器，getter 函数通常不是以 <code>Get</code> 开头，看起来别扭，建议直接使用属性名，比如 <code>person.Age</code>；setter
+用 <code>Set</code> 开头挺合理，于是就这样了，比如：<code>person.SetAge(12)</code>。</p>
+<p>如果一个接口只包含一个方法，那么通常以 <code>-er</code> 结尾，比如 <code>Reader</code>、<code>Writer</code>、<code>Formatter</code> 等等。</p>
+<p>返回字符串表示的方法名应为 <code>String</code>，而非 <code>ToString</code>。</p>
+<p>Go 语言标识符统一是驼峰式的。</p>

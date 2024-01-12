@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/a/java/jvm">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JVM</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/a/java" class="astro-QAANGHZH">Java</a> / JVM
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm" class="astro-UKV4GGCY">JVM</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/spec" class="astro-UKV4GGCY">JVM 规范</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/option" class="astro-UKV4GGCY">JVM 选项</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/java/jvm/gc-algorithms" class="astro-UKV4GGCY">GC 算法</a>
+      </li><li class="toc-li toc-h3 astro-UKV4GGCY">
+        <a href="/a/java/jvm/cms" class="astro-UKV4GGCY">CMS</a>
+      </li><li class="toc-li toc-h3 astro-UKV4GGCY">
+        <a href="/a/java/jvm/g1" class="astro-UKV4GGCY">G1</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">JVM</h1>
+  
+              <ul>
+<li>JVM 结构
+<ul>
+<li>TODO:</li>
+</ul>
+</li>
+<li>GC 主要工作
+<ul>
+<li>分配内存</li>
+<li>保证被引用的对象在内存中</li>
+<li>清理不可达对象。不可达对象也被称为垃圾。整个清理过程被称为垃圾回收</li>
+</ul>
+</li>
+<li>内存空间分代
+<ul>
+<li>每个代中存放着年龄不同的对象</li>
+<li>分代假说：
+<ul>
+<li>假说内容
+<ul>
+<li>大多数对象在年轻时就成了垃圾</li>
+<li>老对象很少持有对年轻对象的引用</li>
+</ul>
+</li>
+<li>根据假说，堆内存被分成两个代
+<ul>
+<li>年轻代(Young): 空间占用较小，GC 较为频繁（Minor GC）</li>
+<li>老年代(Old, Tenured): 空间占用较大，并且缓慢增长 (Major GC, Full GC)</li>
+</ul>
+</li>
+<li>其他内存区域
+<ul>
+<li>方法区
+<ul>
+<li>J8 之前叫永久代(Permanent Generation)</li>
+<li>J8 及其之后叫元空间（Metaspace）</li>
+<li>使用选项 <code>MaxMetaspaceSize</code> 限制大小</li>
+<li>选项 <code>UseCompressedClassesPointers</code> TODO: 啥意思</li>
+</ul>
+</li>
+<li>Code Cache: JIT 编译器存放编译后代码的地方</li>
+<li>Native memory: 系统内存，不由 JVM 管理</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>GC 算法
+<ul>
+<li>G1 之前
+<ul>
+<li>年轻代 GC
+<ul>
+<li>Serial: STW，COPY 收集器，单线程</li>
+<li>ParNew: STW, COPY 收集器，多线程</li>
+<li>Parallel Scavenge: STW, COPY 收集器，多线程 TODO: 和 parnew 的区别</li>
+</ul>
+</li>
+<li>老年代 GC
+<ul>
+<li>Serial Old: STW, MSC（mark-sweep-compact） 收集器，单线程</li>
+<li>CMS: 多数情况并发，低暂停收集器。并发失败退回到 Serial Old TODO: 废弃</li>
+<li>Parallel Old: 压缩收集器，多线程</li>
+</ul>
+</li>
+<li>选项
+<ul>
+<li><code>UseSerialGC</code>: Serial + Serial Old</li>
+<li><code>UseParNewGC</code>: ParNew + Serial Old</li>
+<li><code>UseConcMarkSweepGC</code>: ParNew + CMS + Serial Old</li>
+<li><code>UseParallelGC</code>: Parallel Scavenge + Parallel Old</li>
+</ul>
+</li>
+<li>年轻代空间
+<ul>
+<li>Eden: 新对象总是在此分配内存</li>
+<li>Survivor To:
+<ul>
+<li>GC 后 Eden 和 Survivor From 中剩下的对象被搬到这里</li>
+<li>To 空间不够大怎么办 TODO:</li>
+</ul>
+</li>
+<li>Survivor From:
+<ul>
+<li>Survivor From 足够老的对象被搬到 Old Gen</li>
+<li>被搬空后，To 和 From 互换名字</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Mark-Sweep-Compact
+<ul>
+<li>Mark 阶段: 找出所有的活对象</li>
+<li>Sweep 阶段: 清理堆中垃圾</li>
+<li>Compacht 阶段: 把活对象对齐到堆空间开头</li>
+</ul>
+</li>
+<li>Concurrent Mark Sweep TODO: 算法
+<ul>
+<li>Low-latency collector, Mostly concurrent</li>
+<li>No heap compaction – fragmentation</li>
+<li>Free lists link unallocated regions</li>
+<li>Allocations expensive as compared to bump-the-pointer allocations</li>
+<li>Additional overhead on young collections</li>
+<li>Larger heap size requirement and floating garbage</li>
+<li>Deprecated in Java 9</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>G1</li>
+<li>ZGC
+<ul>
+<li>使用 <code>UseZGC</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>工具
+<ul>
+<li>Java Mission Control TODO: 如何使用</li>
+<li></li>
+</ul>
+</li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://www.herongyang.com/Java-GC/index.html">Java GC Tutorials - Herong’s Tutorial Examples</a></li>
+<li><a href="http://www.fasterj.com/articles/oraclecollectors1.shtml">Oracle JVM Garbage Collectors Available From JDK 1.7.0_04 And After - Fasterj</a></li>
+<li><a href="https://docs.oracle.com/javase/8/docs/">Java Platform Standard Edition 8 Documentation</a></li>
+<li><a href="https://tschatzl.github.io/">tschatzl@github</a></li>
+<li><a href="https://docs.oracle.com/en/java/javase/20/docs/specs/man/index.html">JDK Tool Spec</a></li>
+<li><a href="https://wiki.openjdk.org/">OpenJDK Wiki</a></li>
+<li><a href="https://dev.java/">https://dev.java</a></li>
+<li><a href="https://openjdk.org/">https://openjdk.org/</a></li>
+<li><a href="https://docs.oracle.com/en/java/javase/20/gctuning/">HotSpot Virtual Machine Garbage Collection Tuning Guide</a></li>
+<li><a href="https://www.oracle.com/java/technologies/whitepaper.html">The Java HotSpot Performance Engine Architecture</a></li>
+<li><a href="https://docs.oracle.com/javase/tutorial/index.html">The Java™ Tutorials</a></li>
+<li><a href="https://www.infoq.com/articles/G1-One-Garbage-Collector-To-Rule-Them-All/">G1: One Garbage Collector To Rule Them All</a></li>
+<li><a href="https://www.oracle.com/webfolder/technetwork/tutorials/mooc/JVM_Troubleshooting/week1/lesson1.pdf">JVM Troubleshooting MOOC: Troubleshooting Memory Issues in Java Applications</a></li>
+<li><a href="http://www.gchandbook.org/index.html">The Garbage Collection Handbook: The art of automatic memory management</a></li>
+</ul>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#参考" class="astro-PUKOXQVJ">参考</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

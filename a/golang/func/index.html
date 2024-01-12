@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<h2 id="函数定义">函数定义</h2>
+<p>Go 语言中，函数可以接受 0 个或多个参数。函数的声明以关键字 <code>func</code> 开头，后面依次是：函数名、函数的参数列表、函数的返回值和函数体。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">add</span><span style="color:#C9D1D9">(x </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, y </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> x </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> y</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="函数参数">函数参数</h2>
+<p>函数参数中，如果连续有几个参数类型相同，那么除了最后一个参数的类型之外，前面的可以省略。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">add</span><span style="color:#C9D1D9">(x, y </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> x </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> y</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h3 id="按值传递">按值传递</h3>
+<p>函数的参数一般都是按值传递。对于 struct，传入的是一份 struct 的深复制：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Point2D</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	X, Y </span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Line</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	Start Point2D</span></span>
+<span class="line"><span style="color:#C9D1D9">	End   Point2D</span></span>
+<span class="line"><span style="color:#C9D1D9">	Extra </span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">MoveX</span><span style="color:#C9D1D9">(l Line) Line {</span></span>
+<span class="line"><span style="color:#C9D1D9">	l.Start.X </span><span style="color:#FF7B72">*=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span></span>
+<span class="line"><span style="color:#C9D1D9">	l.End.X </span><span style="color:#FF7B72">*=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span></span>
+<span class="line"><span style="color:#C9D1D9">	l.Extra </span><span style="color:#FF7B72">*=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> l</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	l </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> Line{</span></span>
+<span class="line"><span style="color:#C9D1D9">		Start: Point2D{</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">},</span></span>
+<span class="line"><span style="color:#C9D1D9">		End:   Point2D{</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">},</span></span>
+<span class="line"><span style="color:#C9D1D9">		Extra: </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">,</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;l  = </span><span style="color:#79C0FF">%v\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, l)</span></span>
+<span class="line"><span style="color:#C9D1D9">	sl </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">MoveX</span><span style="color:#C9D1D9">(l)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;sl = </span><span style="color:#79C0FF">%v\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, sl)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;l  = </span><span style="color:#79C0FF">%v\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, l)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>输出结果：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">l  = {{1 2} {3 4} 5}</span></span>
+<span class="line"><span style="color:#c9d1d9">sl = {{2 2} {6 4} 10}</span></span>
+<span class="line"><span style="color:#c9d1d9">l  = {{1 2} {3 4} 5}</span></span></code></pre>
+<h3 id="varargs">varargs</h3>
+<p>Go 语言的函数支持可变参数。<code>fmt</code> 包和 <code>log</code> 包里有很多这样的函数。这里也写一个例子演示下：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">sum</span><span style="color:#C9D1D9">(start </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, values </span><span style="color:#FF7B72">...int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	result </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> start</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> _, it </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> values {</span></span>
+<span class="line"><span style="color:#C9D1D9">		result </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> it</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> result</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">sum</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">sum</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">sum</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, []</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">}</span><span style="color:#FF7B72">...</span><span style="color:#C9D1D9">)) </span><span style="color:#8B949E">// 解构 slice 时把三个点放到后面</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>输出：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">10</span></span>
+<span class="line"><span style="color:#c9d1d9">1</span></span>
+<span class="line"><span style="color:#c9d1d9">10</span></span></code></pre>
+<h2 id="函数返回值">函数返回值</h2>
+<p>在 Go 语言中，函数可以一次返回多个值。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">swap</span><span style="color:#C9D1D9">(x, y </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">) (</span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">, </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> y, x</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	a, b </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">swap</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;hello&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&quot;world&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(a, b)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>你甚至可以给每个返回值取个名字，不过它们在函数内部被视为变量。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">split</span><span style="color:#C9D1D9">(sum </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) (x, y </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	x </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> sum </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">/</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">9</span></span>
+<span class="line"><span style="color:#C9D1D9">	y </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> sum </span><span style="color:#FF7B72">-</span><span style="color:#C9D1D9"> x</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> x, y</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>如果能用文档的形式说明一下返回值名称的意思，那就再好不过啦。</p>
+<p>如果给返回值取了名，那么 <code>return</code> 语句后面可以啥也不写，比如下例。这种写法叫”裸“返回。
+如果函数比较短，这种写法就很简洁。如果函数比较长，这种写法就影响可读性了。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">split</span><span style="color:#C9D1D9">(sum </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) (x, y </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	x </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> sum </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">/</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">9</span></span>
+<span class="line"><span style="color:#C9D1D9">	y </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> sum </span><span style="color:#FF7B72">-</span><span style="color:#C9D1D9"> x</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="重载">重载</h2>
+<p>所谓重载……反正 go 也不支持重载，不解释了。</p>
+<p>既然 go 不支持重载，那么那些内建函数，比如 <code>make</code> 是怎么做到类似重载的效果的呢？可以看到，<code>make</code> 函数的签名如下：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">make</span><span style="color:#C9D1D9">(t Type, size </span><span style="color:#FF7B72">...</span><span style="color:#C9D1D9">IntegerType) Type</span></span></code></pre>
+<p>它能给人一种重载的感觉，全靠约定 :-P</p>
+<h2 id="高阶函数">高阶函数</h2>
+<p>函数也是值，所以函数可以被作为参数传来传去，也可以作为返回值返回。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">compute</span><span style="color:#C9D1D9">(fn </span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">, </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">fn</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">hypot </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">(x, y </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> math.</span><span style="color:#79C0FF">Sqrt</span><span style="color:#C9D1D9">(x</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">x </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> y</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">y)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">compute</span><span style="color:#C9D1D9">(hypot))    </span><span style="color:#8B949E">// 5</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">compute</span><span style="color:#C9D1D9">(math.Pow)) </span><span style="color:#8B949E">// 81</span></span></code></pre>
+<h2 id="闭包">闭包</h2>
+<p>Go 语言中的函数可能是一个闭包。闭包是一种特殊的函数，它引用了自己函数体外部的变量。闭包可以访问和修改外部引用。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">adder</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	sum </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">(x </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		sum </span><span style="color:#FF7B72">+=</span><span style="color:#C9D1D9"> x</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> sum</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	pos, neg </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">adder</span><span style="color:#C9D1D9">(), </span><span style="color:#79C0FF">adder</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">; i</span><span style="color:#FF7B72">++</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">pos</span><span style="color:#C9D1D9">(i), </span><span style="color:#79C0FF">neg</span><span style="color:#C9D1D9">(</span><span style="color:#FF7B72">-</span><span style="color:#79C0FF">2</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">i))</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="defer-语句">defer 语句</h2>
+<p>见<a href="./defer/">Defer 语句</a>。</p>

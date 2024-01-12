@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<p><code>struct</code> 是一组字段的集合。</p>
+<h2 id="定义-struct">定义 struct</h2>
+<p>像下面这样定义一个 <code>struct</code>：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Vertex</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	X </span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">	Y </span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>像下面这样创建一个 <code>struct</code> 值：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(Vertex{</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">}) </span><span style="color:#8B949E">// 输出： {1, 2}</span></span></code></pre>
+<h2 id="访问字段">访问字段</h2>
+<p>使用点号 <code>.</code> 来访问 struct 的字段。如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> Vertex{</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">v.X </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">4</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(v.X)</span></span></code></pre>
+<h2 id="指向-struct-的指针">指向 struct 的指针</h2>
+<p>可以通过 struct 指针来直接访问字段。例如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> Vertex{</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">p </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">&amp;</span><span style="color:#C9D1D9">v</span></span>
+<span class="line"><span style="color:#C9D1D9">p.X </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span><span style="color:#FF7B72">e</span><span style="color:#79C0FF">9</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// 注意，这里 p 是一个指针</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(v)</span></span></code></pre>
+<p>本来可以使用 <code>(*p).X</code> 的形式来访问字段的，但是这么做有点呆萌，所以 Go 语言允许使用 <code>p.X</code> 的形式，直接用指针来访问 struct 字段，而不用显示的解引用（少有的贴心）。</p>
+<h2 id="字面量">字面量</h2>
+<p>Struct 字面量表示一个新分配的 struct 值，形式是在 struct 名称后面的花括号里把字段值列出来。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">Vertex{</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">}       </span><span style="color:#8B949E">// 按字段声明顺序，X 是 1, Y 是 2</span></span>
+<span class="line"><span style="color:#C9D1D9">Vertex{Y: </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, X: </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">} </span><span style="color:#8B949E">// 按名指定字段值</span></span></code></pre>
+<p>创建 struct 值是，可以只给一部分字段设初值。这个时候就必须要指定字段名称了：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">Vertex{X: </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">}  </span><span style="color:#8B949E">// Y 取零值</span></span>
+<span class="line"><span style="color:#C9D1D9">Vertex{}  </span><span style="color:#8B949E">// X 和 Y 都取零值</span></span></code></pre>
+<h2 id="方法">方法</h2>
+<p>你可以在 struct 类型上定义方法。方法是一个函数，但是带有一个特殊的接受参数。接受参数出现在 <code>func</code> 关键字和方法名之间。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Vertex</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	X, Y </span><span style="color:#FF7B72">float64</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (v Vertex) </span><span style="color:#D2A8FF">Abs</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> math.</span><span style="color:#79C0FF">Sqrt</span><span style="color:#C9D1D9">(v.X</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">v.X </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> v.Y</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">v.Y)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> Vertex{</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(v.</span><span style="color:#79C0FF">Abs</span><span style="color:#C9D1D9">()) </span><span style="color:#8B949E">// 5</span></span></code></pre>
+<p>因为方法是函数，所以上例可以写成这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">Abs</span><span style="color:#C9D1D9">(v)) </span><span style="color:#8B949E">// 5</span></span></code></pre>
+<h2 id="指针接受参数">指针接受参数</h2>
+<p>接受参数可以是指针类型的。如果接受参数是值类型，那么传入方法的其实是值的副本，你在方法里对它做的任何修改都不会影响函数调用者。使用指针接受参数，就不会有此限制。因为这个原因，指针类型的接受参数实际上会被用得更多。下例演示了两种接受参数的区别：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">(&quot;fmt&quot;,</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">math</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Vertex</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	X, Y </span><span style="color:#FF7B72">float64</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (v Vertex) </span><span style="color:#D2A8FF">Abs</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	v.X </span><span style="color:#FF7B72">*=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span></span>
+<span class="line"><span style="color:#C9D1D9">	v.Y </span><span style="color:#FF7B72">*=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> math.</span><span style="color:#79C0FF">Sqrt</span><span style="color:#C9D1D9">(v.X</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">v.X </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> v.Y</span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">v.Y)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (v </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9">Vertex) </span><span style="color:#D2A8FF">Scale</span><span style="color:#C9D1D9">(f </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	v.X </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> v.X </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> f</span></span>
+<span class="line"><span style="color:#C9D1D9">	v.Y </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> v.Y </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> f</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> Vertex{</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">	v.</span><span style="color:#79C0FF">Scale</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(v.</span><span style="color:#79C0FF">Abs</span><span style="color:#C9D1D9">()) </span><span style="color:#8B949E">// 输出 100</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(v.</span><span style="color:#79C0FF">Abs</span><span style="color:#C9D1D9">()) </span><span style="color:#8B949E">// 因为 Abs 中修改的是 v 的副本，所以输出和上一行一样</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>// TODO: time.Time.Add 探究</p>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<h1 id="stream-like">Stream-Like</h1>
+<p>前段时间受够了 Java 中的集合操作，于是想着模仿 lodash 自己写一个类似的库。
+最开始我是基于 <code>Iterator</code> 做的，后来看到了这篇文章<a href="https://mp.weixin.qq.com/s/v-HMKBWxtz1iakxFL09PDw">一种新的流：为Java加入生成器(Generator)特性</a>。
+再后来学了点 Clojure，发现 Clojure 中的 <code>seq</code> 和 <code>lazy-seq</code> 也是类似的东西。
+这里整理一下相关思路。</p>
+<p>我们的目标是实现一个类似于 lodash chain 的库，像这样：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#FFA657"> </span><span style="color:#C9D1D9">list</span><span style="color:#FFA657"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> Arrays.</span><span style="color:#D2A8FF">asList</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">6</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">8</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">9</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">);</span></span>
+<span class="line"><span style="color:#FF7B72">var</span><span style="color:#FFA657"> </span><span style="color:#C9D1D9">result</span><span style="color:#FFA657"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> $.(list)</span></span>
+<span class="line"><span style="color:#C9D1D9">    .</span><span style="color:#D2A8FF">filter</span><span style="color:#C9D1D9">(i </span><span style="color:#FF7B72">-&gt;</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">%</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">==</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">    .</span><span style="color:#D2A8FF">map</span><span style="color:#C9D1D9">(i </span><span style="color:#FF7B72">-&gt;</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">    .</span><span style="color:#D2A8FF">unique</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">    .</span><span style="color:#D2A8FF">take</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">    .</span><span style="color:#D2A8FF">reverse</span><span style="color:#C9D1D9">()</span></span>
+<span class="line"><span style="color:#C9D1D9">    .</span><span style="color:#D2A8FF">reduce</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, Integer</span><span style="color:#FF7B72">::</span><span style="color:#C9D1D9">sum);</span></span></code></pre>
+<p>这和 Java Stream API 类似，但是可以支持更多的操作。</p>
+<ul>
+<li><a href="/design-patterns/coding/stream/sequence">思路一：基于链表</a></li>
+</ul>

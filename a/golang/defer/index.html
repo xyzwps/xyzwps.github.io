@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<h2 id="基本用法">基本用法</h2>
+<p><code>defer</code> 语句被包裹在函数内部，在函数 <code>return</code> 之后才会执行。<code>defer</code> 调用的参数是即时计算的，但是函数调用是直到 <code>return</code> 之后才计算。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">add</span><span style="color:#C9D1D9">(a, b </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;add&quot;</span><span style="color:#C9D1D9">, a, </span><span style="color:#A5D6FF">&quot;+&quot;</span><span style="color:#C9D1D9">,  b)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> a </span><span style="color:#FF7B72">+</span><span style="color:#C9D1D9"> b</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	a, b </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">defer</span><span style="color:#C9D1D9"> fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;defered&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">add</span><span style="color:#C9D1D9">(a, b))</span></span>
+<span class="line"><span style="color:#C9D1D9">    a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">3</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">add</span><span style="color:#C9D1D9">(a, b))</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>这段代码输出：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">add 1 + 2</span></span>
+<span class="line"><span style="color:#c9d1d9">add 3 + 2</span></span>
+<span class="line"><span style="color:#c9d1d9">5</span></span>
+<span class="line"><span style="color:#c9d1d9">defered 3</span></span></code></pre>
+<h2 id="defer-栈">defer 栈</h2>
+<p>多个 <code>defer</code> 调用被 push 到一个栈中。函数返回时，按后进先出的顺序执行这些 <code>defer</code> 调用。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;counting&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">; i </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">; i</span><span style="color:#FF7B72">++</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">defer</span><span style="color:#C9D1D9"> fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(i)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;done&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>这段代码输出：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">counting</span></span>
+<span class="line"><span style="color:#c9d1d9">done</span></span>
+<span class="line"><span style="color:#c9d1d9">2</span></span>
+<span class="line"><span style="color:#c9d1d9">1</span></span>
+<span class="line"><span style="color:#c9d1d9">0</span></span></code></pre>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://blog.golang.org/defer-panic-and-recover">Defer, Panic, and Recover</a></li>
+</ul>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<p><code>type</code> 关键字有两个作用：<strong>声明类型别名</strong>和<strong>定义类型</strong>。</p>
+<p>每个类型都有一个<a href="https://golang.org/ref/spec#Types">底层类型</a>。</p>
+<p>TODO: 底层类型</p>
+<h2 id="类型别名">类型别名</h2>
+<p>定义类型别名的语法是：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">类型别名</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> 类型</span></span></code></pre>
+<p>比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">    A1 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">  </span><span style="color:#8B949E">// A1 是 string</span></span>
+<span class="line"><span style="color:#C9D1D9">    A2 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> A1      </span><span style="color:#8B949E">// A2 是 string</span></span>
+<span class="line"><span style="color:#C9D1D9">    A3 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> []A2    </span><span style="color:#8B949E">// A3 是 []string</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">A4</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// A4 是 string</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Point</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> { X, Y </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> } </span><span style="color:#8B949E">// Point 是 struct { x int; y int; z int }</span></span></code></pre>
+<p>类型别名和原来的类型是一回事：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">reflect</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">A1</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">string</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	tstring </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> reflect.</span><span style="color:#79C0FF">TypeOf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;a0&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(tstring)        </span><span style="color:#8B949E">// 输出 string</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> a1 A1 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;a1&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	ta1 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> reflect.</span><span style="color:#79C0FF">TypeOf</span><span style="color:#C9D1D9">(a1)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(ta1, a1)        </span><span style="color:#8B949E">// 输出 string a1</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(ta1 </span><span style="color:#FF7B72">==</span><span style="color:#C9D1D9"> tstring) </span><span style="color:#8B949E">// 输出 true</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="定义类型">定义类型</h2>
+<p>类型定义的语法是：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">类型别名</span><span style="color:#C9D1D9"> 类型</span></span></code></pre>
+<p>比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">    A1 </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">  </span><span style="color:#8B949E">// A1 是 main.A1，底层类型是 string</span></span>
+<span class="line"><span style="color:#C9D1D9">    A2 A1      </span><span style="color:#8B949E">// A2 是 main.A2，底层类型是 string</span></span>
+<span class="line"><span style="color:#C9D1D9">    A3 []A2    </span><span style="color:#8B949E">// A3 是 main.A3，底层类型是 []string</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">A4</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// A4 是 main.A4，底层类型是 string</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Point</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> { X, Y </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> } </span><span style="color:#8B949E">// Point 是 main.Point，底层类型是 struct { x int; y int; z int }</span></span></code></pre>
+<p>可以直接把底层类型的值赋值给新定义的类型。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> a1 A1 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;a1&quot;</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// 把 string 值赋值给 main.A4 变量</span></span></code></pre>
+<p>类型定义之后，新类型和原类型就不是同一个类型了：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">reflect</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">A1</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// 这是和上一节例子的唯一区别</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	tstring </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> reflect.</span><span style="color:#79C0FF">TypeOf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;a0&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(tstring)       </span><span style="color:#8B949E">// 输出 string</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> a1 A1 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;a1&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">	ta1 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> reflect.</span><span style="color:#79C0FF">TypeOf</span><span style="color:#C9D1D9">(a1)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(ta1, a1)        </span><span style="color:#8B949E">// 输出 main.A1 a1</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(ta1 </span><span style="color:#FF7B72">==</span><span style="color:#C9D1D9"> tstring) </span><span style="color:#8B949E">// 输出 false</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h3 id="方法">方法</h3>
+<p>我们可以给新定义的类型增加方法。为 struct 类型增加方法的例子可以在 <a href="./struct/#%E6%96%B9%E6%B3%95">struct</a> 这一节找到。这里给一个更加简单的例子：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Integer</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">int64</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (i Integer) </span><span style="color:#D2A8FF">isOdd</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">bool</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> i</span><span style="color:#FF7B72">%</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">==</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">Integer</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">32</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;</span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF"> is odd: </span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, i, i.</span><span style="color:#79C0FF">isOdd</span><span style="color:#C9D1D9">())</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>注意，你不可以为非本地（<em>non-local</em>）类型定义方法。比如下面为 <code>int</code> 定义的新方法是不允许的：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> (v </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#D2A8FF">p</span><span style="color:#C9D1D9">() </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> v</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>TODO: 底层类型</p>

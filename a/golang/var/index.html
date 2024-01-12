@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<h2 id="声明变量">声明变量</h2>
+<p>在 Go 语言中，用 <code>var</code> 关键字声明一组变量。和函数参数列表类似，类型放在变量名之后。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> c, python, java </span><span style="color:#FF7B72">bool</span></span></code></pre>
+<h2 id="声明并初始化变量">声明并初始化变量</h2>
+<p>用 <code>var</code> 声明变量时，可以带有初始值。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> i, j </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span></span></code></pre>
+<p>如果初始值存在，则可以省略类型，变量会使用初始值的类型。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> c, python, java </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">true</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">false</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&quot;no!&quot;</span></span></code></pre>
+<h2 id="短变量声明">短变量声明</h2>
+<p>在函数内部，可以用操作符 <code>:=</code> 来替代 <code>var</code> 声明一个具有隐式类型的变量。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">penta</span><span style="color:#C9D1D9">(v </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	factor </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">5</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> factor </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> v</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>在函数外部，因为每一个语句必须以关键字开头，所以还是老老实实用 <code>var</code> 吧。</p>
+<p>可以使用操作符 <code>:=</code> 同时定义几个变量。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">a, b </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span></span></code></pre>
+<p>操作符 <code>:=</code> 左边不一定都是新变量，只要至少有一个新变量即可。比如下例，变量 <code>c</code> 最终的值是 9：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">b, c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span></span>
+<span class="line"><span style="color:#C9D1D9">c, d </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">9</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">10</span></span></code></pre>
+<h2 id="常量">常量</h2>
+<p>声明常量就像是声明变量那样，不过要用 <code>const</code> 关键字，而不是用 <code>var</code>。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> a int64 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span></span></code></pre>
+<p>像变量那样，可以在一行内定义多个常量：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> b, c </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span></span></code></pre>
+<p>如果同时要定义好几个常量，单行些比较长的话，还可以用下面的带括号的常量声明语法来定义多个常量：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	d </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">4</span></span>
+<span class="line"><span style="color:#C9D1D9">	e </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">5</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span></code></pre>
+<p>不可以使用 <code>:=</code> 语法来声明常量。</p>
+<p>目前，只有以下几种常量：布尔、<code>rune</code>、整数、浮点数、复数和字符串。不支持创建自定义类型的常量。</p>
+<p>常量声明中的表达式可以省略（除了第一行之外），被省略的表达式实际是重复上一行的表达式。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// 第一行不可省略</span></span>
+<span class="line"><span style="color:#C9D1D9">	b     </span><span style="color:#8B949E">// 这一行省略了常量表达式，重复上一行，所以 b 的值也是 1</span></span>
+<span class="line"><span style="color:#C9D1D9">	c     </span><span style="color:#8B949E">// 这一行省略了常量表达式，重复上一行，上一行也省略了，往上找到第一行，所以 c 的值也是 1</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span></code></pre>
+<h2 id="iota"><code>iota</code></h2>
+<p>在常量声明中，可以使用预定义的标识符 <code>iota</code> 来表示连续的无类型整数常量。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">iota</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// a 的值是 0</span></span>
+<span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> b </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">iota</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// b 的值也是 0</span></span></code></pre>
+<p>上面的例子里，<code>a</code> 和 <code>b</code> 的值都是 0。有啥意思呢？确实没啥意思，<code>iota</code> 要用带括号的常量声明语法才能显示出威力。比如下例：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	Sunday </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">iota</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// 0</span></span>
+<span class="line"><span style="color:#C9D1D9">	Monday        </span><span style="color:#8B949E">// 1</span></span>
+<span class="line"><span style="color:#C9D1D9">	Tuesday       </span><span style="color:#8B949E">// 2</span></span>
+<span class="line"><span style="color:#C9D1D9">	Wednesday     </span><span style="color:#8B949E">// 3</span></span>
+<span class="line"><span style="color:#C9D1D9">	Thursday      </span><span style="color:#8B949E">// 4</span></span>
+<span class="line"><span style="color:#C9D1D9">	Friday        </span><span style="color:#8B949E">// 5</span></span>
+<span class="line"><span style="color:#C9D1D9">	Partyday      </span><span style="color:#8B949E">// 6</span></span>
+<span class="line"><span style="color:#C9D1D9">	numberOfDays  </span><span style="color:#8B949E">// 7</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span></code></pre>
+<p>这个例子中，<code>Sunday</code> 以下的常量表达式都使用 <code>iota</code>，但是他们的值不同。因为 <code>iota</code> 的取值是<a href="https://golang.org/ref/spec#Iota">括号中常量出现的行数</a>（从 0 开始，注释行不算），所以 <code>Sunday</code> 是第“0”个，所以其值为 0，<code>Monday</code> 是第“1”个，所以其值为 1，依次往后推。</p>
+<p>再比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	a, b </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">iota</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">iota</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">  </span><span style="color:#8B949E">// a == 0, b == 0 (iota == 0)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// some comments       // 注释行忽略</span></span>
+<span class="line"><span style="color:#C9D1D9">	c, _                   </span><span style="color:#8B949E">// c == 1         (iota == 1)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#8B949E">// 注意，这里必须写成 “c, _”，而不是单独一个 “c”</span></span>
+<span class="line"><span style="color:#C9D1D9">	d, e                   </span><span style="color:#8B949E">// d == 2, e == 6 (iota == 2)</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span></code></pre>
+<p>还可以对 <code>iota</code> 做运算。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">	a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">iota</span><span style="color:#C9D1D9">     </span><span style="color:#8B949E">// a == 0  (iota == 0)</span></span>
+<span class="line"><span style="color:#C9D1D9">	_            </span><span style="color:#8B949E">// 忽略     (iota == 1)</span></span>
+<span class="line"><span style="color:#C9D1D9">	c            </span><span style="color:#8B949E">// c == 2  (iota == 2)</span></span>
+<span class="line"><span style="color:#C9D1D9">	d </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">iota</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">*</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// d == 9  (iota == 3)</span></span>
+<span class="line"><span style="color:#C9D1D9">	e            </span><span style="color:#8B949E">// e == 12 (iota == 4)</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span></code></pre>

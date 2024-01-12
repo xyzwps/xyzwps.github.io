@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<p>函数在执行过程中，如果主动调用 <code>panic</code> 函数，或者发生了运行时 panic，那么这个函数的执行就会终止。不过 defer 部分还会照常执行。于是我们就可以在 defer 部分调用 <code>recover</code> 函数来处理这些 panic 了。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">div</span><span style="color:#C9D1D9">(a, b </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) (result </span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">defer</span><span style="color:#C9D1D9"> (</span><span style="color:#FF7B72">func</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> err </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">recover</span><span style="color:#C9D1D9">(); err </span><span style="color:#FF7B72">!=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">			fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;Error: </span><span style="color:#79C0FF">%v\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, err)</span></span>
+<span class="line"><span style="color:#C9D1D9">			result </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">10000</span></span>
+<span class="line"><span style="color:#C9D1D9">		}</span></span>
+<span class="line"><span style="color:#C9D1D9">	})()</span></span>
+<span class="line"><span style="color:#C9D1D9">	result </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> a </span><span style="color:#FF7B72">/</span><span style="color:#C9D1D9"> b</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;4 / 2 = </span><span style="color:#79C0FF">%d\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">div</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;4 / 0 = </span><span style="color:#79C0FF">%d\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">div</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>这里依然有坑需要注意。<code>recover</code> 函数返回 <code>nil</code> 有三种情况:</p>
+<ol>
+<li><code>panic</code> 函数的参数是 <code>nil</code></li>
+<li>goroutine 没有发生 panic</li>
+<li><code>recover</code> 不是在 defer 部分被调用的</li>
+</ol>
+<p>所以，在调用 <code>panic</code> 函数时，如果没有特殊理由，千万不要传 <code>nil</code>（当然，如果你希望做一些奇怪的事时除外）。</p>

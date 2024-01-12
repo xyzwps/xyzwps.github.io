@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/blogs/2022-06-25-unicode">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unicode</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/blogs" class="astro-QAANGHZH">博客列表</a> / Unicode
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-12-06-soft-link" class="astro-UKV4GGCY">软连接</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-10-17-password-strength" class="astro-UKV4GGCY">密码强度</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-09-19-graphql-gossip" class="astro-UKV4GGCY">Graphql 碎碎念</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-25-fp" class="astro-UKV4GGCY">函数式编程</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-22-authn" class="astro-UKV4GGCY">Authentication</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-18-id" class="astro-UKV4GGCY">ID 生成算法</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-02-pagination" class="astro-UKV4GGCY">一个跨服务分页示例</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-08-01-data-format" class="astro-UKV4GGCY">一些数据格式</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-07-27-pagination" class="astro-UKV4GGCY">分页</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-25-unicode" class="astro-UKV4GGCY">Unicode</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-23-js-return-await" class="astro-UKV4GGCY">记一个 JS return await 问题</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2022-06-06-go-http-client-use-self-siged-ca" class="astro-UKV4GGCY">Go 语言 https 客户端如何使用自签名 CA</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/blogs/2023-04-17-mirrors" class="astro-UKV4GGCY">国内开源软件镜像</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">Unicode</h1>
+  
+              <h1 id="unicode-草述">Unicode 草述</h1>
+<p>Unicode（或者正式一点，叫 Unicode 标准）是一套信息技术标准，包含字符集、编码方案等。</p>
+<p>一个 Unicode 码点（<em>code point</em>）是一个数字，它对应一个字符。比如 65 对应大写拉丁字母 <code>A</code>，20013 对应汉字 <code>中</code>。</p>
+<p>Unicode 字符集简称 UCS（<em>Unicode Character Set</em>）。UCS-4 用 4 个字节（32bit）编码一个字符。</p>
+<p>在 Unicode 标准中，一个平面（<em>plane</em>）是 65536(<span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>16</mn></msup></mrow><annotation encoding="application/x-tex">2^{16}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">16</span></span></span></span></span></span></span></span></span></span></span></span></span>)个一组的连续码点。目前有 17 个平面，序号是 0-16。</p>
+<p>第 0 平面也叫 <em>Basic Multilingual Plane</em>，简称 BMP。它包含了几乎所有现代语言中的字符和一大堆符号。在 Unicode 14.0 中，BMP 包含 164 个区块。比如：</p>
+<ul>
+<li>0000-007F: 对应 ASCII 字符</li>
+<li>0370-03FF: 对应希腊及科普特字符</li>
+<li>4E00-9FFF: CJK统一表意符号。这里 CJK 指 Chinese、Japanese 和 Korean。常见汉字就在这个区块中。</li>
+</ul>
+<p>第 1 平面也叫 <em>Supplementary Multilingual Plane</em>，简称 SMP。Emoji、麻将、扑克牌、音符等字符就被定义在这个平面中。</p>
+<h1 id="utf-8">UTF-8</h1>
+<p>UTF-8 是最常用的 Unicode 编码方式。UTF 是Unicode 字符集转换格式（<em>UCS Transformation Format</em>）的缩写.</p>
+<p>UTF-8 以字节为单位编码，它对不同范围内的字符使用不同长度的编码。UTF-8 编码格式对应表如下：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="center">字节</th><th>格式</th><th>实际编码位</th><th>码点范围</th></tr></thead><tbody><tr><td align="center">1</td><td><code>0xxxxxxx</code></td><td>7</td><td>0 ~ 127</td></tr><tr><td align="center">2</td><td><code>110xxxxx 10xxxxxx</code></td><td>11</td><td>128 ~ 2047</td></tr><tr><td align="center">3</td><td><code>1110xxxx 10xxxxxx 10xxxxxx</code></td><td>16</td><td>2048 ~ 65535</td></tr><tr><td align="center">4</td><td><code>11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</code></td><td>21</td><td>65536 ~ 2097151</td></tr></tbody></table>
+<p>由此表可以看出，</p>
+<ul>
+<li>对于前 128 个字符，UTF-8 编码与 ASCII 编码完全相同</li>
+<li>用三个字节，就可以表示 BMP 中的全部字符了</li>
+</ul>
+<p>小作业：写一个 UTF-8 的编码器/解码器。😁</p>
+<h1 id="mysql">MySQL</h1>
+<p>MySQL 早期为了节省存储空间（？），用最多三个字节存储 utf-8 编码字符。这意味着 MySQL 中的 utf8 只能存储 BMP 字符。字符串中要是包含 emoji 等特殊字符，utf-8 就无能为力了，这时应该使用 utf8mb4。请各位注意。</p>
+<p>MySQL 中 utf8 是 utf8mb3 的别名。</p>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Plane_(Unicode)#Basic_Multilingual_Plane">Wikipedia: Unicode Plane</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Unicode">Wikipedia: Unicode</a></li>
+<li><a href="https://unicode-table.com/">https://unicode-table.com/</a></li>
+<li><a href="https://baike.baidu.com/item/ASCII/309296">百度百科: ASCII</a></li>
+<li><a href="https://baike.baidu.com/item/%E7%BB%9F%E4%B8%80%E7%A0%81">百度百科: 统一码</a></li>
+<li><a href="https://dev.mysql.com/doc/refman/8.0/en/charset-unicode.html">MySQL: Unicode Support</a></li>
+<li><a href="https://dev.mysql.com/doc/refman/8.0/en/charset-unicode-utf8mb4.html">MySQL: 字符集 utf8mb4</a></li>
+</ul>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h1 astro-PUKOXQVJ">
+        <a href="#unicode-草述" class="astro-PUKOXQVJ">Unicode 草述</a>
+      </li><li class="toc-li toc-h1 astro-PUKOXQVJ">
+        <a href="#utf-8" class="astro-PUKOXQVJ">UTF-8</a>
+      </li><li class="toc-li toc-h1 astro-PUKOXQVJ">
+        <a href="#mysql" class="astro-PUKOXQVJ">MySQL</a>
+      </li><li class="toc-li toc-h1 astro-PUKOXQVJ">
+        <a href="#参考" class="astro-PUKOXQVJ">参考</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

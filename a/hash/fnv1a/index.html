@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/a/hash/fnv1a">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FNV-1a Hash</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / <a href="/a/hash" class="astro-QAANGHZH">哈希算法</a> / FNV-1a Hash
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/mac" class="astro-UKV4GGCY">MAC</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/crc32" class="astro-UKV4GGCY">CRC32</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/fnv1a" class="astro-UKV4GGCY">FNV-1a</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/md5" class="astro-UKV4GGCY">MD5</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/murmur3" class="astro-UKV4GGCY">Murmur3</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/sha1" class="astro-UKV4GGCY">SHA-1</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/sha2" class="astro-UKV4GGCY">SHA-2</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/sip" class="astro-UKV4GGCY">Sip</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">FNV-1a Hash</h1>
+  
+              <h2 id="fnv-1-hash">FNV-1 Hash</h2>
+<p>FNV 哈希算法的基础来自于 1991 年 Glenn Fowler 和 Phong Vo 在 IEEE POSIX P1003.2
+委员会上发表的评论。在随后的一轮投票中: Landon Curt Noll 改进了他们的算法。
+有些人尝试了这个算法，发现效果相当不错。在给 Landon 的一封电子邮件中，他们将其命名为
+“Fowler/Noll/Vo” 或 FNV 哈希。</p>
+<p>FNV 哈希在设计上，计算速度快，同时保持低碰撞率。FNV 可以快速散列大量的数据，同时保持一个合理的碰撞率。
+FNV 哈希的高分散性使它们非常适合哈希几乎相同的字符串，如 URL、主机名、文件名、文本、IP 地址等。</p>
+<p>FNV-1 哈希算法核心如下：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">hash = offset_basis</span></span>
+<span class="line"><span style="color:#c9d1d9">for each octet_of_data to be hashed</span></span>
+<span class="line"><span style="color:#c9d1d9">    hash = hash * FNV_prime</span></span>
+<span class="line"><span style="color:#c9d1d9">    hash = hash xor octet_of_data</span></span>
+<span class="line"><span style="color:#c9d1d9">return hash</span></span></code></pre>
+<p>其中：</p>
+<ul>
+<li>
+<p><code>hash</code> 是一个 <span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em"></span><span class="mord mathnormal">n</span></span></span></span></span> 位无符号整数。换句话说，<span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em"></span><span class="mord mathnormal">n</span></span></span></span></span> 是 <code>hash</code> 的比特长度。</p>
+</li>
+<li>
+<p>执行乘法后，对结果除 <span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6644em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span></span> 取模。</p>
+</li>
+<li>
+<p><code>xor</code> 只在 <code>hash</code> 的低 8 位进行。</p>
+</li>
+<li>
+<p><strong><em><code>FNV_prime</code></em></strong> 的取值与 <span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em"></span><span class="mord mathnormal">n</span></span></span></span></span> 有关：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em"></span><span class="mord mathnormal">n</span></span></span></span></span></th><th><strong><em><code>FNV_prime</code></em></strong></th></tr></thead><tbody><tr><td>32</td><td><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>24</mn></msup><mo>+</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mn>0</mn><mtext>x93</mtext><mo>=</mo><mn>16777619</mn></mrow><annotation encoding="application/x-tex">2^{24} +  2^{8} + 0\text{x93} = 16777619</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">24</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">0</span><span class="mord text"><span class="mord">x93</span></span><span class="mspace" style="margin-right:0.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">16777619</span></span></span></span></span></td></tr><tr><td>64</td><td><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>40</mn></msup><mo>+</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mn>0</mn><mtext>xb3</mtext><mo>=</mo><mn>1099511628211</mn></mrow><annotation encoding="application/x-tex">2^{40} +  2^{8} + 0\text{xb3} = 1099511628211</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">40</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6944em"></span><span class="mord">0</span><span class="mord text"><span class="mord">xb3</span></span><span class="mspace" style="margin-right:0.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">1099511628211</span></span></span></span></span></td></tr><tr><td>128</td><td><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>88</mn></msup><mo>+</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mn>0</mn><mtext>x3b</mtext><mo>=</mo><mn>309485009821345068724781371</mn></mrow><annotation encoding="application/x-tex">2^{88} +  2^{8} + 0\text{x3b} = 309485009821345068724781371</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">88</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6944em"></span><span class="mord">0</span><span class="mord text"><span class="mord">x3b</span></span><span class="mspace" style="margin-right:0.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">309485009821345068724781371</span></span></span></span></span></td></tr><tr><td>256</td><td><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>168</mn></msup><mo>+</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mn>0</mn><mtext>x63</mtext><mo>=</mo><mn>374144419156711147060143317175368453031918731002211</mn></mrow><annotation encoding="application/x-tex">2^{168} +  2^{8} + 0\text{x63} = 374144419156711147060143317175368453031918731002211</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">168</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">0</span><span class="mord text"><span class="mord">x63</span></span><span class="mspace" style="margin-right:0.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">374144419156711147060143317175368453031918731002211</span></span></span></span></span></td></tr><tr><td>512</td><td><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>344</mn></msup><mo>+</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mn>0</mn><mtext>x57</mtext><mo>=</mo><mn>35835915874844867368919076489095108449946327955754392558399825615420669938882575126094039892345713852759</mn></mrow><annotation encoding="application/x-tex">2^{344} +  2^{8} + 0\text{x57} = 35835915874844867368919076489095108449946327955754392558399825615420669938882575126094039892345713852759</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">344</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">0</span><span class="mord text"><span class="mord">x57</span></span><span class="mspace" style="margin-right:0.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">35835915874844867368919076489095108449946327955754392558399825615420669938882575126094039892345713852759</span></span></span></span></span></td></tr><tr><td>1024</td><td><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>680</mn></msup><mo>+</mo><msup><mn>2</mn><mn>8</mn></msup><mo>+</mo><mn>0</mn><mtext>x8d</mtext><mo>=</mo><mn>5016456510113118655434598811035278955030765345404790744303017523831112055108147451509157692220295382716162651878526895249385292291816524375083746691371804094271873160484737966720260389217684476157468082573</mn></mrow><annotation encoding="application/x-tex">2^{680} +  2^{8} + 0\text{x8d} = 5016456510113118655434598811035278955030765345404790744303017523831112055108147451509157692220295382716162651878526895249385292291816524375083746691371804094271873160484737966720260389217684476157468082573</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">680</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">8</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6944em"></span><span class="mord">0</span><span class="mord text"><span class="mord">x8d</span></span><span class="mspace" style="margin-right:0.2778em"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">5016456510113118655434598811035278955030765345404790744303017523831112055108147451509157692220295382716162651878526895249385292291816524375083746691371804094271873160484737966720260389217684476157468082573</span></span></span></span></span></td></tr></tbody></table>
+<p>FNV 的一个神奇之处在于为给定长度的 <code>hash</code> 选取 <span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>FNV_prime</mtext></mrow><annotation encoding="application/x-tex">\text{FNV\_prime}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9933em;vertical-align:-0.31em"></span><span class="mord text"><span class="mord">FNV_prime</span></span></span></span></span></span>。在哈希时，有些质数的表现比其他质数更好。</p>
+</li>
+<li>
+<p>其中 <span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>offset_basis</mtext></mrow><annotation encoding="application/x-tex">\text{offset\_basis}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0044em;vertical-align:-0.31em"></span><span class="mord text"><span class="mord">offset_basis</span></span></span></span></span></span> 的取值也依赖于 <span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em"></span><span class="mord mathnormal">n</span></span></span></span></span>：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th><span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em"></span><span class="mord mathnormal">n</span></span></span></span></span></th><th><strong><em><code>offset_basis</code></em></strong></th></tr></thead><tbody><tr><td>32</td><td>2166136261</td></tr><tr><td>64</td><td>14695981039346656037</td></tr><tr><td>128</td><td>144066263297769815596495629667062367629</td></tr><tr><td>256</td><td>100029257958052580907070968620625704837092796014241193945225284501741471925557</td></tr><tr><td>512</td><td>9659303129496669498009435400716310466090418745672637896108374329434462657994582932197716438449813051892206539805784495328239340083876191928701583869517785</td></tr><tr><td>1024</td><td>14197795064947621068722070641403218320880622795441933960878474914617582723252296732303717722150864096521202355549365628174669108571814760471015076148029755969804077320157692458563003215304957150157403644460363550505412711285966361610267868082893823963790439336411086884584107735010676915</td></tr></tbody></table>
+<p>这些非零整数都是以下 32 字节字符串的 FNV-0 哈希值：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">chongo &lt;Landon Curt Noll&gt; /\../\</span></span></code></pre>
+<p>注意，它不是那些 <code>\</code> 不是 C 风格的转义字符。C 风格的写法如下：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#A5D6FF">&quot;chongo &lt;Landon Curt Noll&gt; /</span><span style="color:#79C0FF">\\</span><span style="color:#A5D6FF">../</span><span style="color:#79C0FF">\\</span><span style="color:#A5D6FF">&quot;</span></span></code></pre>
+<p>注意，上面的字符串长度是 31，之所以说是 32 字节字符串，是因为在 C 中，字符串用字符数组存储，最后一位存数字 0。补上数字 0 之后，就是 32 字节了。。。</p>
+<p>这里所谓 FNV-0，是指 <strong><em><code>offset_basis</code></em></strong> 的初始值是 0 的 FNV 哈希。已经被废弃。</p>
+</li>
+</ul>
+<p>可以看到他们对 <strong><em><code>offset_basis</code></em></strong> 的选择挺那啥的。但是对 <strong><em><code>FNV_prime</code></em></strong>
+的选择就很魔法了，如果你感兴趣，可以在参考文档 <a href="http://www.isthe.com/chongo/tech/comp/fnv/">FNV Hash</a>
+中查看相关的说明，这里就不献丑了。</p>
+<h2 id="fnv-1a-hash">FNV-1a Hash</h2>
+<p>它和 FNV-1 在算法上的区别是乘法和异或的执行顺序。算法如下：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">hash = offset_basis</span></span>
+<span class="line"><span style="color:#c9d1d9">for each octet_of_data to be hashed</span></span>
+<span class="line"><span style="color:#c9d1d9">    hash = hash xor octet_of_data</span></span>
+<span class="line"><span style="color:#c9d1d9">    hash = hash * FNV_prime</span></span>
+<span class="line"><span style="color:#c9d1d9">return hash</span></span></code></pre>
+<p>FNV-1a 算法的各参数和 FNV-1 一致。</p>
+<p>有些人使用 FNV-1a 而不是 FNV-1，因为他们发现对于小内存块（小于 4 字节），其分散性稍好一些。</p>
+<p>现在推荐使用 FNV-1a 而不是 FNV-1。</p>
+<h2 id="现成的实现">现成的实现</h2>
+<p>在 javascript 界，有 <a href="https://github.com/sindresorhus/fnv1a">sindresorhus/fnv1a</a>。</p>
+<p>在 java 界，我搜到了两个用 <code>BitInteger</code> 实现的算法，感觉跟自己手写也差不多了。</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="http://www.isthe.com/chongo/tech/comp/fnv/">FNV Hash - Landon</a></li>
+</ul>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#fnv-1-hash" class="astro-PUKOXQVJ">FNV-1 Hash</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#fnv-1a-hash" class="astro-PUKOXQVJ">FNV-1a Hash</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#现成的实现" class="astro-PUKOXQVJ">现成的实现</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#参考" class="astro-PUKOXQVJ">参考</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

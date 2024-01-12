@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<h1 id="内置函数">内置函数</h1>
+<h2 id="len"><code>len</code></h2>
+<p>接受一个参数，用来求长度。参数类型和返回值含义如下：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>参数类型</th><th>结果</th></tr></thead><tbody><tr><td><code>string</code></td><td>字符串的字节长度</td></tr><tr><td><code>[n]T</code>, <code>*[n]T</code></td><td>数组的长度，值为 <code>n</code></td></tr><tr><td><code>[]T</code></td><td>slice 的长度</td></tr><tr><td><code>map[K]T</code></td><td>map 的长度，即 map 中 key 的数量</td></tr><tr><td><code>chan T</code></td><td>channel buffer 中排队的元素数量</td></tr></tbody></table>
+<h2 id="cap"><code>cap</code></h2>
+<p>接受一个参数，用来求容量。参数类型和返回值含义如下：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>参数类型</th><th>结果</th></tr></thead><tbody><tr><td><code>[n]T</code>, <code>*[n]T</code></td><td>数组的容量，值为 <code>n</code></td></tr><tr><td><code>[]T</code></td><td>slice 的容量</td></tr><tr><td><code>chan T</code></td><td>channel buffer 的容量</td></tr></tbody></table>
+<h2 id="make"><code>make</code></h2>
+<p>用来创建一个 slice、map 或 channel。其调用方式和返回结果如下：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>调用</th><th>T 表示的类型</th><th>返回结果</th></tr></thead><tbody><tr><td><code>make(T, n)</code></td><td><code>slice</code></td><td>T 类型的 slice，容量长度都是 n</td></tr><tr><td><code>make(T, n, m)</code></td><td><code>slice</code></td><td>T 类型的 slice，长度是 n，容量是 m</td></tr><tr><td><code>make(T)</code></td><td><code>map</code></td><td>T 类型的 map</td></tr><tr><td><code>make(T, n)</code></td><td><code>map</code></td><td>T 类型的 map，其初始空间大约可以存放 n 个元素</td></tr><tr><td><code>make(T)</code></td><td><code>channel</code></td><td>无 buffer 的 T 类型 channel</td></tr><tr><td><code>make(T, n)</code></td><td><code>channel</code></td><td>有 buffer 的 T 类型 channel，buffer 容量是 n</td></tr></tbody></table>
+<h2 id="append"><code>append</code></h2>
+<p>用于往一个 slice 后面追加元素，并返回追加新元素后的 slice。可同时追加 0 到多个。比如:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">s0 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> []</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">s1 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">append</span><span style="color:#C9D1D9">(s0, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">)                </span><span style="color:#8B949E">// append a single element     s1 == []int{0, 0, 2}</span></span>
+<span class="line"><span style="color:#C9D1D9">s2 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">append</span><span style="color:#C9D1D9">(s1, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">)          </span><span style="color:#8B949E">// append multiple elements    s2 == []int{0, 0, 2, 3, 5, 7}</span></span>
+<span class="line"><span style="color:#C9D1D9">s3 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">append</span><span style="color:#C9D1D9">(s2, s0</span><span style="color:#FF7B72">...</span><span style="color:#C9D1D9">)            </span><span style="color:#8B949E">// append a slice              s3 == []int{0, 0, 2, 3, 5, 7, 0, 0}</span></span>
+<span class="line"><span style="color:#C9D1D9">s4 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">append</span><span style="color:#C9D1D9">(s3[</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">6</span><span style="color:#C9D1D9">], s3[</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">:]</span><span style="color:#FF7B72">...</span><span style="color:#C9D1D9">)   </span><span style="color:#8B949E">// append overlapping slice    s4 == []int{3, 5, 7, 2, 3, 5, 7, 0, 0}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> t []</span><span style="color:#FF7B72">interface</span><span style="color:#C9D1D9">{}</span></span>
+<span class="line"><span style="color:#C9D1D9">t </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">append</span><span style="color:#C9D1D9">(t, </span><span style="color:#79C0FF">42</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3.1415</span><span style="color:#C9D1D9">, </span><span style="color:#A5D6FF">&quot;foo&quot;</span><span style="color:#C9D1D9">)   </span><span style="color:#8B949E">//                             t == []interface{}{42, 3.1415, &quot;foo&quot;}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> b []</span><span style="color:#FF7B72">byte</span></span>
+<span class="line"><span style="color:#C9D1D9">b </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">append</span><span style="color:#C9D1D9">(b, </span><span style="color:#A5D6FF">&quot;bar&quot;</span><span style="color:#FF7B72">...</span><span style="color:#C9D1D9">)            </span><span style="color:#8B949E">// append string contents      b == []byte{&#39;b&#39;, &#39;a&#39;, &#39;r&#39; }</span></span></code></pre>
+<h2 id="copy"><code>copy</code></h2>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#79C0FF">copy</span><span style="color:#C9D1D9">(dst, src []T) </span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#79C0FF">copy</span><span style="color:#C9D1D9">(dst []</span><span style="color:#FF7B72">byte</span><span style="color:#C9D1D9">, src </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">int</span></span></code></pre>
+<p>用于复制一个 slice 到另一个 slice，也可以用于复制一个字符串到 <code>[]byte</code>。此函数返回的是复制过去的元素个数：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> a </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> [</span><span style="color:#FF7B72">...</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">6</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> s </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">([]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">6</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> b </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">([]</span><span style="color:#FF7B72">byte</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">n1 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">copy</span><span style="color:#C9D1D9">(s, a[</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">:])            </span><span style="color:#8B949E">// n1 == 6, s == []int{0, 1, 2, 3, 4, 5}</span></span>
+<span class="line"><span style="color:#C9D1D9">n2 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">copy</span><span style="color:#C9D1D9">(s, s[</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">:])            </span><span style="color:#8B949E">// n2 == 4, s == []int{2, 3, 4, 5, 4, 5}</span></span>
+<span class="line"><span style="color:#C9D1D9">n3 </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">copy</span><span style="color:#C9D1D9">(b, </span><span style="color:#A5D6FF">&quot;Hello, World!&quot;</span><span style="color:#C9D1D9">)  </span><span style="color:#8B949E">// n3 == 5, b == []byte(&quot;Hello&quot;)</span></span></code></pre>
+<h2 id="delete"><code>delete</code></h2>
+<p>用于从 map 中移除元素。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#79C0FF">delete</span><span style="color:#C9D1D9">(m, k) </span><span style="color:#8B949E">// 从 map m 中移除元素 map[k]</span></span></code></pre>
+<p>如果 <code>m</code> 是 <code>nil</code> 或者 <code>m[k]</code> 不存在，则什么都不做（这就比较爽了）。</p>
+<h2 id="panic-和-recover"><code>panic</code> 和 <code>recover</code></h2>
+<p>见 <a href="./panic.html">panic 和 recover</a></p>
+<h1 id="特殊函数">特殊函数</h1>
+<h2 id="main"><code>main</code></h2>
+<p>在 <code>main</code> 包下的 <code>main</code> 函数是程序执行的入口。这个 <code>main</code> 函数不接受任何参数，也没有任何返回值。</p>
+<p>如果你学过 Java 的话，能看出一个很重要的差别：Java 的 <code>main</code> 方法是接受一个字符串数组作为参数的，这个数组里存放的是命令行参数。在 Go 中，如果你想获取命令行参数的话，可以通过 <code>os.Args</code> 来访问。比如:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#8B949E">// args.go</span></span>
+<span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> (</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">os</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">    argsWithProg </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> os.Args</span></span>
+<span class="line"><span style="color:#C9D1D9">    argsWithoutProg </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> os.Args[</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">:]</span></span>
+<span class="line"><span style="color:#C9D1D9">    arg </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> os.Args[</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(argsWithProg)</span></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(argsWithoutProg)</span></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(arg)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>下面是我在我本地执行的一个示例：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">➜ go run args.go 1 2 3</span></span>
+<span class="line"><span style="color:#c9d1d9">[/var/folders/7w/b0jcv_c16qvbjqc0998w9_zm0000gn/T/go-build37639907/b001/exe/args 1 2 3]</span></span>
+<span class="line"><span style="color:#c9d1d9">[1 2 3]</span></span>
+<span class="line"><span style="color:#c9d1d9">3</span></span></code></pre>
+<h2 id="init"><code>init</code></h2>
+<p>每个包下都可以定义一些 <code>init</code> 函数，它也不接受任何参数，也没有任何返回值。<code>init</code> 函数的功能如其名，主要作用就是进行一些初始化工作。它在包被导入时执行一次。一个包下可以定义很多个 <code>init</code> 函数，甚至在同一个文件里，也可以定义很多个。在同一个文件中的多个 <code>init</code> 函数按出现的顺序依次执行；在同一个包下不同文件中的多个 <code>init</code> 按文件名的字母表顺序依次执行。在 main 包下，<code>init</code> 函数先于 <code>main</code> 函数执行。比如:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">init</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;1&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">init</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;2&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;4&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">init</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;3&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>在指定包下，标识符 <code>init</code> 只能用来定义 <code>init</code> 函数，所以不可以在别的地方引用它。</p>
+<h1 id="参考">参考</h1>
+<ul>
+<li><a href="https://gobyexample.com/command-line-arguments">Go by Example: Command-Line Arguments</a></li>
+<li><a href="https://go.dev/ref/spec">The Go Programming Language Specification</a></li>
+</ul>

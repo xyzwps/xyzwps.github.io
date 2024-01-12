@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<p>Go 语言在赋值时，总是对 struct 进行深复制。观察下面的例子：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Point2D</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	X, Y </span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">type</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">Line</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">struct</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	Start, End Point2D</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> line Line </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> Line{Point2D{</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">}, Point2D{</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">}}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> line2 Line</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;line  = </span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF"> </span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, line)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;line2 = </span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF"> </span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, line2)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	line2 </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> line</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;line2 = </span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF"> </span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, line2)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	line.End.Y </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">10000</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;line  = </span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF"> </span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, line)</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;line2 = </span><span style="color:#79C0FF">%v</span><span style="color:#A5D6FF"> </span><span style="color:#79C0FF">\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, line2)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>以上代码输出:</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">line  = {{1 2} {3 4}}</span></span>
+<span class="line"><span style="color:#c9d1d9">line2 = {{0 0} {0 0}}</span></span>
+<span class="line"><span style="color:#c9d1d9">line2 = {{1 2} {3 4}}</span></span>
+<span class="line"><span style="color:#c9d1d9">line  = {{1 2} {3 10000}}</span></span>
+<span class="line"><span style="color:#c9d1d9">line2 = {{1 2} {3 4}}</span></span></code></pre>

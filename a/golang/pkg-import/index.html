@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<p>类似于 Java，Go 语言的代码是以 package 的方式组织起来的。</p>
+<p>文件的第一行是包声明。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">mypkg</span></span></code></pre>
+<p>在一个包中，以大写字符开头的名称会被暴露出来。比如 <code>math</code> 包中的 <code>Pi</code>。</p>
+<p>在导入一个包时，可以导入整个包，比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">(</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">; </span><span style="color:#A5D6FF">&quot;math&quot;</span><span style="color:#C9D1D9"> )</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(math.Pi)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>也可以只导入包的一部分，比如下例中的 <code>rand</code> 是从 <code>math</code> 包中指明导入的：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">(</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">; </span><span style="color:#A5D6FF">&quot;math/rand&quot;</span><span style="color:#C9D1D9"> )</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;New random integer:&quot;</span><span style="color:#C9D1D9">, rand.</span><span style="color:#79C0FF">Intn</span><span style="color:#C9D1D9">(</span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">))</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>TODO: 可见性问题</p>

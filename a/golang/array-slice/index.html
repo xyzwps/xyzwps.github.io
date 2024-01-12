@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<h2 id="数组">数组</h2>
+<p>类型 <code>[n]T</code> 是指一个数组可以存放 <code>n</code> 个 <code>T</code> 类型的值。</p>
+<p>像下面这样声明一个数组变量：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> a [</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9"> </span><span style="color:#8B949E">// a 的值是 [0 0 0]</span></span></code></pre>
+<p>数组的长度是类型的一部分，所以数组大小不可变。</p>
+<h2 id="切片slice">切片（slice）</h2>
+<p>虽然数组是固定大小的，但是切片是动态大小的。切片是数组的一个视图。在实践中，切片更常用。</p>
+<p>类型 <code>[]T</code> 用于声明一个存放 <code>T</code> 类型元素的切片。注意：这里比较隐晦，方括号里带有数字的是数组，不带数字的是切片。</p>
+<p>切片需要两个指标，下界和上界，这两个指标用分号隔开。比如：<code>a[low : high]</code>。切片包含 <code>a</code> 的第 <code>low</code> 个元素，但不包含第 <code>high</code> 个。这样一来，其长度是 <code>high - low</code>（通行做法嘛）。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">primes </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> [</span><span style="color:#79C0FF">6</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">11</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">13</span><span style="color:#C9D1D9">} </span><span style="color:#8B949E">// primes 是一个数组</span></span>
+<span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> s []int </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> primes[</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">] </span><span style="color:#8B949E">// s 是一个切片</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(s) </span><span style="color:#8B949E">// 输出 [3 5 7]</span></span></code></pre>
+<h3 id="底层数组">底层数组</h3>
+<p>切片本身并不存放任何数据，它只是描述了底层数组的一部分。改变切片的元素，也会改变底层数组中的对应元素。这个改变，对其他共享同一底层数组元素的切片也是可见的。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">nums </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> [</span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{ </span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9"> }   </span><span style="color:#8B949E">// 定义一个数组</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(nums)              </span><span style="color:#8B949E">// 输出 [1 2 3 4]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">a, b </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> nums[</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">], nums[</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">]      </span><span style="color:#8B949E">// a 和 b 共享 nums[1]</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;a =&quot;</span><span style="color:#C9D1D9">, a, </span><span style="color:#A5D6FF">&quot;, b =&quot;</span><span style="color:#C9D1D9">, b) </span><span style="color:#8B949E">// 输出 a = [1 2] , b = [2 3]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">b[</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">] </span><span style="color:#FF7B72">=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">                          </span><span style="color:#8B949E">// 改变切片 b 的第一个元素</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;a =&quot;</span><span style="color:#C9D1D9">, a, </span><span style="color:#A5D6FF">&quot;, b =&quot;</span><span style="color:#C9D1D9">, b) </span><span style="color:#8B949E">// 输出 a = [1 5] , b = [5 3]</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(nums)                 </span><span style="color:#8B949E">// 输出 [1 5 3 4]</span></span></code></pre>
+<p>注意，切片不能超出底层数组的范围。</p>
+<h3 id="切片字面量">切片字面量</h3>
+<p>切片字面量和数组字面量类似，唯一的区别就是不带有长度。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">[</span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">bool</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">true</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">true</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">false</span><span style="color:#C9D1D9">} </span><span style="color:#8B949E">// 数组字面量</span></span>
+<span class="line"><span style="color:#C9D1D9">[]</span><span style="color:#FF7B72">bool</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">true</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">true</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">false</span><span style="color:#C9D1D9">}  </span><span style="color:#8B949E">// 切片字面量，不带有长度</span></span></code></pre>
+<h3 id="切片语法默认行为">切片语法默认行为</h3>
+<p>做切片时，你可以忽略上界和下界，这时会使用默认值。下界的默认值是 0，上界的默认值是数组长度。对于数组：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> a [</span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">]</span><span style="color:#FF7B72">int</span></span></code></pre>
+<p>下面的切片表达式等价：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">a[</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">]</span></span>
+<span class="line"><span style="color:#C9D1D9">a[:</span><span style="color:#79C0FF">10</span><span style="color:#C9D1D9">]</span></span>
+<span class="line"><span style="color:#C9D1D9">a[</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">:]</span></span>
+<span class="line"><span style="color:#C9D1D9">a[:]</span></span></code></pre>
+<h3 id="长度和容量">长度和容量</h3>
+<p>切片既有长度，又有容量。切片的长度是切片中的元素数量。容量是底层数组的长度<strong>减去</strong>切片的下界（只能往屁股上追加）。切片 <code>s</code> 的长度和容量分别用表达式 <code>len(s)</code> 和 <code>cap(s)</code> 求出。你可以通过“重切片”操作来扩展切片的长度，但是要给出足够的容量。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">s </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> []</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">3</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">7</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">11</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">13</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#C9D1D9">s </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> s[:</span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">] </span><span style="color:#8B949E">// []，重切片</span></span>
+<span class="line"><span style="color:#C9D1D9">s </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> s[:</span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">] </span><span style="color:#8B949E">// [2 3 5 7]，重切片。注意，上一步 len(s) 已经是 0 了，真骚</span></span></code></pre>
+<h3 id="零值">零值</h3>
+<p>切片的零值是 <code>nil</code>。零切片的长度和容量都是 0，且没有底层数组。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">var</span><span style="color:#C9D1D9"> s []</span><span style="color:#FF7B72">int</span></span>
+<span class="line"><span style="color:#C9D1D9">fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(s, </span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(s), </span><span style="color:#79C0FF">cap</span><span style="color:#C9D1D9">(s)) </span><span style="color:#8B949E">// 输出 [] 0 0</span></span>
+<span class="line"><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> s </span><span style="color:#FF7B72">==</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">nil</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Println</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;nil!&quot;</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>这里非常蛋疼：尽管 <code>s == nil</code>，但 <code>fmt.Println(s)</code> 输出的是 <code>[]</code>，而且 <code>len(nil)</code> 直接被拒绝。 <code>len(nil)</code> 抛出了一个错误，叫 <code>use of untyped nil</code>，所以 <code>nil</code> 也是有类型的……</p>
+<h3 id="make">make</h3>
+<p>可以通过内置函数 <code>make</code> 来创建切片，这使你可以动态指定切片容量大小。<code>make</code> 函数会分配一个元素均为零值的数组，并返回对此数据的切片。可以在 <code>make</code> 函数的第三个参数中指定切片容量。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">package</span><span style="color:#C9D1D9"> </span><span style="color:#FFA657">main</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;</span><span style="color:#FFA657">fmt</span><span style="color:#A5D6FF">&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">main</span><span style="color:#C9D1D9">() {</span></span>
+<span class="line"><span style="color:#C9D1D9">	a </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">([]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">printSlice</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;a&quot;</span><span style="color:#C9D1D9">, a) </span><span style="color:#8B949E">// a len=5 cap=5 [0 0 0 0 0]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	b </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">make</span><span style="color:#C9D1D9">([]</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">)</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">printSlice</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;b&quot;</span><span style="color:#C9D1D9">, b) </span><span style="color:#8B949E">// b len=0 cap=5 []</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	c </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> b[:</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">]</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">printSlice</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;c&quot;</span><span style="color:#C9D1D9">, c) </span><span style="color:#8B949E">// c len=2 cap=5 [0 0]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C9D1D9">	d </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> c[</span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">:</span><span style="color:#79C0FF">5</span><span style="color:#C9D1D9">]</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#79C0FF">printSlice</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;d&quot;</span><span style="color:#C9D1D9">, d) </span><span style="color:#8B949E">// d len=3 cap=3 [0 0 0]</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">printSlice</span><span style="color:#C9D1D9">(s </span><span style="color:#FF7B72">string</span><span style="color:#C9D1D9">, x []</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">) {</span></span>
+<span class="line"><span style="color:#C9D1D9">	fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;</span><span style="color:#79C0FF">%s</span><span style="color:#A5D6FF"> len=</span><span style="color:#79C0FF">%d</span><span style="color:#A5D6FF"> cap=</span><span style="color:#79C0FF">%d</span><span style="color:#A5D6FF"> </span><span style="color:#79C0FF">%v\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, s, </span><span style="color:#79C0FF">len</span><span style="color:#C9D1D9">(x), </span><span style="color:#79C0FF">cap</span><span style="color:#C9D1D9">(x), x)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h3 id="append">append</h3>
+<p>往切片后面追加新元素是很常见的操作。Go 语言提供了內建的 <code>append</code> 函数来做这件事：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">append</span><span style="color:#C9D1D9">(s []T, vs </span><span style="color:#FF7B72">...</span><span style="color:#C9D1D9">T) []T</span></span></code></pre>
+<p>第一个参数是被追加新元素的切片，剩下的参数是要追加的新元素。</p>
+<p>如果切片的底层数组容量太小，新元素放不下了，<code>append</code> 函数会分配一个新的更大的数组，返回的切片会指向新数组。</p>
+<h3 id="range">range</h3>
+<p><code>for</code> 循环的 <code>range</code> 形式是在一个切片或者 map 上进行迭代。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#C9D1D9">pow </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> []</span><span style="color:#FF7B72">int</span><span style="color:#C9D1D9">{</span><span style="color:#79C0FF">1</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">2</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">4</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">8</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">16</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">32</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">64</span><span style="color:#C9D1D9">, </span><span style="color:#79C0FF">128</span><span style="color:#C9D1D9">}</span></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i, v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> pow {</span></span>
+<span class="line"><span style="color:#C9D1D9">    fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;2**</span><span style="color:#79C0FF">%d</span><span style="color:#A5D6FF"> = </span><span style="color:#79C0FF">%d\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, i, v)</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<p>如果你想跳过索引或者值，可以用 <code>_</code> 替代：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i, _ </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> pow</span></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> _, value </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> pow</span></span></code></pre>
+<p>如果你只想要索引，可以直接忽略第二个变量：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">for</span><span style="color:#C9D1D9"> i </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> </span><span style="color:#FF7B72">range</span><span style="color:#C9D1D9"> pow</span></span></code></pre>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://blog.golang.org/slices-intro">Go Slices: usage and internals</a></li>
+<li><a href="https://golang.org/pkg/builtin/#append">append 函数文档</a></li>
+</ul>

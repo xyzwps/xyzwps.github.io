@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<h2 id="基本-if-语句">基本 if 语句</h2>
+<p>就像 <code>for</code> 语句那样，<code>if</code> 语句的条件表达式不需要用括号圈住，而且后面的花括号不可省略。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> x </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> </span><span style="color:#79C0FF">0</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">    </span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> </span><span style="color:#A5D6FF">&quot;negative&quot;</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="带有初始语句的-if-语句">带有初始语句的 if 语句</h2>
+<p>就像 <code>for</code> 语句那样，<code>if</code> 语句可以以一个短语句开始，这个语句在每次条件判断前执行。其中声明的变量只在 <code>if</code> 语句的作用域内有效。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">pow</span><span style="color:#C9D1D9">(x, n, lim </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> math.</span><span style="color:#79C0FF">Pow</span><span style="color:#C9D1D9">(x, n); v </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> lim {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> v</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> lim</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>
+<h2 id="ifelse">if…else…</h2>
+<p><code>if</code> 语句后面可以带有一个 <code>else</code> 块。在 <code>if</code> 语句的短语句中声明的变量也可以在 <code>else</code> 块中访问。比如：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#FF7B72">func</span><span style="color:#C9D1D9"> </span><span style="color:#D2A8FF">pow</span><span style="color:#C9D1D9">(x, n, lim </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9">) </span><span style="color:#FF7B72">float64</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">if</span><span style="color:#C9D1D9"> v </span><span style="color:#FF7B72">:=</span><span style="color:#C9D1D9"> math.</span><span style="color:#79C0FF">Pow</span><span style="color:#C9D1D9">(x, n); v </span><span style="color:#FF7B72">&lt;</span><span style="color:#C9D1D9"> lim {</span></span>
+<span class="line"><span style="color:#C9D1D9">		</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> v</span></span>
+<span class="line"><span style="color:#C9D1D9">	} </span><span style="color:#FF7B72">else</span><span style="color:#C9D1D9"> {</span></span>
+<span class="line"><span style="color:#C9D1D9">		fmt.</span><span style="color:#79C0FF">Printf</span><span style="color:#C9D1D9">(</span><span style="color:#A5D6FF">&quot;</span><span style="color:#79C0FF">%g</span><span style="color:#A5D6FF"> &gt;= </span><span style="color:#79C0FF">%g\n</span><span style="color:#A5D6FF">&quot;</span><span style="color:#C9D1D9">, v, lim)</span></span>
+<span class="line"><span style="color:#C9D1D9">	}</span></span>
+<span class="line"><span style="color:#C9D1D9">	</span><span style="color:#FF7B72">return</span><span style="color:#C9D1D9"> lim</span></span>
+<span class="line"><span style="color:#C9D1D9">}</span></span></code></pre>

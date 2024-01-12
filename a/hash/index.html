@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="astro-HQDTIEGF">
+  <head>
+    <link rel="canonical" href="/a/hash">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>哈希算法</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/_astro/bm25.a98e70bf.css" /></head>
+  <body class="astro-HQDTIEGF">
+    <div class="container astro-HQDTIEGF">
+      <div class="card astro-DOHJNAO5" style="margin: 8px 8px 0px;">
+  <div style="padding: 8px 16px;" class="astro-QAANGHZH">
+   / 哈希算法
+</div>
+</div>
+      <div class="xy-post astro-HQDTIEGF">
+        <div class="xy-post-left astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="post-toc astro-UKV4GGCY">
+  <li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/mac" class="astro-UKV4GGCY">MAC</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/crc32" class="astro-UKV4GGCY">CRC32</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/fnv1a" class="astro-UKV4GGCY">FNV-1a</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/md5" class="astro-UKV4GGCY">MD5</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/murmur3" class="astro-UKV4GGCY">Murmur3</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/sha1" class="astro-UKV4GGCY">SHA-1</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/sha2" class="astro-UKV4GGCY">SHA-2</a>
+      </li><li class="toc-li toc-h2 astro-UKV4GGCY">
+        <a href="/a/hash/sip" class="astro-UKV4GGCY">Sip</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+
+        <div class="xy-post-center astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <div class="post astro-HUXYRZVI">
+  <h1 class="astro-HUXYRZVI">哈希算法</h1>
+  
+              <h2 id="目录">目录</h2>
+<ul>
+<li>开始
+<ul>
+<li><a href="/a/hash/mac">Mac</a></li>
+<li><a href="/a/hash/sip">SipHash</a></li>
+</ul>
+</li>
+<li>实践
+<ul>
+<li><a href="/a/hash/how-to-securely-store-password-in-db">如何安全存储密码</a></li>
+</ul>
+</li>
+</ul>
+<p>TODO: 衡量 hash 函数的标准：雪崩效应、分布与抗碰撞性、性能、是否是加密安全的、一致性</p>
+<ul>
+<li>DJB2</li>
+<li>DJB2a (variant using xor rather than +)</li>
+<li>FNV-1 (32-bit)</li>
+<li>FNV-1a (32-bit)</li>
+<li>SDBM</li>
+<li>CRC32</li>
+<li>Murmur2 (32-bit)</li>
+<li>SuperFastHash</li>
+<li>SDBM (32-bit)</li>
+<li>LoseLose (32-bit)</li>
+<li>FNV-1/FNV-1a (32-bit)</li>
+<li>CRC16 (16-bit)</li>
+<li>Murmur2/Murmur3 (32-bit).</li>
+<li>CityHash</li>
+<li>xxHash64</li>
+<li>SpookyHash</li>
+<li>SipHash</li>
+<li>Jenkins lookup3</li>
+<li>SuperFastHash</li>
+<li>CityHash</li>
+<li>Metro</li>
+<li>FNV1/1a</li>
+<li>MUM</li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/List_of_hash_functions#Non-cryptographic_hash_functions">List of hash functions - Wikipedia</a></li>
+<li><a href="https://softwareengineering.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed">Which hashing algorithm is best for uniqueness and speed? - Software Engineering Stack Exchange</a></li>
+<li><a href="https://medium.com/miro-engineering/choosing-a-hash-function-to-solve-a-data-sharding-problem-c656259e2b54">Choosing a hash function to solve a data sharding problem | by MiroTech | Medium</a></li>
+<li><a href="https://greenrobot.org/essentials/features/performant-hash-functions-for-java/comparison-of-hash-functions/">Comparison of hash functions and performance benchmarks - Open Source by greenrobot</a></li>
+</ul>
+            
+</div>
+          
+</div>
+        </div>
+
+        <div class="xy-post-right astro-HQDTIEGF">
+          <div class="card astro-DOHJNAO5">
+  
+            <ul class="headings-toc astro-PUKOXQVJ">
+  <li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#目录" class="astro-PUKOXQVJ">目录</a>
+      </li><li class="toc-li toc-h2 astro-PUKOXQVJ">
+        <a href="#参考" class="astro-PUKOXQVJ">参考</a>
+      </li>
+</ul>
+          
+</div>
+        </div>
+      </div>
+    </div>
+  
+
+</body></html>

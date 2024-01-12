@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<h2 id="redis-hash">Redis Hash</h2>
+<p>Redis hash 看起来就像你期望的”hash“那样，存储 field-value 对：</p>
+<p>// 这里应该是因为 redis 中 key 已经有所指，而不说是 key-value 对。</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; hmset user:1000 username antirez birthyear 1977 verified 1</span></span>
+<span class="line"><span style="color:#c9d1d9">OK</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; hget user:1000 username</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;antirez&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; hget user:1000 birthyear</span></span>
+<span class="line"><span style="color:#c9d1d9">&quot;1977&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; hgetall user:1000</span></span>
+<span class="line"><span style="color:#c9d1d9">1) &quot;username&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) &quot;antirez&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">3) &quot;birthyear&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">4) &quot;1977&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">5) &quot;verified&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">6) &quot;1&quot;</span></span></code></pre>
+<p>尽管 hash 可以很方便的表示<em>对象</em>，不过事实上你可以往 hash 添加的 field 数量没有明确上限（除了可用内存以外），所以你可以再你的应用程序中以各种方式来使用 hash。</p>
+<p>命令 <code>HMSET</code> 可以一次性同时设置多个 field 的 value，不过 <code>HGET</code> 一次只能得到一个 field 的值。<code>HMGET</code> 类似于 <code>HGET</code>，不过它返回一个 value 数组：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; hmget user:1000 username birthyear no-such-field</span></span>
+<span class="line"><span style="color:#c9d1d9">1) &quot;antirez&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">2) &quot;1977&quot;</span></span>
+<span class="line"><span style="color:#c9d1d9">3) (nil)</span></span></code></pre>
+<p>Hash 上还有一些命令可以单独操纵 field，比如 <code>HINCRBY</code>：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; hincrby user:1000 birthyear 10</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1987</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; hincrby user:1000 birthyear 10</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1997</span></span></code></pre>
+<p>你可以在这里找到<a href="https://redis.io/commands#hash">全部的 hash 命令文档</a>。</p>
+<p>值得注意的是，小哈希值(也就是一些值很小的元素)在内存中以特殊的方式进行编码，这使得它们的内存效率很高。</p>
+<h2 id="hash-相关命令">Hash 相关命令</h2>
+<ul>
+<li><code>HDEL key field [field ...]</code><br/>
+<small>Delete one or more hash fields</small></li>
+<li><code>HEXISTS key field</code><br/>
+<small>Determine if a hash field exists</small></li>
+<li><code>HGET key field</code><br/>
+<small>Get the value of a hash field</small></li>
+<li><code>HGETALL key</code><br/>
+<small>Get all the fields and values in a hash</small></li>
+<li><code>HINCRBY key field increment</code><br/>
+<small>Increment the integer value of a hash field by the given number</small></li>
+<li><code>HINCRBYFLOAT key field increment</code><br/>
+<small>Increment the float value of a hash field by the given amount</small></li>
+<li><code>HKEYS key</code><br/>
+<small>Get all the fields in a hash</small></li>
+<li><code>HLEN key</code><br/>
+<small>Get the number of fields in a hash</small></li>
+<li><code>HMGET key field [field ...]</code><br/>
+<small>Get the values of all the given hash fields</small></li>
+<li><code>HMSET key field value [field value ...]</code><br/>
+<small>Set multiple hash fields to multiple values</small></li>
+<li><code>HRANDFIELD key [count [WITHVALUES]]</code><br/>
+<small>Get one or multiple random fields from a hash</small></li>
+<li><code>HSCAN key cursor [MATCH pattern] [COUNT count]</code><br/>
+<small>Incrementally iterate hash fields and associated values</small></li>
+<li><code>HSET key field value [field value ...]</code><br/>
+<small>Set the string value of a hash field</small></li>
+<li><code>HSETNX key field value</code><br/>
+<small>Set the value of a hash field, only if the field does not exist</small></li>
+<li><code>HSTRLEN key field</code><br/>
+<small>Get the length of the value of a hash field</small></li>
+<li><code>HVALS key</code><br/>
+<small>Get all the values in a hash</small></li>
+</ul>

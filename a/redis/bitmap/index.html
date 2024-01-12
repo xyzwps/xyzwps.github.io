@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<h2 id="bitmap">Bitmap</h2>
+<p>Bitmap 不是一个实际上的数据类型，而是一组定义在字符串上的面向bit的操作集合。因为字符串是二进制安全的 blob，最大长度是 512MB，所以它可以设置 <span class="math math-inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>32</mn></msup></mrow><annotation encoding="application/x-tex">2^{32}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">32</span></span></span></span></span></span></span></span></span></span></span></span></span> 个不同的 bit。</p>
+<p>Bit 操作被分成两组：常数时间的单 bit 操作，类似于把一个 bit 设置为 0 或 1，或者获取它的值；和对一组 bit 进行的操作，例如统计指定范围内的bit数量。</p>
+<p>Bitmap 的一个最大优点是它在存储信息时极为节省空间。比如一个系统中，不同的用户用递增的用户 ID，那么用 bitmap 只需要 512MB 内存就可以记录 40一个用户的单 bit 信息。</p>
+<p>设置和获取 bit 使用命令 <code>SETBIT</code> 和 <code>GETBIT</code>：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; setbit key 10 1</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; getbit key 10</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 1</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; getbit key 11</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 0</span></span></code></pre>
+<p>命令 <code>SETBIT</code> 把第一个参数作为 bit 的位置，第二个参数作为 bit 的值（取 0 或 1）。命令自动扩展字符串的长度，在设置的 bit 为超出字符串长度时。</p>
+<p>命令 <code>GETBIT</code> 只是返回指定索引处的 bit 值。超出字符串长度范围之外的 bit 总是被认为是 0.</p>
+<p>有三个命令来操作一组 bit：</p>
+<ol>
+<li><code>BITOP</code> 在不同字符串之间进行按位操作。提供的操作有 AND、OR、XOR 和 NOT。</li>
+<li><code>BITCOUNT</code> 进行统计，返回所有为 1 的 bit 的数量。</li>
+<li><code>BITPOS</code> 返回第一个具有指定值的 bit 的位置。</li>
+</ol>
+<p><code>BITPOS</code> 和 <code>BITCOUNT</code> 都可以按字节操作字符串，而非遍历整个字符串。下面是一个使用 <code>BITCOUNT</code> 命令的简单例子：</p>
+<pre class="astro-code" style="background-color:#0d1117;overflow-x:auto"><code><span class="line"><span style="color:#c9d1d9">&gt; setbit key 0 1</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 0</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; setbit key 100 1</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 0</span></span>
+<span class="line"><span style="color:#c9d1d9">&gt; bitcount key</span></span>
+<span class="line"><span style="color:#c9d1d9">(integer) 2</span></span></code></pre>
+<p>常见的使用场景有：</p>
+<ul>
+<li>各种实时分析</li>
+<li>存储空间高线且高性能的布尔信息，和一个对象的 ID 关联。</li>
+</ul>
+<p>把多个 Bitmap 拆分成多个 key 很简单，比如，因为要对数据集进行分片，或者因为通常建议避免使用巨型 key。</p>
+<h2 id="相关命令">相关命令</h2>
+<ul>
+<li><code>BITCOUNT key [start end [BYTE|BIT]]</code><br/>
+<small>Count set bits in a string</small></li>
+<li><code>BITFIELD key [GET encoding offset] [SET encoding offset value] [INCRBY encoding offset increment] [OVERFLOW WRAP|SAT|FAIL]</code><br/>
+<small>Perform arbitrary bitfield integer operations on strings</small></li>
+<li><code>BITFIELD_RO key GET encoding offset</code><br/>
+<small>Perform arbitrary bitfield integer operations on strings. Read-only variant of BITFIELD</small></li>
+<li><code>BITOP operation destkey key [key ...]</code><br/>
+<small>Perform bitwise operations between strings</small></li>
+<li><code>BITPOS key bit [start [end [BYTE|BIT]]]</code><br/>
+<small>Find first bit set or clear in a string</small></li>
+<li><code>GETBIT key offset</code><br/>
+<small>Returns the bit value at offset in the string value stored at key</small></li>
+<li><code>SETBIT key offset value</code><br/>
+<small>Sets or clears the bit at offset in the string value stored at key</small></li>
+</ul>
