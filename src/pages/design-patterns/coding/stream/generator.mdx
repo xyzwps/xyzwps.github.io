@@ -1,0 +1,53 @@
+# 思路三改进Generator
+
+在思路三中，我们最终得到一个这样的接口：
+
+```java
+interface LazySequence<T> {
+    Current<T> popCurrent();
+}
+
+sealed interface Current<T> {
+    record Value<T>(T value) implements Current<T> {
+    }
+
+    @SuppressWarnings("rawtypes")
+    enum End implements Current {
+        INSTANCE
+    }
+}
+```
+
+巧了，这和 JavaScript 中[迭代器协议](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Iteration_protocols#%E8%BF%AD%E4%BB%A3%E5%99%A8%E5%8D%8F%E8%AE%AE)简直一模一样：
+
+我们还注意到，`LazySequence` 中的方法，并不是必须和 `Sequence` 一起使用，即 `Sequence`
+对 `LazySequence` 来说不是必须的。所以，我们把 `Sequence` 删除。
+另外，这个 `LazySequence` 实际上是 JavaScript 中的 iterator，但是因为 Java 中已经有
+`Iterator` 了，所以改用 `Generator` 来替换 `LazySequence` 的名字。
+
+最后接口变成了这样：
+
+```java
+interface Generator<T> {
+    NextResult<T> next();
+}
+
+sealed interface NextResult<T> {
+    record Value<T>(T value) implements NextResult<T> {
+    }
+
+    @SuppressWarnings("rawtypes")
+    enum End implements NextResult {
+        INSTANCE
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> NextResult<T> end() {
+        return End.INSTANCE;
+    }
+}
+```
+
+可以看到，Java 中的 `Iterator` 把判断是否有下一个元素和获取下一个元素的操作分来了，这个接口则是把两个操作合并到了一起。
+
+其他方法和 `LazySequence` 中几乎一模一样，不再列出。
