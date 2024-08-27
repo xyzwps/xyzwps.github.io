@@ -1,0 +1,13 @@
+---
+import blogs from './_index.data';
+---
+
+<ul>
+  {
+    blogs.map((it) => (
+      <li>
+        <a href={it.path}>{it.title}</a>
+      </li>
+    ))
+  }
+</ul>

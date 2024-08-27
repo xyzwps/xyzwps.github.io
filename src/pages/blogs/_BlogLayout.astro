@@ -2,6 +2,7 @@
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import PostToc from '../../components/PostToc.astro';
 import MdxLayout from '../../layouts/MdxLayout.astro';
+import blogs from './_index.data'
 import type { MDXLayoutProps } from 'astro';
 
 type Props = MDXLayoutProps<{
@@ -10,25 +11,6 @@ type Props = MDXLayoutProps<{
   author: string;
   date: string;
 }>;
-
-const list = [
-  { depth: 2, title: '软连接', link: '/blogs/2022-12-06-soft-link' },
-  { depth: 2, title: '密码强度', link: '/blogs/2022-10-17-password-strength' },
-  { depth: 2, title: 'Graphql 碎碎念', link: '/blogs/2022-09-19-graphql-gossip' },
-  { depth: 2, title: '函数式编程', link: '/blogs/2022-08-25-fp' },
-  { depth: 2, title: 'Authentication', link: '/blogs/2022-08-22-authn' },
-  { depth: 2, title: 'ID 生成算法', link: '/blogs/2022-08-18-id' },
-  { depth: 2, title: '一个跨服务分页示例', link: '/blogs/2022-08-02-pagination' },
-  { depth: 2, title: '一些数据格式', link: '/blogs/2022-08-01-data-format' },
-  { depth: 2, title: '分页', link: '/blogs/2022-07-27-pagination' },
-  { depth: 2, title: '记一个 JS return await 问题', link: '/blogs/2022-06-23-js-return-await' },
-  {
-    depth: 2,
-    title: 'Go 语言 https 客户端如何使用自签名 CA',
-    link: '/blogs/2022-06-06-go-http-client-use-self-siged-ca',
-  },
-  { depth: 2, title: '国内开源软件镜像', link: '/blogs/2023-04-17-mirrors' },
-];
 
 const { frontmatter, url, title } = Astro.props;
 
@@ -44,6 +26,6 @@ const INDEX_PATH = '/blogs';
       url == INDEX_PATH ? null : { title: frontmatter.title as string },
     ]}
   />
-  <PostToc slot="left" links={list} />
+  <PostToc slot="left" links={blogs.map(it => ({ depth:2, title: it.title, link: it.path }))} />
   <slot slot="center" />
 </MdxLayout>
