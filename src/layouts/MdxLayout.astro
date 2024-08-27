@@ -29,7 +29,7 @@ const { frontmatter, url, headings } = Astro.props;
       <Card class="my-2"><slot name="breadcrumb" /></Card>
       <div class="grid grid-cols-5 gap-2">
         <Card>
-          <h1 class="mx-3 mt-4 text-sm text-gray-500">我的文章</h1>
+          <h1 class="mx-3 mt-4 text-sm text-indigo-600">我的文章</h1>
           <slot name="left" />
         </Card>
         <Card class="col-span-3">
@@ -38,7 +38,7 @@ const { frontmatter, url, headings } = Astro.props;
           </Post>
         </Card>
         <Card>
-          <h1 class="mx-3 mt-4 text-sm text-gray-500">本文目录</h1>
+          <h1 class="mx-3 mt-4 text-sm text-indigo-600">本文目录</h1>
           <HeadingsToc headings={headings} />
         </Card>
       </div>
