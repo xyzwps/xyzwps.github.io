@@ -12,7 +12,7 @@ const { items } = Astro.props as Props;
       .filter((it) => it)
       .map((it, i, list) => (
         <>
-          {i > 0 ? ' > ' : ''}
+          {i > 0 ? <span class="text-indigo-500"> &gt; </span> : ''}
           {i + 1 == list.length ? <span class="text-gray-400">{it.title}</span> : <a href={it.path}>{it.title}</a>}
         </>
       ))

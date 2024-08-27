@@ -33,7 +33,7 @@ const { frontmatter, url, headings } = Astro.props;
           <slot name="left" />
         </Card>
         <Card class="col-span-3">
-          <Post title={frontmatter.title}>
+          <Post class='prose max-w-none' title={frontmatter.title}>
             <slot name="center" />
           </Post>
         </Card>
