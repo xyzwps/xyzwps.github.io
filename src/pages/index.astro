@@ -1,0 +1,21 @@
+---
+import Directory from '../components/HomePage/Directory.astro'
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>xyzwps pages</title>
+  </head>
+  <body class="bg-gray-200">
+    <div style="max-width: 1024px;" class="mx-auto bg-white flex flex-col border-x-gray-500 px-4 min-h-screen">
+      <h1 class="block my-4 font-bold">xyzwps pages</h1>
+      <div class="my-4 flex gap-2">
+        <Directory href="/blogs">Blogs</Directory>
+        <Directory href="/collections">Collections</Directory>
+        <Directory href="/design-patterns">Design Patterns</Directory>
+        <Directory href="/a">Anthologies</Directory>
+      </div>
+    </div>
+  </body>
+</html>
