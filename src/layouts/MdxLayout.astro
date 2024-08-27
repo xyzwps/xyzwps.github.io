@@ -24,29 +24,23 @@ const { frontmatter, url, headings } = Astro.props;
     <title>{frontmatter.title}</title>
     <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet" />
   </head>
-  <body>
-    <div class="container">
-      <Card style="margin: 8px 8px 0px;"><slot name="breadcrumb" /></Card>
-      <div class="xy-post">
-        <div class="xy-post-left">
-          <Card>
-            <slot name="left" />
-          </Card>
-        </div>
-
-        <div class="xy-post-center">
-          <Card>
-            <Post title={frontmatter.title}>
-              <slot name="center" />
-            </Post>
-          </Card>
-        </div>
-
-        <div class="xy-post-right">
-          <Card>
-            <HeadingsToc headings={headings} />
-          </Card>
-        </div>
+  <body class="bg-gray-100">
+    <div class="container mx-auto bg-white px-4 min-h-screen">
+      <Card class="my-2"><slot name="breadcrumb" /></Card>
+      <div class="grid grid-cols-5 gap-2">
+        <Card>
+          <h1 class="mx-3 mt-4 text-sm text-gray-500">我的文章</h1>
+          <slot name="left" />
+        </Card>
+        <Card class="col-span-3">
+          <Post title={frontmatter.title}>
+            <slot name="center" />
+          </Post>
+        </Card>
+        <Card>
+          <h1 class="mx-3 mt-4 text-sm text-gray-500">本文目录</h1>
+          <HeadingsToc headings={headings} />
+        </Card>
       </div>
     </div>
   </body>
@@ -88,67 +82,5 @@ const { frontmatter, url, headings } = Astro.props;
   .astro-code {
     padding: 16px;
     border-radius: 6px;
-  }
-</style>
-
-<style lang="scss">
-  body {
-    padding: 0px;
-    margin: 0px;
-    background-color: #f8f9fa;
-  }
-
-  .xy-post {
-    padding: 8px;
-    display: flex;
-    gap: 8px;
-  }
-
-  @media only screen and (max-width: 959px) {
-    .xy-post {
-      .xy-post-left {
-        display: none;
-      }
-
-      .xy-post-center {
-        width: 100%;
-      }
-
-      .xy-post-right {
-        display: none;
-      }
-    }
-  }
-
-  @media only screen and (min-width: 960px) and (max-width: 1279px) {
-    .xy-post {
-      .xy-post-left {
-        width: 25%;
-      }
-
-      .xy-post-center {
-        width: 75%;
-      }
-
-      .xy-post-right {
-        display: none;
-      }
-    }
-  }
-
-  @media only screen and (min-width: 1280px) {
-    .xy-post {
-      .xy-post-left {
-        width: 20%;
-      }
-
-      .xy-post-center {
-        width: 60%;
-      }
-
-      .xy-post-right {
-        width: 20%;
-      }
-    }
   }
 </style>

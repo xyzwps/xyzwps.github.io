@@ -1,15 +1,7 @@
 ---
-const { style } = Astro.props;
+const { class: className } = Astro.props;
 ---
 
-<div class="card" style={style}>
+<div class:list={['border border-indigo-200 rounded bg-white ', className]}>
   <slot />
 </div>
-
-<style lang="scss">
-  .card {
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    background-color: #fff;
-  }
-</style>

@@ -21,7 +21,6 @@ const list = [
   { depth: 2, title: '一个跨服务分页示例', link: '/blogs/2022-08-02-pagination' },
   { depth: 2, title: '一些数据格式', link: '/blogs/2022-08-01-data-format' },
   { depth: 2, title: '分页', link: '/blogs/2022-07-27-pagination' },
-  { depth: 2, title: 'Unicode', link: '/blogs/2022-06-25-unicode' },
   { depth: 2, title: '记一个 JS return await 问题', link: '/blogs/2022-06-23-js-return-await' },
   {
     depth: 2,
@@ -39,7 +38,11 @@ const INDEX_PATH = '/blogs';
 <MdxLayout {...Astro.props}>
   <Breadcrumb
     slot="breadcrumb"
-    items={[{ title: '博客列表', path: INDEX_PATH }, url == INDEX_PATH ? null : { title: frontmatter.title }]}
+    items={[
+      { title: '🏠️', path: '/' },
+      { title: '我的文章', path: INDEX_PATH },
+      url == INDEX_PATH ? null : { title: frontmatter.title as string },
+    ]}
   />
   <PostToc slot="left" links={list} />
   <slot slot="center" />

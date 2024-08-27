@@ -1,19 +1,20 @@
 ---
-import List from './List';
+interface Props {
+  items: ({ title: string; path?: string } | null)[];
+}
 
-const { items } = Astro.props;
+const { items } = Astro.props as Props;
 ---
 
-<div style="padding: 8px 16px;">
+<div class="mx-4 py-2">
   {
     (items || [])
       .filter((it) => it)
-      .map((it, i, list) => <> / {i + 1 == list.length ? it.title : <a href={it.path}>{it.title}</a>}</>)
+      .map((it, i, list) => (
+        <>
+          {i > 0 ? ' > ' : ''}
+          {i + 1 == list.length ? <span class="text-gray-400">{it.title}</span> : <a href={it.path}>{it.title}</a>}
+        </>
+      ))
   }
 </div>
-
-<style lang="scss">
-  .post {
-    padding: 16px;
-  }
-</style>
