@@ -1,0 +1,176 @@
+---
+layout: ./_BlogLayout.astro
+title: 从有向图到依赖注入
+date: 2024-08-27
+---
+
+本文在讨论**依赖注入**（_dependency inject_，**DI**）时，只关心实现。
+
+## 依赖
+
+举个例子：
+
+```java
+var a = new A();
+
+var b = new B(a);
+
+var c = new C(b);
+c.setA(a);
+```
+
+此例中，
+- 对象 `a` 不**依赖**其他对象；
+- 对象 `b` 在初始化时，需要从构造器中传入一个 `A` 类型对象，这里传入的是 `a`，我们就说 `b` **依赖** `a`；
+- 对象 `c` 在初始化时，需要从构造器传入一个 `B` 类型对象，这里传入的是 `b`，还需要通过 set 方法传入一个 `A` 类型对象，这里传入的是 `a`，我们就说 `c` **依赖** `a` 和 `b`。
+
+我们可以用**有向图**来表达这种依赖关系：
+
+```
+   ╭--> b
+c ╴┤    ↓
+   ╰--> a
+```
+
+我们甚至可以用 xml 来表示这个依赖关系：
+
+```xml
+<bean id="a" class="A"/>
+<bean id="b" class="B">
+    <constructor-arg ref="a"/>
+</bean>
+<bean id="c" class="C">
+    <constructor-arg ref="b"/>
+    <property name="a" ref="a"/>
+</bean>
+```
+
+Spring 框架当年就是用这种 xml 文件来表达对象之间的依赖关系的。现在大家更喜欢用 java 代码来配置 bean：
+
+```java
+@Bean
+public A a() { return new A(); }
+
+@Bean
+public B b(A a) { return new B(a); }
+
+@Bean
+public C c(A a, B b) {
+    var c = new C(b);
+    c.setA(a);
+    return c;
+}
+```
+
+无论是哪种方式并没有本质区别：这些形式都是描述对象之间依赖关系的元数据。整个依赖关系构成一个有向图，每个对象都是有向图的一个顶点，
+每个依赖关系都是有向图的一条边。
+
+
+我们可以写一个工具解析这些元数据，来自动初始化这些类实例，而我们需要做的就是编写这些元数据。
+这个工具我们暂且把它叫做
+
+## `BeanFactory`
+
+它长这样：
+
+```java
+interface BeanFactory {
+    <T> T getBean(String id);
+}
+```
+
+因为元数据是有向图，所以初始化对象的过程就是对有向图的遍历。它的一个实现可以是这样的：
+
+```java
+class VerySimpleBeanFactory implements BeanFactory {
+    @Cache
+    public <T> T getBean(String id) {
+        var beanMetaInfo = allMetaInfo.getById(id);
+        if (beanMetaInfo == null) {
+            throw new IllegalStateException();
+        }
+        var dependencies = allMetaInfo.getDependenciesMetaInfo(beanMetaInfo).stream()
+            .map(it -> this.getBean(it.id))
+            .toList();
+        return beanMetaInfo.createInstance(dependencies);
+    }
+}
+```
+
+## 循环依赖
+
+`VerySimpleBeanFactory` 的 `getBean` 方法是递归的。所以在这段代码中，一旦出现循环依赖，就会 stack overflow······
+
+对于循环依赖问题，我们可以对 `allMetaInfo` 中的元数据进行**拓扑排序**来确定是否有循环依赖，如果发现循环依赖，就抛出异常，并打印循环依赖信息（有向图中的环）。
+我们也可以通过深度优先遍历的方式来判断是否有环：把已经访问过的顶点做标记，在访问“新”定点时，判断它是否已经被访问过，如果是的话，就说明有循环依赖。
+
+循环依赖并不是不可解的。比如，对于 set 注入方式产生的依赖，可以先把构造器注入产生的依赖关系构建好之后，再集中处理 set 依赖。
+对于构造器注入产生的依赖关系，则没有好的办法处理。
+
+
+## 按类型注入
+
+在 spring 框架中，有两种自动装配方式。一种是按名称，一种是按类型。上面 `BeanFactory` 的 `getBean` 就是按名称装配的 api，
+我们已经为其提供了一个实现。要提供按类型注入功能，只需要把 `BeanFactory` 改一下即可：
+
+```java
+interface BeanFactory {
+    <T> T getBean(String id);
+    <T> T getBean(Class<T> type);
+}
+```
+
+我们可以脑补一个实现：
+
+```java
+class VerySimpleBeanFactory implements BeanFactory {
+    @Cache
+    public <T> T getBean(Class<T> type) {
+        var beanMetaInfo = allMetaInfo.getByType(type)
+                                      .findTheBestMatch(someRules);
+        if (beanMetaInfo == null) {
+            throw new IllegalStateException();
+        }
+        var dependencies = allMetaInfo.getDependenciesMetaInfo(beanMetaInfo).stream()
+            .map(it -> switch(it.injectType) {
+                case BY_NAME -> this.getBean(it.id);
+                case BY_TYPE -> this.getBean(it.type);
+            })
+            .toList();
+        return beanMetaInfo.createInstance(dependencies);
+    }
+}
+```
+
+到此为止，我们基本上可以
+
+## 手搓一个简陋的 DI 库
+
+了。整个 DI 库的逻辑实际上就两个步骤：
+
+1. 收集依赖关系元数据
+2. 实现 `BeanFactory` 接口
+
+收集依赖关系元数据，在 Java 中一般有几种方式：
+
+1. 在运行时收集
+   1. 手动编写元数据文件。早期 spring 框架就是这么干的，美其名曰“非入侵”。
+   2. 在运行时扫描类文件来获取元数据。现在 spring 框架是这么做的
+2. 在编译时收集。通过 Java 的 annotation processing API 从源代码来获取元数据
+
+对应的 `BeanFactory` 实现也大致分为两个流派：
+
+1. 运行时依赖注入：运行时通过反射、代理等方式创建对象
+2. 编译时依赖注入：直接生成创建对象的代码······
+
+显而易见，运行时 DI 会在启动时消耗一些时间来扫描元数据，编译时 DI 则会在 JVM 中占用更多的 Metaspace 空间。
+
+## 一些 DI 库
+
+编译时依赖注入的库，我尝试过的有俩：
+- [Google Dagger](https://github.com/google/dagger)：其注解语义需要适应一下。
+- [Avaje DI](https://avaje.io/inject/)：它使用的注解基本保持了 Jakarta EE 注解的语义，没有学习门槛。
+
+Google 还搞了个[guice](https://github.com/google/guice)库，是为运行时依赖注入框架。
+
+对于 web 框架，Spring Boot 和 Quarkus 选择了运行时注入，Micronaut 则是编译时注入。

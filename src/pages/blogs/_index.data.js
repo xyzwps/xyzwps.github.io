@@ -1,5 +1,5 @@
 const data = [
-    { title: "从有向无环图到依赖注入再到工厂模式", path: "/blogs/2024-08-27-dag-di-factory" },
+    { title: "从有向图到依赖注入", path: "/blogs/2024-08-27-dg-to-di" },
     { title: "国内开源软件镜像", path: "/blogs/2023-04-17-mirrors" },
     { title: "Go 语言 https 客户端如何使用自签名 CA", path: "/blogs/2022-06-06-go-http-client-use-self-siged-ca" },
     { title: "记一个 JS return await 问题", path: "/blogs/2022-06-23-js-return-await" },
