@@ -1,0 +1,43 @@
+---
+import type { MarkdownHeading } from 'astro';
+import Row from './_MdxLayoutTocRow.astro';
+
+type Props = { headings: MarkdownHeading[] };
+
+const { headings } = Astro.props;
+---
+
+<ol class="ml-3 mt-4">
+  {
+    headings.map((it) =>
+      (() => {
+        switch (it.depth) {
+          case 1:
+            return (
+              <li class="font-black">
+                <Row slug={it.slug} text={it.text} />
+              </li>
+            );
+          case 2:
+            return (
+              <li class="font-bold">
+                <Row slug={it.slug} text={it.text} />
+              </li>
+            );
+          case 3:
+            return (
+              <li class="ml-4">
+                <Row slug={it.slug} text={it.text} />
+              </li>
+            );
+          default:
+            return (
+              <li>
+                <Row slug={it.slug} text={it.text} />
+              </li>
+            );
+        }
+      })()
+    )
+  }
+</ol>

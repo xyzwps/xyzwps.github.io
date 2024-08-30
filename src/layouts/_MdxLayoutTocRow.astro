@@ -1,0 +1,6 @@
+---
+type Props = { text: string, slug: string };
+
+const { text, slug } = Astro.props;
+---
+<a class="cursor-pointer hover:bg-indigo-100" href={"#" + slug}>{text}</a>
