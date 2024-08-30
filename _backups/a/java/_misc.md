@@ -1,4 +1,0 @@
-- 学习 java: https://dev.java/learn/
-- JDK tools 居然有一个规范: https://docs.oracle.com/en/java/javase/20/docs/specs/man/index.html
-- 执行单文件 java 程序： https://dev.java/learn/single-file-program/
-- 用新版本的 JDK 准没错: https://kstefanj.github.io/2021/11/24/gc-progress-8-17.html
