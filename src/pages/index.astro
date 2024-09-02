@@ -1,6 +1,9 @@
-<!-- ---
-import Directory from '../components/HomePage/Directory.astro'
---- -->
+---
+const blogs = [
+  { href: '/blogs/2024-08-30-seckill', title: '秒杀问题' },
+  { href: '/blogs/2024-08-27-dg-to-di', title: '从有向图到依赖注入' },
+];
+---
 
 <html lang="en">
   <head>
@@ -11,10 +14,15 @@ import Directory from '../components/HomePage/Directory.astro'
   <body class="bg-gray-200">
     <div class="container mx-auto bg-white flex flex-col border-x-gray-500 px-4 min-h-screen text-base">
       <h1 class="block my-4 font-bold">xyzwps pages</h1>
-      <h2>最近文章</h2>
-      <ul class="list-disc ml-8">
-        <li><a href="/blogs/2024-08-30-seckill">秒杀问题</a></li>
-        <li><a href="/blogs/2024-08-27-dg-to-di">从有向图到依赖注入</a></li>
+      <h2 class="font-bold">最近文章</h2>
+      <ul class="list-none">
+        {
+          blogs.map((it) => (
+            <li class="my-2 before:content-['▫']">
+              <a class="cursor-pointer p-2 pl hover:bg-indigo-100 rounded" href={it.href}>{it.title}</a>
+            </li>
+          ))
+        }
       </ul>
     </div>
   </body>
