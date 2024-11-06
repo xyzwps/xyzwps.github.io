@@ -1,0 +1,88 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: Spring Boot Hello World
+---
+
+万事开头难。不过 spring boot 开头现在已经不难了。
+
+本项目目标是得到一个最基本的代码框架，并写出一个返回 hello world 的 HTTP 接口。步骤如下：
+
+## 步骤一：生成项目手脚架
+
+手脚架是通过 spring initializr 生成的。在其中只要填写表单，就能生成整个手脚架了
+
+1. 打开 spring initializr 网址 https://start.spring.io/ （国内可访问，无需魔法）
+2. 在网站中填写表单
+   * **Project** 项勾选 Maven
+     > 如果你熟悉 Gradle 的话，也可勾选。不熟悉的话，就选择 Maven 吧，它很简单，不折腾。
+   * **Language** 项勾选 Java
+     > 如果你熟悉 Groovy 或者 Kotlin，或者正打算学习，可以勾选。这里选择 Java，因为你决定看了本文，那么你必然会一点 Java 语言。
+   * **Spring Boot** 项勾选最新的正式版
+     > 如果版本号后面有 SNAPSHOT 或者 RC+数字，那么它不是正式版，建议只用于尝鲜。
+   * **Project Metadata** 下
+     - **Group** 自己随便填一个，也可以使用默认的
+     - **Artifact** 是模块名，这里填 helloworld
+       >  Group 和 artifact 填写好之后，**name** 和 **package name** 会自动拼好，一般不用管。
+     - **Description** 中是项目的描述，可以保持默认，也可以随便写点什么。
+     - **Packaging** 是打包方式，这里勾选 jar
+     - **Java** 是指 Java 版本，看喜好随便勾选。我选最新版。
+   * 右侧 **dependencies** 中，点击 ADD 按钮，在弹出的对话框上面，输入 "web" 搜索，勾选 "Spring Web"。
+   
+   最终效果如下图：
+
+   ![](/assets/img/cheatsheet/spring/spring-boot-hello-world-init.png)
+
+3. 点击下方的 GENERATE 按钮，下载项目手脚架，是一个 .zip 文件。按照上图的方式，得到的是一个 helloworld.zip 文件。
+
+## 步骤二：导入手脚架
+
+就是把上面下载的 .zip 文件解压后，导入到 IDE 中。
+
+> 这里推荐使用 IntelliJ IDEA 社区版，原因是免费。现在使用 Eclipse 和 NetBeans 的人较少，新手遇到问题难搞，不推荐使用。
+> VSCode 也可以，但不推荐新手使用，如果你在看本文，那么不推荐你使用。如果你非常喜欢 VSCode，并希望用它来编写 Java 程序，可参见
+> [VSCode 官方的 Java 教程](https://code.visualstudio.com/docs/java/java-tutorial)。
+
+1. 如果你本地没有安装 IntelliJ IDEA 社区版，请[戳这里去官网下载](https://www.jetbrains.com/idea/download/)并安装。
+   > 如果你本机没有安装 JDK 也没关系。
+2. 解压 helloworld.zip 文件后，得到 helloworld 文件夹。其下应该有一个 pom.xml 文件和一些其他文件、文件夹。
+3. 使用 IntelliJ IDEA 导入 hello world 项目。选择 `File` > `New` >
+   `Project from Existing Sources...`，在弹出的对话框里选择 helloworld 文件夹后，点击下方 OK 按钮。
+4. 在弹出的 *Import Project* 对话框中，默认应该选择了 *Import project from external model*
+   和 *Maven*。如果不是，请按此选择。之后点击下方 Create 按钮，导入项目。
+   
+   - 如果弹出 *Trust and Open Project xxx* 对话框，选择信任。
+   - 如果弹出 *New Project* 对话框问你是否在再新窗口中打开项目，请选择 New Window 按钮。主要是省事。
+   - 导入之后，如果 IDEA 右下角弹出气泡询问是否希望 windows defender 信任此项目，选择信任。
+
+此时，项目导入完成，IDEA 会做一些环境准备工作。IDEA 大致会做几件事情：
+
+- 根据 .mvn/wrapper 目录下的 maven-wrapper.properties 文件中的地址，下载指定版本的 Maven。
+- 根据 pom.xml 文件中的配置下载依赖和相关插件。
+
+如果你本地没有安装上面选择的 JDK 版本，可以通过 File > Project Structure 中，Project 项里下载对应版本的 JDK，并选择。
+
+你可以看一下 pom.xml 文件中的信息，并和之前在 spring initializr 中填写的信息做对比。
+
+## 步骤三：编写 Hello World
+
+现在正式写代码。
+
+1. 在 src/main/java 下面找到 HelloworldApplication.java 文件。可以看到其中有一个 main 方法，这是我们等下启动项目时的入口。
+2. 在和 `HelloworldApplication` 类同一个包下创建 `HelloWorldController`:
+   ```java
+   import org.springframework.web.bind.annotation.GetMapping;
+   import org.springframework.web.bind.annotation.RestController;
+   
+   @RestController
+   public class HelloWorldController {
+   
+       @GetMapping("/hello-world")
+       public String hello() {
+           return "Hello World!";
+       }
+   }
+   ```
+3. 运行 `HelloworldApplication` 类中的 main 方法
+4. 在浏览器访问 `http://localhost:8080/hello-world`，浏览器窗口应该显示 `Hello World!`。
+
+
