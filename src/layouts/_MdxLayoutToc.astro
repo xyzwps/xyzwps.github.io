@@ -7,7 +7,7 @@ type Props = { headings: MarkdownHeading[] };
 const { headings } = Astro.props;
 ---
 
-<ol class="ml-3 mt-4">
+<ol class="ml-3 mt-4 list-disc pl-4">
   {
     headings.map((it) =>
       (() => {

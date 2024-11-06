@@ -32,8 +32,10 @@ const { frontmatter, url, headings } = Astro.props;
           <slot />
         </div>
         <div class="max-lg:hidden">
+          <div class="sticky top-24">
           <h1 class="mx-3 mt-4 text-indigo-600">本文目录</h1>
           <Toc headings={headings} />
+        </div>
         </div>
       </div>
     </div>
