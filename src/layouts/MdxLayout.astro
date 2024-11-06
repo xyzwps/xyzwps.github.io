@@ -1,6 +1,7 @@
 ---
 import type { MDXLayoutProps } from 'astro';
 import Toc from './_MdxLayoutToc.astro';
+import CommonHeader from '../components/CommonHeader.astro';
 
 type Props = MDXLayoutProps<{
   // 在这里定义 frontmatter 属性
@@ -23,6 +24,7 @@ const { frontmatter, url, headings } = Astro.props;
     <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet" />
   </head>
   <body class="bg-gray-100">
+    <CommonHeader />
     <div class="container mx-auto bg-white p-8 min-h-screen">
       <div class="grid grid-cols-4 gap-2">
         <div class="prose max-w-none col-span-3 max-lg:col-span-4">
