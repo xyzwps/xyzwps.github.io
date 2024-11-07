@@ -14,25 +14,25 @@ const { headings } = Astro.props;
         switch (it.depth) {
           case 1:
             return (
-              <li class="font-black">
+              <li class="font-black text-sm">
                 <Row slug={it.slug} text={it.text} />
               </li>
             );
           case 2:
             return (
-              <li class="font-bold">
+              <li class="font-bold text-sm">
                 <Row slug={it.slug} text={it.text} />
               </li>
             );
           case 3:
             return (
-              <li class="ml-4">
+              <li class="ml-4 text-sm">
                 <Row slug={it.slug} text={it.text} />
               </li>
             );
           default:
             return (
-              <li>
+              <li class="text-sm">
                 <Row slug={it.slug} text={it.text} />
               </li>
             );

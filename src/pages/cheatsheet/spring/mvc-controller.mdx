@@ -1,0 +1,364 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: Spring MVC 中如何编写 Controller
+---
+
+现在的 Spring 应用程序很少是传统 MVC 那种形式了。一般而言，现在多使用 `@RestController` 注解来编写 HTTP API 的实现。
+默认情况下，`@RestController` 类下的 handler，接受 `application/json` 格式的数据，返回 `application/json` 格式的数据。
+
+## Controller 路由的两种写法
+
+一种是在 controller 类上加 `@RequestMapping` 注解。比如下例中，发起 HTTP 请求 http://localhost:8080/demo/get-persons
+后，会调用 `getPersons` 方法处理请求。
+
+```java
+import com.xyzwps.cheatsheet.controller.model.Person;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/demo")
+public class DemoController {
+    @GetMapping("/get-persons")
+    public List<Person> getPersons() {
+        return List.of(new Person("Amy", "aa972211-5f71-4c42-a05b-1adf62ff2de3"));
+    }
+}
+```
+
+另一种是不在 controller 类上加 `@RequestMapping` 注解，把完整路由写道 handler 方法上。比如下例中，
+发起 HTTP 请求 http://localhost:8080/hello/world 后，会调用 `hello` 方法处理请求。
+
+```java
+@RestController
+public class HelloWorldController {
+    @GetMapping("/hello/world")
+    public Map<String, Object> hello() {
+        return Map.of("hello", "world");
+    }
+}
+```
+
+使用哪种全看个人喜好。
+
+## 如何创建一个 HTTP API Handler ？
+
+一种是使用 `@RequestMapping` 注解，在注解的 `method` 字段中指明 `GET`。比如：
+
+```java
+@RequestMapping(value = "/get-persons", method = RequestMethod.GET)
+public List<Person> getPersons() {
+    return List.of(new Person("Amy", "aa972211-5f71-4c42-a05b-1adf62ff2de3"));
+}
+```
+
+另一种是使用 `@GetMapping` 注解。比如：
+
+```java
+@GetMapping("/get-persons-short")
+public List<Person> getPersonsShort() {
+    return List.of(new Person("Amy", "aa972211-5f71-4c42-a05b-1adf62ff2de3"));
+}
+```
+
+对于 POST、PUT、DELETE、PATCH 等方法类似。
+
+## 如何接受请求体 HTTP API Handler ？
+
+使用 `@RequestBody` 注解，框架会尝试把请求体转换成对应的 Java 对象。如：
+
+```java
+@PostMapping("/create-persons")
+public Person createPersonShort(@RequestBody CreatePerson payload) {
+    return new Person(payload.getName(), UUID.randomUUID().toString());
+}
+```
+
+## 如何获取 Search Parameter？
+
+使用 `@RequestParams` 注解。比如：
+
+```java
+/// ```sh
+/// $ curl http://localhost:8080/demo/get-person-by-id?id=dddd
+/// {"name":"Name of dddd","id":"dddd"}
+/// ```
+@GetMapping("/get-person-by-id")
+public Person getPersonById(@RequestParam("id") String id) {
+    return new Person("Name of " + id, id);
+}
+```
+
+## 如何获取 HTTP Header？
+
+使用 `@RequestHeader` 注解。比如：
+
+```java
+/// ```sh
+/// $ curl http://localhost:8080/demo/get-current-person -H "Authorization: A-TOKEN"
+/// {"name":"Token of A-TOKEN","id":"A-TOKEN"}
+/// ```
+@GetMapping("/get-current-person")
+public Person getCurrentPerson(@RequestHeader("Authorization") String token) {
+    return new Person("Token of " + token, token);
+}
+```
+
+## 如何获取 Cookie？
+
+使用 `@CookieValue` 注解。例：
+
+```java
+/// ```sh
+/// $ curl http://localhost:8080/demo/get-current-person-v2 -H "Cookie: sid=qwerty"
+/// {"name":"Session of qwerty","id":"qwerty"}
+/// ```
+@GetMapping("/get-current-person-v2")
+public Person getPersonCookie(@CookieValue("sid") String sid) {
+    return new Person("Session of " + sid, sid);
+}
+```
+
+## 如何获取 Path Variable？
+
+使用 `@PathVariable` 注解。例：
+
+```java
+/// ```sh
+/// $ curl http://localhost:8080/demo/persons/123
+/// {"name":"Name of 123","id":"123"}
+/// ```
+@GetMapping("/persons/{id}")
+public Person getPersonInfo(@PathVariable("id") String id) {
+    return new Person("Name of " + id, id);
+}
+```
+
+## 如何获取 `HttpServletRequest` 和 `HttpServletResponse`？
+
+直接把 `HttpServletRequest` 参数声明到请求 handler 方法参数中即可。例：
+
+```java
+/// ```sh
+/// $ curl http://localhost:8080/demo/get-http-servlet-request -H "X-TEST: 123"
+/// 123
+/// ```
+@GetMapping("/get-http-servlet-request")
+public String getPersonAvatar(HttpServletRequest req) {
+    return req.getHeader("X-TEST");
+}
+```
+
+获取 `HttpServletResponse` 的方式一样。
+
+## 如何上传文件？
+
+上传文件一般是通过 `multipart/form-data` 来进行的。使用 `@RequestPart` 注解来访问其中的文件参数：
+
+```java
+/// ```sh
+/// $ curl -X POST -F "file=@demo.csv" http://localhost:8080/demo/upload-csv
+/// [["Name","Age"],["Amber","16"],["Keqing","18"]]
+/// ```
+@PostMapping("/upload-csv")
+public List<List<String>> uploadCsv(@RequestPart("file") MultipartFile file) throws IOException {
+    CSVParser parser = new CSVParser(new InputStreamReader(file.getInputStream()), CSVFormat.DEFAULT);
+    return parser.stream().map(CSVRecord::toList).toList();
+}
+```
+
+上面示例中，`@RequestPart` 注解可以替换成 `@RequestParam`：
+
+```java
+/// ```sh
+/// $ curl -X POST -F "file=@demo.csv" http://localhost:8080/demo/upload-csv-v2
+/// [["Name","Age"],["Amber","16"],["Keqing","18"]]
+/// ```
+@PostMapping("/upload-csv-v2")
+public List<List<String>> uploadCsvV2(@RequestParam("file") MultipartFile file) throws IOException {
+    CSVParser parser = new CSVParser(new InputStreamReader(file.getInputStream()), CSVFormat.DEFAULT);
+    return parser.stream().map(CSVRecord::toList).toList();
+}
+```
+
+可以把 `MultipartFile` 放到对象里，以便整体性获取整个 form：
+
+```java
+@Data
+public static class UploadForm {
+    private String type;
+    private MultipartFile file;
+}
+
+/// ```sh
+/// $ curl -X POST -F "type=csv" -F "file=@demo.csv" http://localhost:8080/demo/upload-csv-v3
+/// {"type":"csv","csv":[["Name","Age"],["Amber","16"],["Keqing","18"]]}
+/// ```
+@PostMapping("/upload-csv-v3")
+public Map<String, Object> uploadCsvV3(UploadForm form) throws IOException {
+    CSVParser parser = new CSVParser(new InputStreamReader(form.file.getInputStream()), CSVFormat.DEFAULT);
+    return Map.of(
+            "csv", parser.stream().map(CSVRecord::toList).toList(),
+            "type", form.type
+    );
+}
+```
+
+Spring 提供的 `MultipartFile` 可以被替换成 `jakarta.servlet.http.Part`。
+
+## 如何下载文件？
+
+直接把文件的二进制表示写到 `HttpServletResponse` 的输出流中即可。记得设置对应的 HTTP header：
+
+```java
+/// ```sh
+/// $ curl http://localhost:8080/demo/text/xx100.txt
+/// xx100
+/// xx100
+/// ```
+@GetMapping("/text/{fileName}.txt")
+public void getTextFile(@PathVariable("fileName") String fileName, HttpServletResponse res) throws IOException {
+    res.setHeader("Content-Type", "text/plain");
+    var bytes = fileName.getBytes();
+    res.setHeader("Content-Length", (bytes.length * 2 + 1) + "");
+    var os = res.getOutputStream();
+    os.write(bytes);
+    os.write('\n');
+    os.write(bytes);
+    os.flush();
+}
+```
+
+## 如何做数据校验？
+
+首先要在 pom.xml 文件中引入相关依赖：
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+如果要检查请求体，可以像下面这样：
+
+```java
+@Data
+public static class UpdatePersonPayload {
+    @NotEmpty(message = "Person id cannot be null or empty.") // 1
+    private String id;
+
+    @NotNull(message = "Person name cannot be null.")
+    @Size(min = 3, max = 20, message = "Person name length must be between {min} and {max}.")
+    private String name;
+}
+
+/// ```sh
+/// $ curl -X POST -d '{"name":"a", "id":"abc"}' \
+///                -H "Content-Type: application/json" \
+///                http://localhost:8080/demo/update-person
+/// {"timestamp":"2024-11-07T11:26:38.803+00:00","status":400,"error":"Bad Request","path":"/demo/update-person"}
+///
+/// $ curl -X POST -d '{"name":"adddd", "id":"abc"}' \
+///                -H "Content-Type: application/json" \
+///                http://localhost:8080/demo/update-person
+/// {"name":"adddd","id":"abc"}
+/// ```
+@PostMapping("/update-person")
+public Person updatePerson(@RequestBody @Valid UpdatePersonPayload payload) { // 2
+    return new Person(payload.getName(), payload.getId());
+}
+```
+
+解释：
+
+1. 在要检查的字段上，增加 jakarta validation 注解，表示对字段的要求。
+2. 在被检查的请求体上，增加 `jakarta.validation.Valid` 注解。Spring MVC 会对由此注解的参数做检查。
+
+上面例子中可以看到，name 长度为 1 的时候抛出了 400 错误。后面会介绍如何处理错误。
+
+如果检查其他参数，只可以直接把 jakarta validation 注解直接注到参数上。例：
+
+```java
+/// ```sh
+/// $ curl http://localhost:8080/demo/search-person
+/// {"timestamp":"2024-11-07T11:37:25.083+00:00","status":400,"error":"Bad Request","path":"/demo/search-person"}
+///
+/// $ curl http://localhost:8080/demo/search-person?name=a
+/// [{"name":"a","id":"2299e4ee-372e-4003-96e5-5d86fa80146f"}]
+/// ```
+@GetMapping("/search-person")
+public List<Person> searchPerson(
+        @Valid @NotEmpty(message = "Name CANNOT be empty.") // 1
+        @RequestParam("name") String name) {
+    return List.of(new Person(name, UUID.randomUUID().toString()));
+}
+```
+
+解释：
+
+1. 把 `@Valid` 注到要检查的参数上。
+2. 为要检查的参数加上一条校验规则 `@NotEmpty`。
+
+注意到上面参数校验不通过时，返回的数据中没有具体错误信息。
+
+## 如何处理异常？
+
+在一个 `@ControllerAdvice` 或者 `@Controller` 类中增加一个 `@ExceptionHandler` 注解的方法即可。例如：
+
+```java
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.context.MessageSourceResolvable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+
+@ControllerAdvice
+public class ErrorHandler {
+
+    public record ErrorResponse(int code, String message) {
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handle(Exception ex) {
+        ErrorResponse payload = switch (ex) {
+            case ConstraintViolationException e ->
+                    new ErrorResponse(400, e.getConstraintViolations().stream()
+                            .findFirst()
+                            .map(ConstraintViolation::getMessage)
+                            .orElse("Bad request."));
+            case HandlerMethodValidationException e ->
+                    new ErrorResponse(400, e.getAllErrors().stream()
+                            .findFirst()
+                            .map(MessageSourceResolvable::getDefaultMessage)
+                            .orElse("Bad request."));
+            case MissingServletRequestParameterException e ->
+                    new ErrorResponse(400, "Parameter " + e.getParameterName() + " is required.");
+            case AppException e ->
+                    new ErrorResponse(HttpStatus.NOT_IMPLEMENTED.value(), e.getMessage());
+            default -> new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
+        };
+        return ResponseEntity.status(payload.code()).body(payload);
+    }
+}
+```
+
+现在试试：
+
+```sh
+$ curl http://localhost:8080/demo/search-person
+{"code":400,"message":"Parameter name is required."}
+
+$ curl http://localhost:8080/demo/search-person?name=
+{"code":400,"message":"Name CANNOT be empty."}
+
+$ curl http://localhost:8080/demo/search-person?name=1
+[{"name":"1","id":"9e7cb5fd-d094-4efb-aed6-0fced698f8c6"}]
+```
