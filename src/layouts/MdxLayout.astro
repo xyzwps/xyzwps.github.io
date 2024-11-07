@@ -8,11 +8,13 @@ type Props = MDXLayoutProps<{
   title: string;
   author: string;
   date: string;
+  parent?: { name: string; path: string } | undefined;
 }>;
 
 // 现在，`frontmatter`、`url` 和其他 Markdown 布局属性
 // 可以通过 TypeScript 类型安全地访问
 const { frontmatter, url, headings } = Astro.props;
+const { parent } = frontmatter;
 ---
 
 <html lang="zh-CN">
@@ -33,9 +35,22 @@ const { frontmatter, url, headings } = Astro.props;
         </div>
         <div class="max-lg:hidden">
           <div class="sticky top-24">
-          <h1 class="mx-3 mt-4 text-indigo-600">本文目录</h1>
-          <Toc headings={headings} />
-        </div>
+            {
+              parent && (
+                <div class="mx-3 text-indigo-600 font-bold">
+                  <a href={parent.path}>{parent.name}</a>
+                </div>
+              )
+            }
+            {
+              headings.length > 0 && (
+                <>
+                  <h1 class="mx-3 mt-4 text-indigo-600 font-bold">本文目录</h1>
+                  <Toc headings={headings} />
+                </>
+              )
+            }
+          </div>
         </div>
       </div>
     </div>
