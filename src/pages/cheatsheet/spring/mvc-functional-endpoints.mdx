@@ -6,4 +6,199 @@ parent:
   path: /cheatsheet/spring
 ---
 
-顶顶顶
+## 如何开始使用函数式路由？
+
+在一个配置类中，注册一个返回 `RouterFunction` 的 bean 即可。如下：
+
+```java
+import static org.springframework.web.servlet.function.RouterFunctions.*;
+import static org.springframework.web.servlet.function.ServerResponse.*;
+
+@Configuration
+public class Routes {
+    @Bean
+    public RouterFunction<ServerResponse> demoRoutes() {
+        return route()
+                .GET("/hello-world", req -> ok().body(Map.of("Hello", "world")))
+                .build();
+    }
+}
+```
+
+你可以注册多个返回 `RouterFunction` 的 bean，注意不要使其中的路由有冲突即可。
+
+响应返回数据默认的 content type 是 `application/json`。如果需要修改，可以参考下文[如何下载文件](#如何下载文件)部分。
+
+如果请求带有请求体，默认按 `application/json` 来解析。如果需要指定不同的 content type，可以参考下文[如何上传文件](#如何上传文件)部分。
+
+## 如何以嵌套的方式组织路由？
+
+请直接查看示例：
+
+```java
+@Bean
+public RouterFunction<ServerResponse> demoRoutes() {
+    return route()
+            .GET("/hello-world", req -> ok().body(Map.of("Hello", "world")))
+            .path("/demo", next -> next
+                    .GET("/hello-world", req -> ok().body("Hello world"))
+            )
+            .build();
+}
+```
+
+## 如何获取 Search Parameter？
+
+通过 `ServerRequest#params()` 方法可以获取。例如：
+
+```java
+.GET("/get-search-param", req -> {
+    var id = req.params().getFirst("id");
+    return ObjectUtils.isEmpty(id)
+            ? badRequest().body(new Err(400, "id is empty"))
+            : ok().body(Map.of("id", id));
+})
+```
+
+## 如何获取 HTTP Header？
+
+通过 `ServerRequest#headers()` 方法获取。
+
+## 如何获取 Cookie？
+
+通过 `ServerRequest#cookies()` 方法获取。
+
+## 如何获取 Path Variable？
+
+通过 `ServerRequest#pathVariable(String)` 方法或者 `ServerRequest#pathVariables()` 方法获取。
+
+## 如何接受请求体？
+
+通过 `ServerRequest#body(Class<T>)` 方法获取。例如：
+
+```java
+.POST("/persons", req -> {
+    var payload = req.body(CreatePersonPayload.class);
+    return ok().body(new Person(UUID.randomUUID().toString(), payload.getName()));
+})
+```
+
+## 如何上传文件？
+
+通过 `ServerRequest#multipartData()` 方法获取 multipart form data 中的项，然后按需筛选即可。例如：
+
+```java
+.POST("/upload-csv", // 1. path
+      accept(MediaType.MULTIPART_FORM_DATA), // 2. 要求必须通过 multipart/form-data 提交
+      req -> { // 3. request handler
+          var file = req.multipartData().getFirst("file");
+          if (file == null) {
+              return badRequest().body(new Err(400, "file is empty"));
+          }
+
+          var parser = new CSVParser(new InputStreamReader(file.getInputStream()), CSVFormat.DEFAULT);
+          return ok().body(parser.stream().map(CSVRecord::toList).toList());
+      })
+```
+
+## 如何下载文件？
+
+把数据写入响应 body 中即可。例如：
+
+```java
+.GET("/download/{fileName}.txt", req -> {
+    var fileName = req.pathVariable("fileName");
+    var text = "This is a text file named " + fileName + ".\nNobody knows xx better than me.";
+    var bytes = text.getBytes(StandardCharsets.UTF_8);
+    return ok().contentType(MediaType.TEXT_PLAIN) // 1. 指定文件的类型
+            .contentLength(bytes.length) // 2. 指定文件长度
+            .body(bytes); // 3. 写入数据到 response body
+})
+```
+
+## 如何做数据校验？
+
+如果你不打算自己手写数据校验器的话，需要加上 `spring-boot-starter-validation` 依赖。
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+之后注入默认的 `org.springframework.validation.Validator` 即可。例如：
+
+```java
+// 待校验数据
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+@Data
+public class UpdatePersonPayload {
+    @NotEmpty(message = "Person name cannot be empty!")
+    @Size(min = 5, max = 20, message = "Person name length must be between {min} and {max}.")
+    private String name;
+}
+
+// router
+@Bean
+public RouterFunction<ServerResponse> demoRoutes(Validator validator) { // 注入 validator
+    return route()
+        .path("/demo", next -> next
+            .PUT("/persons/{id}", accept(MediaType.APPLICATION_JSON), request -> {
+                var id = request.pathVariable("id");
+                var payload = request.body(UpdatePersonPayload.class);
+                var errors = validator.validateObject(payload); // 使用 validator 检查
+                if (errors.hasErrors()) {
+                    throw new AppException(400, errors.getAllErrors().getFirst().getDefaultMessage());
+                } else {
+                    return ok().body(new Person(id, payload.getName()));
+                }
+            })
+        )
+        .build();
+}
+```
+
+## 如何处理异常？
+
+Spring MVC 中的 `@ExceptionHandler` 在此处失效。全局的错误处理方法是在最外层的 router 外面增加 filter。比如：
+
+```java
+@Bean
+public RouterFunction<ServerResponse> demoRoutes(Validator validator) {
+    return route()
+        .GET("/hello-world", req -> ok().body(Map.of("Hello", "world")))
+        .path("/demo", next -> next
+            .PUT("/persons/{id}", accept(MediaType.APPLICATION_JSON), request -> {
+                var id = request.pathVariable("id");
+                var payload = request.body(UpdatePersonPayload.class);
+                var errors = validator.validateObject(payload);
+                if (errors.hasErrors()) {
+                    throw new AppException(400, errors.getAllErrors().getFirst().getDefaultMessage());
+                } else {
+                    return ok().body(new Person(id, payload.getName()));
+                }
+            })
+        )
+        .build()
+        .filter((req, next) -> {
+            // 这里处理全局错误
+            try {
+                return next.handle(req);
+            } catch (AppException e) {
+                return status(e.getCode()).body(new Err(e.getCode(), e.getMessage()));
+            } catch (Exception e) {
+                var internalServerError = HttpStatus.INTERNAL_SERVER_ERROR;
+                return status(internalServerError).body(new Err(internalServerError.value(), e.getMessage()));
+            }
+        });
+}
+```
+
+如果希望把错误处理放到更外层，可以使用 `jakarta.servlet.Filter`，方式和上面类似。
+
+## 示例
+
+[戳这里查看可运行示例](https://gitee.com/xyzwps/cheatsheet-spring/tree/master/functional-endpoints)。
