@@ -1,5 +1,5 @@
 ---
-import CommonHeader from "../components/CommonHeader.astro";
+import CommonHeader from '../components/CommonHeader.astro';
 
 const blogs = [
   { href: '/blogs/2024-08-30-seckill', title: '秒杀问题' },
@@ -13,20 +13,30 @@ const blogs = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>xyzwps pages</title>
   </head>
-  <body class="bg-gray-200">
+  <body class="bg-slate-100">
     <CommonHeader />
     <div class="container mx-auto bg-white flex flex-col border-x-gray-500 px-4 min-h-screen text-base">
-      <h1 class="block my-4 font-bold">xyzwps pages</h1>
-      <h2 class="font-bold">最近文章</h2>
-      <ul class="list-none">
-        {
-          blogs.map((it) => (
-            <li class="my-2 before:content-['▫']">
-              <a class="cursor-pointer p-2 pl hover:bg-indigo-100 rounded" href={it.href}>{it.title}</a>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="p-4">
+        <h1 class="font-bold">速查手册</h1>
+        <ul class="flex gap-2">
+          <li class="border px-4 py-2"><a href="/cheatsheet/cyber-huashui">赛博养生学</a></li>
+          <li class="border px-4 py-2"><a href="/cheatsheet/spring">Spring</a></li>
+        </ul>
+      </div>
+      <div class="p-4">
+        <h1 class="font-bold">最近文章</h1>
+        <ul class="list-none">
+          {
+            blogs.map((it) => (
+              <li class="my-2 before:content-['▫']">
+                <a class="cursor-pointer p-2 pl hover:bg-indigo-100 rounded" href={it.href}>
+                  {it.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
   </body>
 </html>
