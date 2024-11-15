@@ -5,3 +5,277 @@ parent:
   name: 返回上级
   path: /cheatsheet/spring
 ---
+
+## 项目搭建
+
+pom.xml 文件中需要增加 *spring-cloud-starter-gateway* 依赖。建议从 https://start.spring.io/
+上生成一个项目，并加上 gateway 依赖，然后浏览生成的 pom.xml 文件，从里面抄需要的部分。
+
+## 如何配置网关转发请求？
+
+1. 配置到 *application.yml* 文件中。比如：
+   ```yml
+   spring:
+     cloud:
+       gateway:
+         routes:
+         - id: after_route
+           uri: https://example.org
+           predicates:
+           - Cookie=mycookie,mycookievalue
+   ```
+   具体的配置细节建议去查 spring cloud gateway 的手册。
+2. 手动编写 dsl。就是注册一个 `RouteLocator` bean，然后在其中编写配置项。类似与这种：
+   ```java
+   @Bean
+   public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+     return builder.routes()
+         .route("prefix-match", r -> r.path("/apis/**")
+                .uri("http://localhost:3000"))
+         .route("rewrite", r -> r.path("/api-v1/**")
+                .filters(f -> f.rewritePath("/api-v1/(?<segment>[a-zA-Z0-9_-]*)", "/apis/${segment}"))
+                .uri("http://localhost:3000"))
+         .build();
+   }
+   ```
+   这个东西下文会做解释。
+
+因为使用 dsl 可以更加灵活，所以本文主要使用这种方式来描述。
+
+## `gateway` 和 `gateway-mvc` 有什么区别？
+
+`gateway` 是基于 spring webflux 异步框架的，底层是 netty；`gateway-mvc`
+是基于 spring mvc 的，底层是 servlet 容器。
+
+在网关场景下，主要工作是做请求的转发，主要瓶颈在于网络 IO。所以这里推荐使用
+`gateway` 而非 `gateway-mvc`。使用 `gateway` 的话，建议简单学习下
+[Reactor 项目](https://projectreactor.io/)，因为几乎所有基于 webflux
+的开发都是如何编写 reactive operator 的。
+
+本文基于 `gateway`。
+
+## Gateway 如何工作的？
+
+![how cloud gateway works](/assets/img/cheatsheet/spring/cloud-gateway-how-it-works.png)
+
+
+## 如何编写全局 Filter？
+
+在 Gateway 中，全局 filter 是一个 `GlobalFilter` 实例。要协调多个 filter 之间的执行顺序，只需要实现
+`Ordered` 接口即可。比如：
+
+```java
+import com.google.common.util.concurrent.RateLimiter;
+import com.xyzwps.cheatsheet.cloudgateway.FilterOrder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+@Slf4j
+@SuppressWarnings("UnstableApiUsage")
+@Component
+public class ThrottleFilter implements GlobalFilter, Ordered {
+
+    private static final RateLimiter rateLimiter = RateLimiter.create(1); // 每秒1次
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        var req = exchange.getRequest();
+        log.info("[{}] Try to throttle: {} {}", FilterOrder.THROTTLE_FILTER, req.getMethod(), req.getPath());
+        if (rateLimiter.tryAcquire()) {
+            return chain.filter(exchange);
+        }
+
+        var res = exchange.getResponse();
+        res.setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+        res.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        return exchange.getResponse().writeWith(Mono.just(res.bufferFactory().wrap("{\"error\":\"Too Many Requests\"}".getBytes())));
+    }
+
+    @Override
+    public int getOrder() {
+        return FilterOrder.THROTTLE_FILTER;
+    }
+}
+```
+
+## 解释一下上文中的 `route` 方法
+
+对于这个例子：
+
+```java
+.route("prefix-match", // 1
+      r -> r.path("/apis/**").uri("http://localhost:3000")) // 2
+```
+
+在 `route` 方法中
+
+1. 可以在第一个参数中指定路由 id，如果不指定，则使用随机 id。这里 id 是 *prefix-match*。
+2. 之后跟一个函数 `Function<PredicateSpec, Buildable<Route>>`。在这里用来做请求匹配、请求转发、对请求和响应本身做修改等等。这里是把所有
+   `/apis/` 开头的请求都转发到 `http://localhost:3000` 这个服务器中去。
+
+上例中 `r` 的类型是 `PredicateSpec`，它提供了很多方法用来匹配进入 Gateway 的请求，它继承了 `BooleanSpec`
+接口，其中提供了一些逻辑运算方法用于更灵活的配置。具体可以查看其 Javadoc。
+
+## 如何为指定的 `route` 添加 Filter？
+
+`PredicateSpec` 中有很多匹配请求的方法都返回 `BooleanSpec`。`BooleanSpec` 提供了一个 `filters` 方法，可以在其中添加各种各样的
+`GatewayFilter`。比如我们有一个这样的 `GatewayFilter`：
+
+```java
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+@Slf4j
+@AllArgsConstructor
+public class DemoGatewayFilter implements GatewayFilter {
+
+    private final String name;
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        log.info("A gateway filter - {}", name);
+        return chain.filter(exchange);
+    }
+}
+```
+
+我们就可以这样使用：
+
+```java
+public Builder gatewayFilter(Builder builder) {
+    return builder.route("prefix-match", r -> r.path("/apis/**")
+            .filters(f -> f
+                    .filter(new DemoGatewayFilter("1"), 2)
+                    .filter(new DemoGatewayFilter("2"), 1))
+            .uri("http://localhost:3000"));
+}
+```
+
+上例中的 `f` 是一个 `GatewayFilterSpec`，除了可以往里加入自定义的 `GatewayFilter` 之外，
+它本身还提供了众多的方法，包括但不限于
+
+- 操作请求和响应的各种参数，比如 HTTP 头、search params、请求路径、payload 等等
+- 调用失败重试
+- 缓存
+- 重定向
+- 断路器
+- 限速器
+
+等等。比如，我们可以在请求被转发到被代理的服务器之前，为请求增加一个 search param，可以这样操作：
+
+```java
+public Builder addRequestParam(Builder builder) {
+    return builder.route("prefix-match", r -> r.path("/apis/**")
+            .filters(f -> f.addRequestParameter("add", "123"))
+            .uri("http://localhost:3000"));
+}
+```
+
+## `GatewayFilter` 和 `GlobalFilter` 之间有什么区别？
+
+这两个接口除了名字之外，长得一模一样。但是 `GlobalFilter` 发生在路由匹配之前，是为应用于全局；`GatewayFilter`
+发生在路由匹配之后，作用于一个个具体的 `route`。
+
+在使用它们时，要注意各个 filter 之间的顺序编排。
+
+## 如何重写请求路径？
+
+```java
+public Builder rewrite(Builder builder) {
+    return builder.route("rewrite", r -> r.path("/api-v1/**")
+            .filters(f -> f.rewritePath("/api-v1/(?<segment>.*)", "/apis/${segment}"))
+            .uri("http://localhost:3000"));
+}
+```
+
+上例中，把 Gateway 接受到的以 `/api-v1/` 开头的请求，都改成 `/apis/` 开头，然后转发到 `http://localhost:3000`。使用
+
+## 如何重定向？
+
+下面的方法把所有匹配的请求都重定向到固定地址：
+
+```java
+public Builder redirect(Builder builder) {
+    return builder.route("redirect", r -> r.path("/npm/*")
+            .filters(f -> f.redirect(301, "https://mirrors.cloud.tencent.com"))
+            .uri("no://op"));
+}
+```
+
+因为请求被重定向走了，所以 `uri` 部分应该填 `no://op`。这种做法比较尴尬，原因是只能重定向到固定地址。
+如果希望重定向地址是动态的，可以参考 `RedirectToGatewayFilterFactory` 的写法自己实现 `GatewayFilter`。比如：
+
+```java
+public Builder customRedirect(Builder builder) {
+    return builder.route("custom-redirect", r -> r.path("/npm/*")
+            .filters(f -> f.filter(new RedirectGatewayFilter(
+                    Pattern.compile("/npm/(?<package>.*)"),
+                    "https://mirrors.cloud.tencent.com/npm/{package}")))
+            .uri("no://op"));
+}
+
+/// 自定义的重定向 filter
+public record RedirectGatewayFilter(Pattern pathPattern, String toTemplate) implements GatewayFilter {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        var path = exchange.getRequest().getURI().getPath();
+        if (!exchange.getResponse().isCommitted()) {
+            setResponseStatus(exchange, HttpStatus.valueOf(301)); // 使用 301 重定向
+            var location = format(path, pathPattern, toTemplate); // 获取重定向地址
+            var res = exchange.getResponse();
+            res.getHeaders().set(HttpHeaders.LOCATION, location); // 设置 location 头
+            return res.setComplete();
+        }
+        return Mono.empty();
+    }
+    // 其他方法省略
+}
+```
+
+## 如何重试？
+
+在 Gateway 转发的请求失败需要重试的时候，可以使用 `GatewayFilterSpec` 提供的 `retry` 方法。
+默认情况下对 5xx 的 GET 请求进行重试，不过相关参数都是可以修改的。这个重试功能，是使用 reactor 自带的 retry 实现的。
+
+## 如何使用 Circuit Breaker？
+
+`GatewayFilterSpec` 提供了 `circuitBreaker` 方法，目前它是根据状态码来决定是否断路，
+之后把请求 fallback 到另一个 URI。比如：
+
+```java
+public Builder circuitBreaker(Builder builder) {
+    return builder.route("circuit-breaker", r -> r.path("/apis/**")
+            .filters(f -> f.circuitBreaker((config) -> {
+                config.addStatusCode("404");
+                config.setFallbackUri("forward:/apis/demo/get-user");
+            }))
+            .uri("http://localhost:3000"));
+}
+```
+
+当前，仅支持 fallback 到另一个 URI。如果你希望 fallback 到一个固定地方，比如一个空数组、固定对象，或者自定义
+fallback 发生的条件，可以参照 `SpringCloudCircuitBreakerFilterFactory` 来自己实现一版。
+Gateway 提供了一个基于 resilience4j 的 circuit breaker。
+
+## 如何使用 Rate Limiter？
+
+如果是全局限流，可以在 `GlobalFilter` 中自己实现。
+
+如果是指定 route 的限流，可以使用 `GatewayFilterSpec` 提供了 `requestRateLimiter` 方法。
+Gateway 提供了一个基于 redis 的限流器。
+
+## 示例
+
+[戳这里查看示例代码](https://gitee.com/xyzwps/cheatsheet-spring/tree/master/cloud-gateway)。
