@@ -276,6 +276,74 @@ Gateway 提供了一个基于 resilience4j 的 circuit breaker。
 如果是指定 route 的限流，可以使用 `GatewayFilterSpec` 提供了 `requestRateLimiter` 方法。
 Gateway 提供了一个基于 redis 的限流器。
 
+## 如何使用 Metadata？
+
+可以在 route 上设置一些元数据，这些元数据可以在 `GatewayFilter` 使用。比如：
+
+
+```java
+public Builder metadata(Builder builder) {
+    return builder.route("metadata", r -> r.path("/apis/**")
+            .filters(f -> f.filter(new MetadataGatewayFilter(om)))
+            .metadata("foo", "bar")            // 元数据 foo
+            .metadata("aha", List.of(1, 2, 3)) // 元数据 aha
+            .uri("no://op"));
+}
+
+public record MetadataGatewayFilter(ObjectMapper om) implements GatewayFilter {
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
+        if (route == null) {
+            return Mono.error(new RuntimeException("Impossible"));
+        }
+
+        var res = exchange.getResponse();
+        var buffer = Mono.just(route)
+                .map(Route::getMetadata) // 通过 route 获取全部元数据
+                .flatMap(it -> {
+                    try {
+                        return Mono.just(om.writeValueAsBytes(it));
+                    } catch (JsonProcessingException e) {
+                        return Mono.error(e);
+                    }
+                })
+                .map(bytes -> res.bufferFactory().wrap(bytes));
+        res.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        return res.writeWith(buffer);
+    }
+}
+```
+
+## 如何设置超时？
+
+在 `HttpClientProperties` 中定义了两个配置项，用于全局超时配置：
+
+```java
+Integer connectTimeout;
+Duration responseTimeout;
+```
+
+可以在 `application.properties` 中增加以下配置设置全局超时控制：
+
+```properties
+spring.cloud.gateway.httpclient.connect-timeout=1000
+spring.cloud.gateway.httpclient.response-timeout=5s
+```
+
+如果希望在 route 上设置超时配置，则需通过 metadata 来设置。比如：
+
+```java
+public Builder timeout(Builder builder) {
+    return builder.route("timeout", r -> r.path("/apis/**")
+            .metadata(RouteMetadataUtils.CONNECT_TIMEOUT_ATTR, 200) // ms
+            .metadata(RouteMetadataUtils.RESPONSE_TIMEOUT_ATTR, 200) // ms
+            .uri("http://localhost:3000"));
+}
+```
+
+TODO: 负载均衡如何做？
+
 ## 示例
 
 [戳这里查看示例代码](https://gitee.com/xyzwps/cheatsheet-spring/tree/master/cloud-gateway)。
