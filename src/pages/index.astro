@@ -1,6 +1,12 @@
 ---
 import CommonHeader from '../components/CommonHeader.astro';
 
+const cheatsheets = [
+  { href: '/cheatsheet/cyber-huashui', title: '赛博养生学' },
+  { href: '/cheatsheet/spring', title: 'Spring' },
+  { href: '/cheatsheet/wsl', title: 'WSL' },
+];
+
 const blogs = [
   { href: '/blogs/2024-08-30-seckill', title: '秒杀问题' },
   { href: '/blogs/2024-08-27-dg-to-di', title: '从有向图到依赖注入' },
@@ -21,8 +27,13 @@ const blogs = [
       <div class="p-4">
         <h1 class="font-bold">速查手册</h1>
         <ul class="flex gap-2">
-          <li class="border px-4 py-2"><a href="/cheatsheet/cyber-huashui">赛博养生学</a></li>
-          <li class="border px-4 py-2"><a href="/cheatsheet/spring">Spring</a></li>
+          {
+            cheatsheets.map((it) => (
+              <li class="border px-4 py-2">
+                <a href={it.href}>{it.title}</a>
+              </li>
+            ))
+          }
         </ul>
       </div>
       <div class="p-4">
