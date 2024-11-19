@@ -6,3 +6,88 @@ parent:
   path: /cheatsheet/spring
 ---
 
+一般来说，每个 starter 都属于一个单独的模块。
+
+有几种方式创建自己的 starter：
+
+## 创建 Enable\* 风格的 Starter
+
+这种方式需要你在 starter 中创建一个 `@EnableXXX` 注解，然后把指定的配置文件给 `@Import` 进去就可以了。比如：
+
+EnableStarterA.java
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Import(StarterAConfiguration.class)
+public @interface EnableStarterA {
+}
+```
+
+StarterAConfiguration.java
+```java
+@Configuration
+public class StarterAConfiguration {
+    @Bean
+    public StarterAService starterAService() {
+        return new StarterAService();
+    }
+}
+```
+
+在使用时，只需要把 `@EnableStarterA` 的注解标记到 `@SpringBootApplication`
+旁边，就可以在应用中自动注入 `StarterAService` 了。
+
+[戳这里查看完整代码](https://gitee.com/xyzwps/cheatsheet-spring/tree/master/boot-starter-a)。
+
+## 创建自动配置的 Starter
+
+这种方式使用 `@AutoConfiguration` 注解，主要把标记的此注解的类放到
+`META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+文件中即可。比如：
+
+```java
+// 此类全名应写入 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports 文件中
+@AutoConfiguration
+public class StarterBConfiguration {
+    @Bean
+    public StarterBService starterBService() {
+        return new StarterBService();
+    }
+}
+```
+
+在使用时，只需把此 starter 模块加入依赖，就可以自动注入 `StarterBService` 了。
+
+[戳这里查看完整代码](https://gitee.com/xyzwps/cheatsheet-spring/tree/master/boot-starter-b)。
+
+## 使用自定义 Starter
+
+```java
+@SpringBootApplication
+@RestController
+@EnableStarterA
+public class StartersApp {
+
+    @Autowired
+    private StarterAService starterA;
+
+    @Autowired
+    private StarterBService starterB;
+
+    @GetMapping("/messages")
+    public List<String> getMessages() {
+        return List.of(starterA.getMessage(), starterB.getMessage());
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(StartersApp.class, args);
+    }
+}
+```
+
+[戳这里查看完整代码](https://gitee.com/xyzwps/cheatsheet-spring/blob/master/boot-use-custom-starters)。
+
+## 参考
+
+- [Creating Your Own Auto-configuration](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)
