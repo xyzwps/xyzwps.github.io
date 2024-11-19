@@ -61,6 +61,12 @@ public class StarterBConfiguration {
 
 [戳这里查看完整代码](https://gitee.com/xyzwps/cheatsheet-spring/tree/master/boot-starter-b)。
 
+> 在 Spring Boot 2.x 版本早期，官方文档中描写的是使用文件 [`META-INF/spring.factories`](https://docs.spring.io/spring-boot/docs/2.0.0.M3/reference/html/boot-features-developing-auto-configuration.html)。
+> 在 Spring Boot 3.x 中，使用的是
+> [`META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)。
+> [这个变化发生在 Spring Boot 2.7 中](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.7-Release-Notes#building-jars-with-maven-shade-plugin-and-gradle-shadow-plugin)。
+
+
 ## 使用自定义 Starter
 
 ```java
@@ -87,7 +93,3 @@ public class StartersApp {
 ```
 
 [戳这里查看完整代码](https://gitee.com/xyzwps/cheatsheet-spring/blob/master/boot-use-custom-starters)。
-
-## 参考
-
-- [Creating Your Own Auto-configuration](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)
