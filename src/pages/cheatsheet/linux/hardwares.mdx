@@ -1,0 +1,76 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 硬件信息
+parent:
+  name: 返回上级
+  path: /cheatsheet/linux
+---
+
+## CPU 信息
+
+### `lscpu`
+
+```sh
+$ lscpu
+架构：                    x86_64
+  CPU 运行模式：          32-bit, 64-bit
+  Address sizes:          48 bits physical, 48 bits virtual
+  字节序：                Little Endian
+CPU:                      16
+  在线 CPU 列表：         0-15
+厂商 ID：                 AuthenticAMD
+  型号名称：              AMD Ryzen 9 6900HX with Radeon Graphics
+    CPU 系列：            25
+    型号：                68
+```
+
+## 内存信息
+
+### `free`
+
+`free` 用于查看内存使用情况：
+
+```sh
+$ free -h
+               total        used        free      shared  buff/cache   available
+内存：          27Gi       9.2Gi        11Gi       178Mi       7.5Gi        17Gi
+交换：          15Gi       1.8Gi        14Gi
+```
+
+## 硬盘信息
+
+### `fdisk`
+
+`fdisk` 用于查看硬盘信息：
+
+```sh
+$ sudo fdisk -l
+Disk /dev/nvme0n1: 476.94 GiB, 512110190592 bytes, 1000215216 sectors
+Disk model: KINGSTON SKC3000S512G
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 5251A60E-9723-4A29-A2A9-97B56A85B75C
+
+Device            Start        End   Sectors   Size Type
+/dev/nvme0n1p1     2048     616447    614400   300M EFI System
+/dev/nvme0n1p2   616448    3762175   3145728   1.5G Linux filesystem
+/dev/nvme0n1p3  3762176   37316607  33554432    16G Linux filesystem
+/dev/nvme0n1p4 37316608   68773887  31457280    15G Linux filesystem
+/dev/nvme0n1p5 68773888 1000214494 931440607 444.1G Linux filesystem
+
+
+Disk /dev/sda: 476.94 GiB, 512110190592 bytes, 1000215216 sectors
+Disk model: Fanxiang S201 Pr
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: C00DF873-D989-4FC0-8B98-155C6529942A
+
+Device     Start        End    Sectors   Size Type
+/dev/sda1     34      32767      32734    16M Microsoft reserved
+/dev/sda2  32768 1000212479 1000179712 476.9G Microsoft basic data
+```
+

@@ -1,0 +1,112 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 查看系统与内核信息
+parent:
+  name: 返回上级
+  path: /cheatsheet/linux
+---
+
+## 查看系统信息
+
+### `uname`
+
+```sh
+# 显示所有内核信息，包括内核版本、系统架构、主机名、操作系统名称等
+$ uname -a
+Linux xyzwps-PC 6.9.6-amd64-desktop-rolling #23.01.01.02 SMP PREEMPT_DYNAMIC Tue Jul 23 12:20:02 CST 2024 x86_64 GNU/Linux
+
+# 仅显示内核版本
+$ uname -r
+6.9.6-amd64-desktop-rolling
+
+# 显示系统架构，如x86_64、i686等
+$ uname -m
+x86_64
+```
+
+### `/etc/os-release`
+
+```sh
+$ cat /etc/os-release
+PRETTY_NAME="Deepin 23"
+NAME="Deepin"
+VERSION_ID="23"
+VERSION="23"
+ID=deepin
+HOME_URL="https://www.deepin.org/"
+BUG_REPORT_URL="https://bbs.deepin.org"
+VERSION_CODENAME=beige
+```
+
+### `hostnamectl`
+
+`hostnamectl` 命令不仅可以显示和设置系统的主机名，还可以显示操作系统的相关信息，如名称、版本、架构等。
+
+```sh
+$ hostnamectl
+ Static hostname: xyzwps-PC
+       Icon name: computer-desktop
+         Chassis: desktop 🖥️
+      Machine ID: df76f4c6bd26446d96b7a83e15be1287
+         Boot ID: a1c6a19cdb3b419fa743575ba1372036
+Operating System: Deepin 23
+          Kernel: Linux 6.9.6-amd64-desktop-rolling
+    Architecture: x86-64
+ Hardware Vendor: AZW
+  Hardware Model: GTR
+Firmware Version: GTR6_P5C4V21
+   Firmware Date: Fri 2023-03-10
+    Firmware Age: 1y 8month 1w 5d
+```
+
+### `/proc/version`
+
+该文件用于包含当前Linux内核的版本号和编译日期等信息。虽然它主要显示内核信息，但也可以间接反映操作系统的版本。
+
+```sh
+$ cat /proc/version
+Linux version 6.9.6-amd64-desktop-rolling (root@deepinci-amd7) (gcc (Deepin 13.2.0-3deepin3) 13.2.0, GNU ld (GNU Binutils for Deepin) 2.41) #23.01.01.02 SMP PREEMPT_DYNAMIC Tue Jul 23 12:20:02 CST 2024
+```
+
+## 查看发行版信息
+
+### `lsb_release`
+
+```sh
+# 显示所有发行版信息，包括发行版名称、版本号、描述等
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID:	Deepin
+Description:	Deepin 23
+Release:	23
+Codename:	beige
+
+# 仅显示发行版描述
+$ lsb_release -d
+No LSB modules are available.
+Description:	Deepin 23
+
+# 仅显示发行版名称
+$ lsb_release -s
+No LSB modules are available
+```
+
+注意：并非所有Linux发行版都支持lsb_release命令，这取决于是否安装了LSB（Linux Standard Base）模块。
+
+### `/etc/issue`
+
+该文件也包含了系统的版本信息，但格式可能因发行版而异：
+
+```sh
+$ cat /etc/issue
+Deepin GNU/Linux 23 \n \l
+```
+
+### `/etc/debian_version`
+
+仅适用于给予 debian 的系统，如 ubuntu 等：
+
+```sh
+$ cat /etc/debian_version
+bookworm/sid
+```
