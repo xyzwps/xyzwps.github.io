@@ -9,12 +9,13 @@ type Props = MDXLayoutProps<{
   author: string;
   date: string;
   parent?: { name: string; path: string } | undefined;
+  translateFrom?: { url: string; title: string } | undefined;
 }>;
 
 // 现在，`frontmatter`、`url` 和其他 Markdown 布局属性
 // 可以通过 TypeScript 类型安全地访问
 const { frontmatter, url, headings } = Astro.props;
-const { parent } = frontmatter;
+const { parent, translateFrom } = frontmatter;
 ---
 
 <html lang="zh-CN">
@@ -26,13 +27,14 @@ const { parent } = frontmatter;
     <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet" />
   </head>
   <body>
-    <div class="bg-slate-100 ">
+    <div class="bg-slate-100">
       <CommonHeader />
     </div>
     <div class="container mx-auto bg-white p-8 min-h-screen">
       <div class="grid grid-cols-4 gap-8">
         <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4">
           <h1>{frontmatter.title}</h1>
+          {translateFrom && <div class="border-2 p-4 rounded-lg"><strong>提示</strong>：本文翻译自 <strong><a  href={translateFrom.url} target="_blank">{translateFrom.title}</a></strong>。本文不保证翻译质量，并可能有删改。如果你英文水平不错（过了四级），强烈建议尝试看一下原文。</div>}
           <slot />
         </div>
         <div class="max-lg:hidden">
