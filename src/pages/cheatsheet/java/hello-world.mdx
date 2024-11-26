@@ -1,0 +1,45 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: Hello World
+parent:
+  name: 返回上级
+  path: /cheatsheet/java
+---
+
+## 启动单文件源代码程序
+
+从 JDK 11 开始，`java` 命令支持直接运行单文件源代码程序。
+
+```bash
+java HelloWorld.java
+```
+
+见 [JEP 330](https://openjdk.org/jeps/330)。
+
+## 启动多文件源代码程序
+
+从 JDK 22 开始，`java` 命令支持直接运行多文件源代码程序。
+
+```java
+// HelloWorld2.java
+class HelloWorld2 {
+    public static void run() {
+        System.out.println("Hello, World!");
+    }
+}
+
+// HelloWorld.java
+class HelloWorld {
+    public static void main(String[] args) {
+        HelloWorld2.run();
+    }
+}
+```
+
+然后只要执行以下命令就可以了：
+
+```bash
+java HelloWorld.java
+```
+
+对于预编译的类（如 class 文件、jar 包）等的支持，见 [JEP 458](https://openjdk.org/jeps/458)。

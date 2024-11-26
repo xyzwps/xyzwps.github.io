@@ -1,0 +1,26 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 变量
+parent:
+  name: 返回上级
+  path: /cheatsheet/java
+---
+
+## `var`
+
+TODO: 
+
+## 未命名变量
+
+在 Java 22 中，如果你需要声明一个变量，但是又不需要使用它，可以使用 `_` 占用本来应该位于变量名的位置。比如：
+
+```java
+while (q.size() >= 3) {
+    var x = q.remove();
+    var _ = q.remove();       // Unnamed variable
+    var _ = q.remove();       // Unnamed variable
+    ... new Point(x, 0) ...
+}
+```
+
+见 [JEP 456](https://openjdk.org/jeps/456)。

@@ -1,0 +1,64 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 模式匹配
+parent:
+  name: 返回上级
+  path: /cheatsheet/java
+---
+
+## Record 模式匹配
+
+TODO:
+
+见 [JEP 440](https://openjdk.org/jeps/440)。
+
+## Switch 模式匹配
+
+TODO:
+
+见 [JEP 441](https://openjdk.org/jeps/441)。
+
+## 带有未命名变量的模式匹配
+
+在 Java 22 中，如果模式匹配过程中声明的变量不需要被使用，则可以用未命名变量 `_` 占用此位置。
+
+这是一个 `switch` 模式匹配的例子：
+
+```java
+switch (ball) {
+    case RedBall _   -> process(ball);
+    case BlueBall _  -> process(ball);
+    case GreenBall _ -> stopProcessing();
+}
+
+switch (box) {
+    case Box(RedBall _)   -> processBox(box);
+    case Box(BlueBall _)  -> processBox(box);
+    case Box(GreenBall _) -> stopProcessing();
+    case Box(var _)       -> pickAnotherBox();
+}
+```
+
+这是一个 `instanceof` 模式匹配的例子：
+
+```java
+record Point(int x, int y) { }
+enum Color { RED, GREEN, BLUE }
+record ColoredPoint(Point p, Color c) { }
+
+var r = new ColoredPoint(new Point(3,4), Color.GREEN);
+
+if (r instanceof ColoredPoint(Point(int x, int y), Color c)) {
+    System.out.println(x + " " + y);
+}
+
+if (r instanceof ColoredPoint(Point(int x, int y), Color _)) { // 用 _ 替换 c
+    System.out.println(x + " " + y);
+}
+
+if (r instanceof ColoredPoint(Point(int x, int y), _)) { // 用 _ 替换 Color c
+    System.out.println(x + " " + y);
+}
+```
+
+见 [JEP 456](https://openjdk.org/jeps/456)。
