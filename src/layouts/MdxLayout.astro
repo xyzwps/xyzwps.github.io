@@ -30,14 +30,14 @@ const { parent, translateFrom } = frontmatter;
     <div class="bg-slate-100">
       <CommonHeader />
     </div>
-    <div class="container mx-auto bg-white p-8 min-h-screen">
-      <div class="grid grid-cols-4 gap-8">
-        <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4">
+    <div class="container mx-auto bg-white p-4 min-h-screen">
+      <div class="grid grid-cols-4 gap-4">
+        <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow">
           <h1>{frontmatter.title}</h1>
-          {translateFrom && <div class="border-2 p-4 rounded-lg"><strong>提示</strong>：本文翻译自 <strong><a  href={translateFrom.url} target="_blank">{translateFrom.title}</a></strong>。本文不保证翻译质量，并可能有删改。如果你英文水平不错（过了四级），强烈建议尝试看一下原文。</div>}
+          {translateFrom && <div class="border-2 p-4 rounded-lg"><strong>提示</strong>：本文翻译自 <strong><a  href={translateFrom.url} target="_blank">{translateFrom.title}</a></strong>。本文不保证翻译质量，并可能有删改。若你自觉英语尚可，强烈建议尝试看一下原文。</div>}
           <slot />
         </div>
-        <div class="max-lg:hidden">
+        <div class="max-lg:hidden border rounded-lg p-6 shadow">
           <div class="sticky top-4">
             {
               parent && (
