@@ -1,0 +1,88 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: Queue-Based Load Leveling pattern
+parent:
+  name: 返回上级
+  path: /cheatsheet/cloud-patterns/
+translateFrom:
+  url: https://learn.microsoft.com/en-us/azure/architecture/patterns/queue-based-load-leveling
+  title: Queue-Based Load Leveling pattern - Azure Architecture Center
+---
+
+TODO: 翻译很奇怪
+
+使用队列作为任务和它调用的服务之间的缓冲区，以平滑可能导致服务失败或任务超时的间歇性重负载。
+这有助于最大限度地减少需求高峰对任务和服务的可用性和响应能力的影响。
+
+## 问题上下文
+
+云中的许多解决方案都涉及运行调用服务的任务。在这种环境中，如果服务受到间歇性的重负载，它可能会导致性能或可靠性问题。
+
+服务可以是与使用它的任务相同的解决方案的一部分，也可以是提供对常用资源（如缓存或存储服务）的访问的第三方服务。
+如果同一服务被多个同时运行的任务使用，则很难预测任何时候对该服务的请求量。
+
+服务可能会遇到需求高峰，导致它过载，无法及时响应请求。
+如果服务无法处理这些请求引起的争用，用大量并发请求淹没服务也可能导致服务失败。
+
+## 解决方案
+
+重构解决方案并在任务和服务之间引入队列。任务和服务异步运行。任务将包含服务所需数据的消息发布到队列中。
+队列充当缓冲区，存储消息，直到服务检索到它。服务从队列中检索消息并处理它们。
+来自多个任务的请求可以以高度可变的速率生成，可以通过相同的消息队列传递给服务。此图显示了使用队列来平衡服务的负载。
+
+![](https://learn.microsoft.com/en-us/azure/architecture/patterns/_images/queue-based-load-leveling-pattern.png)
+
+队列将任务与服务分离，服务可以按照自己的速度处理消息，而不管并发任务的请求量如何。
+此外，如果服务在向队列发布消息时不可用，则任务不会延迟。
+
+这种模式提供了以下好处：
+
+- 它有助于最大限度地提高可用性，因为服务中出现的延迟不会对应用程序产生立即和直接的影响，
+  即使服务不可用或当前没有处理消息，应用程序也可以继续将消息发布到队列中。
+
+- 它有助于最大限度地提高可扩展性，因为队列数量和服务数量都可以变化以满足需求。
+
+- 它有助于控制成本，因为部署的服务实例数量只需足以满足平均负载而不是峰值负载。
+
+  > 一些服务在需求达到阈值时实施限制，超过阈值系统可能会失败。限制会减少可用的功能。
+  >您可以使用这些服务实现负载均衡，以确保不会达到此阈值。
+
+## 实现考量
+
+在决定如何实现此模式时，请考虑以下几点：
+
+- 有必要实现应用程序逻辑来控制服务处理消息的速率，以避免使目标资源不堪重负。
+  避免将需求高峰传递到系统的下一阶段。在负载下测试系统以确保它提供所需的均衡，并调整队列数量和处理消息的服务实例数量以实现这一点。
+
+- 消息队列是一种单向通信机制。如果任务期望来自服务的回复，则可能需要实现服务可以用来发送响应的机制。有关详细信息，请参阅异步消息入门。
+  https://learn.microsoft.com/en-us/previous-versions/msp-n-p/dn589781(v=pandp.10)
+
+- 如果将自动缩放应用于侦听队列请求的服务，请小心。这可能会导致这些服务共享的任何资源的争用增加，并降低使用队列来平衡负载的有效性。
+
+- 根据服务的负载，您可能会遇到这样一种情况，即您实际上总是落后，系统排队的请求总是比您处理的请求多。
+  需要考虑应用程序传入流量的可变性
+
+- 根据队列的持久性，该模式可能会丢失信息。如果队列崩溃或丢弃信息（由于系统限制），您可能没有保价信函。
+  需要根据解决方案的需要考虑队列的行为和系统限制。
+
+## 何时使用
+
+此模式对于任何使用容易过载的服务的应用程序都很有用。
+
+如果应用程序期望来自服务的响应具有最小延迟，则此模式无用。
+
+
+TODO:
+
+Load leveling focuses on producing the right product mix to ensure low FG stock and becoming flexible by reducing changeover time, while load balancing ensures all processes in the line are running at the same pace to meet demand. 
+hashllp.com+3
+
+
+Load leveling and load balancing are two different concepts that are often used interchangeably, but they have distinct meanings and applications. Here's a comparison of the two:
+
+Load Leveling: This concept is about producing the right product mix to ensure low finished goods (FG) stock and becoming flexible by reducing changeover time. It's a strategy that focuses on producing every product every week (EPEW) to meet customer demand more precisely, which can lead to a high FG stock. Load leveling is a key strategy in Lean thinking and aims to reduce waste by balancing throughput rates of activities within a process. 
+hashllp.com+1
+Load Balancing: This concept is about ensuring all processes in the line are running at the same pace to meet the demand. It's about balancing the line to prevent stockouts and maintain a steady production flow. Load balancing is a method used to prevent stock out by allocating production orders in different locations or time slots based on the supply network's capacity and costs. 
+
+qualityamerica.com
+Both concepts are important in different contexts, such as manufacturing, IT, or supply chain management. They are used to prevent stockouts and improve efficiency by managing production orders and throughput rates effectively. Understanding the differences between these two concepts can help in choosing the right approach for a specific situation.
