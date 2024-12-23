@@ -1,0 +1,239 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: MongoDB Cheatsheet
+parent:
+  name: 返回上级
+  path: /cheatsheet/java
+---
+
+## Database
+
+| 目的 | 命令 |
+|-----------|----------|
+| 查看所有 db | `show dbs` |
+| 创建/使用制定 db | `use ${dbName}` |
+| 删除 db    | `db.dropDatabase()` |
+
+## Collection
+
+| 目的 | 命令 |
+|------|-------|
+| 查看所有 collection | `show collections` |
+| 创建 collection | `db.createCollection('${collectionName}')` |
+| 删除 collection | `db.${collectionName}.drop()` |
+
+TODO: 固定大小集合、时间序列集合、集群化索引集合
+TODO: 文档验证
+TODO: 修改文档结构
+
+## 数据类型
+
+MongoDB 使用 [BSON 数据类型](https://www.mongodb.com/zh-cn/docs/manual/reference/bson-types/)。
+
+| 类型 | 数值 | 别名 | 注意 |
+|------|-----|-----|------|
+| double     | 1 | `"double"` | |
+| 字符串      | 2 | `"string"` | |
+| 对象        | 3 | `"object"` | |
+| 阵列        | 4 | `"array"`    |  |
+| 二进制数据   | 5 | `"binData"`  | |
+| 未定义      | 6 | `"undefined"` | 已弃用。|
+| ObjectId   | 7 | `"objectId"` | |
+| 布尔        | 8 | `"bool"`     | |
+| Date       | 9 | `"date"`      | |
+| null       | 10 | `"null"`    | |
+| 正则表达式   | 11 | `"regex"`      | |
+| 数据库指针   | 12 | `"dbPointer"`  |	 已弃用。|
+| JavaScript | 13 | `"javascript"` | |
+| 符号 	      | 14 | `"symbol"`     |	 已弃用。|
+| 32 位整数   | 16 | `"int"`        | |
+| 时间戳      | 17 | `"timestamp"`  | |
+| 64 位整型   | 18 | `"long"`       | |
+| Decimal128 | 19 | `"decimal"`    | |
+| Minkey     | -1 | `"minKey"`     | |
+| Max key    | 127 | `"maxKey"`    | |
+
+## CRUD
+
+- 插入一条
+  ```js
+  db.articles.insertOne({ title: "MongoDB Tutorial" })
+  ```
+- 插入多条
+  ```js
+  db.articles.insertMany([{ title: "MongoDB Cheatsheet" }])
+  ```
+- 插入时指定 ID
+  ```js
+  db.articles.insertOne({ _id  : "MongoDB-Cheatsheet",
+                          title: "MongoDB Cheatsheet" })
+  ```
+- 查询所有
+  ```js
+  db.articles.find()
+  ```
+- 限制查询结果数量
+  ```js
+  db.articles.find().limit(1)
+  ```
+- 按条件查询
+  ```js
+  db.articles.find({ title: "MongoDB Tutorial" })
+  ```
+- 按条件更新
+  ```js
+  db.articles.update({ title: "MongoDB Tutorial" },
+                     { $set: {status: "DRAFT" } })
+  ```
+
+TODO: replace、upsert、upateOne
+
+- 按条件删除
+  ```js
+  db.articles.deleteMany({ title: "MongoDB Cheatsheet" })
+  ```
+
+## 条件过滤器
+
+数据准备：
+
+```js
+db.inventory.insertMany([
+  { item: 'journal',  qty: 25,  size: { h: 14,    w: 21,    uom: 'cm' }, status: 'A' },
+  { item: 'notebook', qty: 50,  size: { h: 8.5,   w: 11,    uom: 'in' }, status: 'A' },
+  { item: 'paper',    qty: 100, size: { h: 8.5,   w: 11,    uom: 'in' }, status: 'D' },
+  { item: 'planner',  qty: 75,  size: { h: 22.85, w: 30,    uom: 'cm' }, status: 'D' },
+  { item: 'postcard', qty: 45,  size: { h: 10,    w: 15.25, uom: 'cm' }, status: 'A' }
+])
+```
+
+- 等值匹配
+  ```js
+  db.inventory.find({ 'size.uom': 'in' });
+  ```
+- 比较大小
+  ```js
+  db.inventory.find({ 'size.h': { $lt: 15 } });
+  ```
+- 逻辑与
+  ```js
+  db.inventory.find({ 'size.h': { $lt: 15 },
+                      'size.uom': 'in',
+                      status: 'D' });
+  ```
+- 逻辑或
+  ```js
+  db.inventory.find({ $or: [{ qty: 25 }, { qty: { $gte: 50 } }],
+                      status: 'A' });
+  ```
+- 条件嵌套
+  ```js
+  db.inventory.find({ size: { h: 14, w: 21, uom: 'cm' } });
+  ```
+  ⚠ MongoDB 不建议对嵌入式文档进行比较，因为这些操作需要与指定的 `<value>` 文档完全匹配，包括字段顺序。
+  ```js
+  db.inventory.find({ size: { w: 21, h: 14, uom: 'cm' } });
+  ```
+- 仅获取部分字段
+  ```js
+  db.inventory.find(
+    { status: 'A' },       // filter
+    { status: 1, item: 1 } // projection
+  )
+  ```
+  也不要 `_id`：
+  ```js
+  db.inventory.find({ status: 'A' }, { status: 1, item: 1, _id: 0 })
+  ```
+- 排除字段
+  ```js
+  db.inventory.find({ status: 'A' }, { size: 0 })
+  ```
+
+### 比较操作符
+
+- 等于：`$eq`
+- 大于：`$gt`
+- 小于：`$lt`
+- 大于或等于：`$gte`
+- 小于或等于：`$lte`
+- in：`$in`
+- not in：`$nin`
+
+### 逻辑操作符
+
+- `$and`
+- `$or`
+- `$not`
+- `$nor` 等价于 `{ $not: { $or: [ <exp1>, <exp2>, ... ] } }`
+
+### 元素查询
+
+- `$exists` 判断字段是否存在 `{ field: { $exists: <boolean> } }`
+- `$type` 判断字段的类型 `{ field: { $type: <BSON type> } }`
+
+### 表达式查询
+
+- [`$expr`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/expr/)
+- [`$jsonSchema`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/jsonSchema/)
+- [`$mod`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/mod/)
+- [`$regex`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/regex/)
+- [`$where`](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/where/) 已弃用
+
+### 地理空间查询
+
+参见[地理空间查询](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query-geospatial/)。
+
+### 数组查询
+
+- `$all` 操作符选择字段值为包含所有指定元素的数组的文档。
+- `$elemMatch` 操作符匹配包含数组字段的文档，其中至少有一个元素匹配所有指定查询条件。
+- `$size` 数组长度。
+
+### 按位查询
+
+参见[按位查询](https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query-bitwise/)。
+
+## 投影
+
+TODO: https://www.mongodb.com/zh-cn/docs/manual/reference/operator/projection/
+
+## 索引
+
+- 查看索引
+  ```js
+  db.collection.getIndexes()
+  ```
+- 在单字段上创建一个单键降序索引
+  ```js
+  db.collection.createIndex({ name: -1 })
+  ```
+- 创建索引并指定名称
+  ```js
+  db.collection.createIndex({ name: -1 }, { name: "NameIndex" })
+  ```
+- 创建多列索引
+  ```js
+  db.students.createIndex({ name: 1, gpa: -1 })
+  ```
+- 创建部分索引
+  ```js
+  db.restaurants.createIndex(
+    { cuisine: 1, name: 1 },
+    { partialFilterExpression: { rating: { $gt: 5 } } }
+  )
+  ```
+- 创建稀疏索引
+  ```js
+  db.addresses.createIndex({ "xmpp_id": 1 }, { sparse: true })
+  ```
+- 创建唯一索引
+  ```js
+  db.members.createIndex( { "user_id": 1 }, { unique: true } )
+  ```
+- 删除索引
+  ```js
+  db.<collection>.dropIndex("<indexName>") // 删除单个索引
+  db.<collection>.dropIndexes(["<index1>", "<index2>", "<index3>"]) // 删除多个索引
+  db.<collection>.dropIndexes() // 删除所有自建索引（除主键索引之外的所有索引）
+  ```
