@@ -1,17 +1,5 @@
 ---
-import CommonHeader from '../components/CommonHeader.astro';
 
-const cheatsheets = [
-  { href: '/cheatsheet/cyber-huashui', title: '赛博养生学' },
-  { href: '/cheatsheet/spring', title: 'Spring' },
-  { href: '/cheatsheet/wsl', title: 'WSL' },
-  { href: '/cheatsheet/cloud-patterns', title: '云设计模式' },
-];
-
-const blogs = [
-  { href: '/blogs/2024-08-30-seckill', title: '秒杀问题' },
-  { href: '/blogs/2024-08-27-dg-to-di', title: '从有向图到依赖注入' },
-];
 ---
 
 <html lang="en">
@@ -21,36 +9,41 @@ const blogs = [
     <title>xyzwps pages</title>
   </head>
   <body>
-    <div class="bg-slate-100">
-      <CommonHeader />
-    </div>
     <div class="container mx-auto bg-white flex flex-col border-x-gray-500 px-4 min-h-screen text-base">
-      <div class="p-4">
-        <h1 class="font-bold">速查手册</h1>
-        <ul class="flex gap-2">
-          {
-            cheatsheets.map((it) => (
-              <li class="border px-4 py-2">
-                <a href={it.href}>{it.title}</a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-      <div class="p-4">
-        <h1 class="font-bold">最近文章</h1>
-        <ul class="list-none">
-          {
-            blogs.map((it) => (
-              <li class="my-2 before:content-['▫']">
-                <a class="cursor-pointer p-2 pl hover:bg-indigo-100 rounded" href={it.href}>
-                  {it.title}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+      <div class="h-24"></div>
+      <div class="text-center text-5xl text-indigo-700 my-8 font-bold select-none">xyzwps</div>
+      <div class="flex justify-center">
+        <div
+          class={[
+            'border-solid border-indigo-600 border rounded',
+            'has-[:focus]:ring-indigo-400 has-[:focus]:ring-2',
+            'w-full max-w-[420px]',
+            'p-3 flex',
+          ].join(' ')}
+        >
+          <input class="flex-1 focus:outline-none focus:border-6 ml-2" placeholder="搜索" id="search-input" />
+          <span class="ml-2 cursor-pointer" id="search-icon">🔍</span>
+        </div>
       </div>
     </div>
+    <script>
+      const searchInput = document.getElementById('search-input') as HTMLInputElement;
+      const search = () => {
+        const value = searchInput.value;
+        if (value && value.trim()) {
+          location.href = `https://cn.bing.com/search?q=${encodeURI(value)}`;
+        }
+      };
+      searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+          search();
+        }
+      });
+
+      const searchIcon = document.getElementById('search-icon');
+      searchIcon.addEventListener('click', () => {
+        search();
+      });
+    </script>
   </body>
 </html>
