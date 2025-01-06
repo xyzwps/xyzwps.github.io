@@ -1,7 +1,7 @@
 import { useFloating } from '@floating-ui/react';
 import { useCVData } from "./store"
 import type { EduStage } from './types'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeading, DialogDescription, DialogClose } from '../../../react/Dialog';
 
 const virtualReference = {
@@ -40,9 +40,7 @@ const EduStageItem = ({ stage, index, onAdd, onDelete, onChange }: EduStageItemP
         className='hover:ring-2 hover:ring-indigo-400 rounded py-1'
         onMouseEnter={e => setToolsOpen(true)}
         onMouseLeave={e => setToolsOpen(false)}>
-        <span className="font-mono"><input value={stage.start} onChange={e => {
-          onChange?.({ ...stage, start: e.target.value })
-        }} /> ~ {stage.end}</span>：{stage.desc}
+        <span className="font-mono">{stage.start} ~ {stage.end}</span>：{stage.desc}
         {toolsOpen && <div ref={refs.setFloating} style={floatingStyles} className='rounded-b border-2 border-indigo-400 bg-indigo-200 ml-4 flex gap-2 py-1 px-2'>
           <span className='text-sm cursor-pointer' onClick={() => setEditing(true)}>编辑本行</span>
           <span className='text-sm cursor-pointer' onClick={() => onAdd?.(index)} >上方加一行</span>
@@ -52,29 +50,61 @@ const EduStageItem = ({ stage, index, onAdd, onDelete, onChange }: EduStageItemP
         <Dialog open={editing} onOpenChange={setEditing}>
           <DialogContent className="border-2 border-indigo-400 rounded bg-white flex flex-col w-96">
             <DialogHeading className='text-2xl font-bold py-2 px-4 border-b border-indigo-400'>编辑学习经历</DialogHeading>
-            <DialogDescription className='p-4'>
-              <div className='flex flex-col mb-4'>
-                <label className='select-none'>开始时间：</label>
-                <input className='border border-indigo-300 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400' />
-              </div>
-              <div className='flex flex-col mb-4'>
-                <label className='select-none'>结束时间：</label>
-                <input className='border border-indigo-300 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400' />
-              </div>
-              <div className='flex flex-col mb-4'>
-                <label className='select-none'>描述：</label>
-                <textarea className='border border-indigo-300 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400' rows={3} />
-              </div>
-            </DialogDescription>
-            <div className='py-2 px-4 border-t border-indigo-400 flex flex-row-reverse gap-2'>
-              <button className='border border-indigo-300 rounded px-2'>保存</button>
-              <DialogClose className='border border-indigo-300 rounded px-2'>取消</DialogClose>
-            </div>
+            <EduStageForm stage={stage} onChange={(it) => {
+              onChange?.(it)
+              setEditing(false)
+            }} />
           </DialogContent>
         </Dialog>
       </div>
     </li>
   )
+}
+
+function EduStageForm({ stage, onChange }: { stage: EduStage, onChange?: (s: EduStage) => void }) {
+  const [start, setStart] = useState(stage.start)
+  const [end, setEnd] = useState(stage.end)
+  const [desc, setDesc] = useState(stage.desc)
+
+  useEffect(() => {
+    setStart(stage.start)
+    setEnd(stage.end)
+    setDesc(stage.desc)
+  }, [stage])
+
+  return <>
+    <DialogDescription className='p-4'>
+      <div className='flex flex-col mb-4'>
+        <label className='select-none'>开始时间：</label>
+        <input
+          value={start}
+          onChange={e => setStart(e.target.value)}
+          className='border border-indigo-300 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400' />
+      </div>
+      <div className='flex flex-col mb-4'>
+        <label className='select-none'>结束时间：</label>
+        <input
+          value={end}
+          onChange={e => setEnd(e.target.value)}
+          className='border border-indigo-300 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400' />
+      </div>
+      <div className='flex flex-col mb-4'>
+        <label className='select-none'>描述：</label>
+        <textarea
+          value={desc}
+          onChange={e => setDesc(e.target.value)}
+          className='border border-indigo-300 rounded p-2 outline-none focus:ring-2 focus:ring-indigo-400' rows={3} />
+      </div>
+    </DialogDescription>
+    <div className='py-2 px-4 border-t border-indigo-400 flex flex-row-reverse gap-2'>
+      <button
+        className='border border-indigo-300 rounded px-2'
+        onClick={e => onChange?.({ ...stage, start, end, desc })}>
+        保存
+      </button>
+      <DialogClose className='border border-indigo-300 rounded px-2'>取消</DialogClose>
+    </div>
+  </>
 }
 
 export default function AppEduExp() {
