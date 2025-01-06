@@ -1,5 +1,11 @@
 ---
 import SearchInput from '../components/HomePage/SearchInput.astro';
+
+const list = [
+  { title: 'DeepSeek', href: 'https://www.deepseek.com/' },
+  { title: '通义千问', href: 'https://tongyi.aliyun.com/qianwen/' },
+  { title: '知乎', href: 'https://www.zhihu.com/' },
+];
 ---
 
 <html lang="en">
@@ -23,7 +29,16 @@ import SearchInput from '../components/HomePage/SearchInput.astro';
       <div class="text-center text-5xl text-indigo-700 my-8 font-bold select-none">xyzwps</div>
       <SearchInput />
       <div class="text-center m-8 text-sm text-gray-500 text-light">
-        <a href="https://tongyi.aliyun.com/qianwen/" target="_blank">通义千问</a>&emsp;|&emsp;<a href="https://www.zhihu.com/" target="_blank">知乎</a>
+        {
+          list.map((it, i) => (
+            <>
+              {i > 0 ? <>&emsp;|&emsp;</> : ''}
+              <a href={it.href} target="_blank">
+                {it.title}
+              </a>
+            </>
+          ))
+        }
       </div>
     </div>
   </body>

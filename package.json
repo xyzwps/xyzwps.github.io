@@ -13,6 +13,7 @@
     "@astrojs/mdx": "^4.0.3",
     "@astrojs/react": "^4.1.2",
     "@astrojs/tailwind": "^5.1.4",
+    "@floating-ui/react": "^0.27.2",
     "@types/react": "^18.0.10",
     "@types/react-dom": "^18.0.5",
     "astro": "^5.1.1",
@@ -23,7 +24,8 @@
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "sass": "^1.83.0",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.14"
