@@ -1,14 +1,34 @@
-import AppInput from "./AppInput"
-import { useCVData } from "./store"
+import Input from "../../../react/Input";
+import { useCVData } from "./store";
 
 export default function AppPersonalInformation() {
-  const { birthYear, gender, xueli, email, phone } = useCVData(state => state.personalInfomation)
-  return <div className="mt-8">
-    <div className="my-2">
-      出生年份：<AppInput className="w-24" value={birthYear} />&emsp;性别：<AppInput className="w-12" value={gender} />&emsp;&emsp;学历：<AppInput className="w-12" value={xueli} />
-    </div>
-    <div className="my-2">
-      邮箱：<AppInput className="w-64" value={email} />&emsp;电话：<AppInput className="w-32" value={phone} />
-    </div>
-  </div>
+  const { birthYear, gender, xueli, email, phone } = useCVData((state) => state.personalInfomation);
+  return (
+    <table className="mt-8">
+      <tbody>
+        <tr>
+          <td>
+            <strong>出生年份：</strong>
+            <Input size="sm" noborder className="w-24" value={birthYear} />
+            &emsp;<strong>性别：</strong>
+            <Input className="w-12" size="sm" noborder value={gender} />
+          </td>
+          <td>
+            <strong>学历：</strong>
+            <Input className="w-24" size="sm" noborder value={xueli} />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>邮箱：</strong>
+            <Input className="w-64" size="sm" noborder value={email} />
+          </td>
+          <td>
+            <strong>电话：</strong>
+            <Input className="w-48" size="sm" noborder value={phone} />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  );
 }

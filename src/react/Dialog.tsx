@@ -9,7 +9,7 @@ import {
   FloatingPortal,
   FloatingFocusManager,
   FloatingOverlay,
-  useId
+  useId,
 } from "@floating-ui/react";
 
 interface DialogOptions {
@@ -18,7 +18,11 @@ interface DialogOptions {
   onOpenChange?: (open: boolean) => void;
 }
 
-export function useDialog({ initialOpen = false, open: controlledOpen, onOpenChange: setControlledOpen }: DialogOptions = {}) {
+export function useDialog({
+  initialOpen = false,
+  open: controlledOpen,
+  onOpenChange: setControlledOpen,
+}: DialogOptions = {}) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
   const [labelId, setLabelId] = React.useState<string | undefined>();
   const [descriptionId, setDescriptionId] = React.useState<string | undefined>();
@@ -43,17 +47,17 @@ export function useDialog({ initialOpen = false, open: controlledOpen, onOpenCha
       labelId,
       descriptionId,
       setLabelId,
-      setDescriptionId
+      setDescriptionId,
     }),
-    [open, setOpen, interactions, data, labelId, descriptionId]
+    [open, setOpen, interactions, data, labelId, descriptionId],
   );
 }
 
 type ContextType =
   | (ReturnType<typeof useDialog> & {
-    setLabelId: React.Dispatch<React.SetStateAction<string | undefined>>;
-    setDescriptionId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  })
+      setLabelId: React.Dispatch<React.SetStateAction<string | undefined>>;
+      setDescriptionId: React.Dispatch<React.SetStateAction<string | undefined>>;
+    })
   | null;
 
 const DialogContext = React.createContext<ContextType>(null);
@@ -68,11 +72,9 @@ export const useDialogContext = () => {
   return context;
 };
 
-export function Dialog({ children, ...options }: { children: React.ReactNode; } & DialogOptions) {
+export function Dialog({ children, ...options }: { children: React.ReactNode } & DialogOptions) {
   const dialog = useDialog(options);
-  return (
-    <DialogContext.Provider value={dialog}>{children}</DialogContext.Provider>
-  );
+  return <DialogContext.Provider value={dialog}>{children}</DialogContext.Provider>;
 }
 
 interface DialogTriggerProps {
@@ -80,114 +82,107 @@ interface DialogTriggerProps {
   asChild?: boolean;
 }
 
-export const DialogTrigger = React.forwardRef<
-  HTMLElement,
-  React.HTMLProps<HTMLElement> & DialogTriggerProps
->(function DialogTrigger({ children, asChild = false, ...props }, propRef) {
-  const context = useDialogContext();
-  const childrenRef = (children as any).ref;
-  const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
+export const DialogTrigger = React.forwardRef<HTMLElement, React.HTMLProps<HTMLElement> & DialogTriggerProps>(
+  function DialogTrigger({ children, asChild = false, ...props }, propRef) {
+    const context = useDialogContext();
+    const childrenRef = (children as any).ref;
+    const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
 
-  // `asChild` allows the user to pass any element as the anchor
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(
-      children,
-      context.getReferenceProps({
-        ref,
-        ...props,
-        ...children.props,
-        "data-state": context.open ? "open" : "closed"
-      })
+    // `asChild` allows the user to pass any element as the anchor
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(
+        children,
+        context.getReferenceProps({
+          ref,
+          ...props,
+          ...children.props,
+          "data-state": context.open ? "open" : "closed",
+        }),
+      );
+    }
+
+    return (
+      <button
+        ref={ref}
+        // The user can style the trigger based on the state
+        data-state={context.open ? "open" : "closed"}
+        {...context.getReferenceProps(props)}
+      >
+        {children}
+      </button>
     );
-  }
+  },
+);
 
-  return (
-    <button
-      ref={ref}
-      // The user can style the trigger based on the state
-      data-state={context.open ? "open" : "closed"}
-      {...context.getReferenceProps(props)}
-    >
-      {children}
-    </button>
-  );
-});
+export const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
+  function DialogContent(props, propRef) {
+    const { context: floatingContext, ...context } = useDialogContext();
+    const ref = useMergeRefs([context.refs.setFloating, propRef]);
 
-export const DialogContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLProps<HTMLDivElement>
->(function DialogContent(props, propRef) {
-  const { context: floatingContext, ...context } = useDialogContext();
-  const ref = useMergeRefs([context.refs.setFloating, propRef]);
+    if (!floatingContext.open) return null;
 
-  if (!floatingContext.open) return null;
+    return (
+      <FloatingPortal>
+        <FloatingOverlay className="bg-slate-800/80 grid place-items-center" lockScroll>
+          <FloatingFocusManager context={floatingContext}>
+            <div
+              ref={ref}
+              aria-labelledby={context.labelId}
+              aria-describedby={context.descriptionId}
+              {...context.getFloatingProps(props)}
+            >
+              {props.children}
+            </div>
+          </FloatingFocusManager>
+        </FloatingOverlay>
+      </FloatingPortal>
+    );
+  },
+);
 
-  return (
-    <FloatingPortal>
-      <FloatingOverlay className="bg-slate-800/80 grid place-items-center" lockScroll>
-        <FloatingFocusManager context={floatingContext}>
-          <div
-            ref={ref}
-            aria-labelledby={context.labelId}
-            aria-describedby={context.descriptionId}
-            {...context.getFloatingProps(props)}
-          >
-            {props.children}
-          </div>
-        </FloatingFocusManager>
-      </FloatingOverlay>
-    </FloatingPortal>
-  );
-});
+export const DialogHeading = React.forwardRef<HTMLHeadingElement, React.HTMLProps<HTMLHeadingElement>>(
+  function DialogHeading({ children, ...props }, ref) {
+    const { setLabelId } = useDialogContext();
+    const id = useId();
 
-export const DialogHeading = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLProps<HTMLHeadingElement>
->(function DialogHeading({ children, ...props }, ref) {
-  const { setLabelId } = useDialogContext();
-  const id = useId();
+    // Only sets `aria-labelledby` on the Dialog root element
+    // if this component is mounted inside it.
+    React.useLayoutEffect(() => {
+      setLabelId(id);
+      return () => setLabelId(undefined);
+    }, [id, setLabelId]);
 
-  // Only sets `aria-labelledby` on the Dialog root element
-  // if this component is mounted inside it.
-  React.useLayoutEffect(() => {
-    setLabelId(id);
-    return () => setLabelId(undefined);
-  }, [id, setLabelId]);
+    return (
+      <h2 {...props} ref={ref} id={id}>
+        {children}
+      </h2>
+    );
+  },
+);
 
-  return (
-    <h2 {...props} ref={ref} id={id}>
-      {children}
-    </h2>
-  );
-});
+export const DialogDescription = React.forwardRef<HTMLParagraphElement, React.HTMLProps<HTMLParagraphElement>>(
+  function DialogDescription({ children, ...props }, ref) {
+    const { setDescriptionId } = useDialogContext();
+    const id = useId();
 
-export const DialogDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLProps<HTMLParagraphElement>
->(function DialogDescription({ children, ...props }, ref) {
-  const { setDescriptionId } = useDialogContext();
-  const id = useId();
+    // Only sets `aria-describedby` on the Dialog root element
+    // if this component is mounted inside it.
+    React.useLayoutEffect(() => {
+      setDescriptionId(id);
+      return () => setDescriptionId(undefined);
+    }, [id, setDescriptionId]);
 
-  // Only sets `aria-describedby` on the Dialog root element
-  // if this component is mounted inside it.
-  React.useLayoutEffect(() => {
-    setDescriptionId(id);
-    return () => setDescriptionId(undefined);
-  }, [id, setDescriptionId]);
+    return (
+      <p {...props} ref={ref} id={id}>
+        {children}
+      </p>
+    );
+  },
+);
 
-  return (
-    <p {...props} ref={ref} id={id}>
-      {children}
-    </p>
-  );
-});
-
-export const DialogClose = React.forwardRef<
-  HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement>
->(function DialogClose(props, ref) {
-  const { setOpen } = useDialogContext();
-  return (
-    <button type="button" {...props} ref={ref} onClick={() => setOpen(false)} />
-  );
-});
+export const DialogClose = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
+  function DialogClose(props, ref) {
+    const { setOpen } = useDialogContext();
+    return <button type="button" {...props} ref={ref} onClick={() => setOpen(false)} />;
+  },
+);

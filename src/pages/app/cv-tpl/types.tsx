@@ -4,3 +4,5 @@ export type EduStage = {
   desc: string,
   key: string,
 }
+
+export type WorkStage = EduStage
