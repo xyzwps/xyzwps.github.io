@@ -5,4 +5,4 @@ export type EduStage = {
   key: string;
 };
 
-export type WorkStage = EduStage;
+export type WorkStage = EduStage & { title: string; corp: string };
