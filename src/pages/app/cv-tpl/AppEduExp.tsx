@@ -6,19 +6,7 @@ import { Dialog, DialogContent, DialogHeading, DialogDescription, DialogClose } 
 import Input, { TextArea } from "../../../react/Input";
 import Button, { buttonStyles } from "../../../react/Button";
 import { TbRowInsertBottom, TbRowInsertTop, TbRowRemove, TbEdit, TbSquarePlus } from "react-icons/tb";
-
-const virtualReference = {
-  getBoundingClientRect() {
-    return {
-      top: 10,
-      left: 10,
-      bottom: 20,
-      right: 100,
-      width: 90,
-      height: 10,
-    };
-  },
-};
+import Panel from "../../../react/Panel";
 
 type EduStageItemProps = {
   stage: EduStage;
@@ -78,10 +66,7 @@ const EduStageItem = ({ stage, index, onAdd, onDelete, onChange }: EduStageItemP
           </div>
         )}
         <Dialog open={editing} onOpenChange={setEditing}>
-          <DialogContent className="border-2 border-indigo-400 rounded bg-white flex flex-col w-96">
-            <DialogHeading className="text-2xl font-bold py-2 px-4 border-b border-indigo-400">
-              编辑学习经历
-            </DialogHeading>
+          <DialogContent className="border-2 border-indigo-400 rounded bg-white w-96">
             <EduStageForm
               stage={stage}
               onChange={(it) => {
@@ -108,8 +93,25 @@ function EduStageForm({ stage, onChange }: { stage: EduStage; onChange?: (s: Edu
   }, [stage]);
 
   return (
-    <>
-      <DialogDescription className="p-4">
+    <Panel
+      title={
+        <div className="flex items-center justify-between">
+          <span>编辑学习经历</span>
+          <DialogClose className={buttonStyles(null, "sm")} style={{ paddingLeft: 0, paddingRight: 0 }}>
+            ✖
+          </DialogClose>
+        </div>
+      }
+      footer={
+        <div className="flex flex-row-reverse gap-2">
+          <Button size="sm" onClick={(e) => onChange?.({ ...stage, start, end, desc })}>
+            保存
+          </Button>
+          <DialogClose className={buttonStyles(null, "sm")}>取消</DialogClose>
+        </div>
+      }
+    >
+      <DialogDescription className="py-4">
         <div className="flex flex-col mb-4">
           <span className="select-none">开始时间：</span>
           <Input value={start} onChange={(e) => setStart(e.target.value)} />
@@ -123,13 +125,7 @@ function EduStageForm({ stage, onChange }: { stage: EduStage; onChange?: (s: Edu
           <TextArea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} />
         </div>
       </DialogDescription>
-      <div className="py-2 px-4 border-t border-indigo-400 flex flex-row-reverse gap-2">
-        <Button size="sm" onClick={(e) => onChange?.({ ...stage, start, end, desc })}>
-          保存
-        </Button>
-        <DialogClose className={buttonStyles(null, "sm")}>取消</DialogClose>
-      </div>
-    </>
+    </Panel>
   );
 }
 
@@ -155,9 +151,7 @@ export default function AppEduExp() {
     setEduExp(eduExp.map((it) => (it.key === stage.key ? stage : it)));
   };
   return eduExp.length === 0 ? (
-    <div className="text-2xl">
-      <TbSquarePlus onClick={() => addAt(0)} />
-    </div>
+    <TbSquarePlus className="cursor-pointer hover:text-xl" onClick={() => addAt(0)} />
   ) : (
     <ul className="list-disc ml-4">
       {eduExp.map((it, i) => (

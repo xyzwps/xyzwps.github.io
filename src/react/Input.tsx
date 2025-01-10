@@ -7,7 +7,7 @@ const inputStyles = (className?: string, size?: Size, noborder?: boolean) =>
   classNames(
     noborder || "border",
     "rounded outline-none",
-    size === "sm" ? "px-2 py-1" : "px-4 py-2",
+    size === "sm" ? "px-2" : "px-4 py-2",
     "border-indigo-300",
     "hover:ring-2 hover:ring-indigo-200 hover:bg-indigo-50",
     "focus:ring-2 focus:ring-indigo-400 focus:bg-white",

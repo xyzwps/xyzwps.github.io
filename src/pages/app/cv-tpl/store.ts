@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { EduStage } from './types'
+import type { EduStage, WorkStage } from './types'
 
 interface CVData {
   title: string,
@@ -21,6 +21,8 @@ interface CVData {
   },
   eduExp: EduStage[],
   setEduExp: (it: EduStage[]) => void
+  workExp: WorkStage[],
+  setWorkExp: (it: WorkStage[]) => void
 }
 
 export const useCVData = create<CVData>()(persist((set) => ({
@@ -44,6 +46,8 @@ export const useCVData = create<CVData>()(persist((set) => ({
     { start: '2018.12.13', end: '2019.12.12', desc: 'xxxxx', key: '123' },
   ],
   setEduExp: (eduExp) => set((state) => ({ eduExp })),
+  workExp: [],
+  setWorkExp: (workExp) => set((state) => ({ workExp })),
 }), {
   name: 'app-cv-tpl'
 }))
