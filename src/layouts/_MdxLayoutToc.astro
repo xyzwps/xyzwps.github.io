@@ -30,12 +30,14 @@ const { headings } = Astro.props;
                 <Row slug={it.slug} text={it.text} />
               </li>
             );
-          default:
+          case 4:
             return (
-              <li class="text-sm">
+              <li class="ml-8 text-xs">
                 <Row slug={it.slug} text={it.text} />
               </li>
             );
+          default:
+            return null;
         }
       })()
     )

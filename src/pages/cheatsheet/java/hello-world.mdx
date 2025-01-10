@@ -6,6 +6,31 @@ parent:
   path: /cheatsheet/java
 ---
 
+## 第一个程序
+
+按照惯例，学习一门编程语言的第一个程序都是 Hello world。下面是 Java 版本：
+
+```java
+// HelloWorld.java
+class HelloWorld {
+  public static void main(String[] args) {
+    System.out.println("Hello, World!");
+  }
+}
+```
+
+Java 语言是一种编译型语言，所以需要先对其进行变编译：
+
+```sh
+javac HelloWorld.java
+```
+
+变异后得到 `HelloWorld.class` 文件。之后就可以通过 Java 虚拟机（Java virtual machine, JVM）来执行这个 `.class` 文件了：
+
+```sh
+java HelloWorld # 执行 HelloWorld.class
+```
+
 ## 启动单文件源代码程序
 
 从 JDK 11 开始，`java` 命令支持直接运行单文件源代码程序。
@@ -23,16 +48,16 @@ java HelloWorld.java
 ```java
 // HelloWorld2.java
 class HelloWorld2 {
-    public static void run() {
-        System.out.println("Hello, World!");
-    }
+  public static void run() {
+    System.out.println("Hello, World!");
+  }
 }
 
 // HelloWorld.java
 class HelloWorld {
-    public static void main(String[] args) {
-        HelloWorld2.run();
-    }
+  public static void main(String[] args) {
+    HelloWorld2.run();
+  }
 }
 ```
 
@@ -42,4 +67,9 @@ class HelloWorld {
 java HelloWorld.java
 ```
 
-对于预编译的类（如 class 文件、jar 包）等的支持，见 [JEP 458](https://openjdk.org/jeps/458)。
+对于预编译的类（如 class 文件、jar 包）等的支持，巷见 [JEP 458](https://openjdk.org/jeps/458)。
+
+## 参考
+
+- [JEP 330](https://openjdk.org/jeps/330): Launch Single-File Source-Code Programs
+- [JEP 458](https://openjdk.org/jeps/458): Launch Multi-File Source-Code Programs

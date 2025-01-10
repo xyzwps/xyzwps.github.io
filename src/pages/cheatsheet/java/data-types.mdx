@@ -1,0 +1,99 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 数据类型
+parent:
+  name: 返回上级
+  path: /cheatsheet/java
+---
+
+使用合适的数据类型进行计算是编程语言中的核心问题之一。
+
+Java 支持的数据类型有两类：
+
+- 基本数据类型
+- 引用类型
+
+## 基本数据类型
+
+基本数据类型（primitive types） 只有以下几种：
+
+- 数值类型
+  - 整数：`byte`、`short`、`int`、`long`、`char`
+  - 浮点数：`float`、`double`
+- `boolean`
+
+### `boolean`
+
+TODO:
+
+### 整数
+
+#### 整数的取值范围
+
+| 类型     | 位宽 | 有无符号 | 取值范围 |
+|---------|-----|---------|---------|
+| `byte`  | 8   | 有 | -128（$-2^7$） ~ 127（$2^{7}-1$）|
+| `short` | 16  | 有 |-32768（$-2^{15}$） ~ 32767（$2^{15}-1$）|
+| `int`   | 32  | 有 |-2147483648（$-2^{31}$） ~ 2147483647（$2^{31}-1$）|
+| `long`  | 64  | 有 |-9223372036854775808（$-2^{63}$） ~ 9223372036854775807（$2^{63}-1$）|
+| `char`  | 16  | 无 | `'\u0000'`（0） ~ `'\uffff'`（65535） |
+
+#### 整数字面量
+
+整数有以下几种表示方式：
+
+- 十进制。如：`123`、`-123`
+- 十六进制，以 `0x` 或者 `0X` 开头。如：`0x7B`、`-0X7b`
+- 八进制，以 `0` 开头。如：`0173`、`-0173`
+- 二进制，以 `0b` 或者 `0B` 开头。如：``
+
+TODO: https://docs.oracle.com/javase/specs/jls/se23/html/jls-4.html#jls-4.2
+
+#### 整数支持的操作
+
+所有数值类型都支持以下操作：
+
+- 比较大小：`<`、`<=`、`>=`、`>`
+- 比较是否相等：`==`、`!=`
+
+```java
+class ComparasionOperations {
+  public static void main(String[] args) {
+    System.out.println(1 > 2);
+    System.out.println(2 >= 2);
+    System.out.println('a' <= 'A');
+    System.out.println(2 == 2);
+    System.out.println(2 != 2);
+  }
+}
+```
+
+`int` 和 `long` 还支持以下特定操作：
+
+- 一元操作符：`+`、`-`
+- 加减乘除：`+`、`-`、`*`、`/`
+- 递增：`++`（前缀式和后缀式）
+- 递减：`--`（前缀式和后缀式）
+- 位操作：`&`、`^`、`|`
+- 位移：`<<`、`>>`、`>>>`
+- 补码：`~`
+
+### 类型转化
+
+## 第一个程序
+
+按照惯例，学习一门编程语言的第一个程序都是 Hello world。下面是 Java 版本：
+
+```java
+// HelloWorld.java
+class HelloWorld {
+  public static void main(String[] args) {
+    System.out.println("Hello, World!");
+  }
+}
+```
+
+
+## 参考
+
+- [Java 语言规范第四章：类型、值与变量](https://docs.oracle.com/javase/specs/jls/se23/html/jls-4.html#jls-4.2)
