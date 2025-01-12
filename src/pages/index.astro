@@ -1,10 +1,10 @@
 ---
-import SearchInput from '../components/HomePage/SearchInput.astro';
+import SearchInput from "../components/HomePage/SearchInput.astro";
 
 const list = [
-  { title: 'DeepSeek', href: 'https://www.deepseek.com/' },
-  { title: '通义千问', href: 'https://tongyi.aliyun.com/qianwen/' },
-  { title: '知乎', href: 'https://www.zhihu.com/' },
+  { title: "DeepSeek", href: "https://www.deepseek.com/" },
+  { title: "通义千问", href: "https://tongyi.aliyun.com/qianwen/" },
+  { title: "知乎", href: "https://www.zhihu.com/" },
 ];
 ---
 
@@ -23,8 +23,8 @@ const list = [
       })();
     </script>
   </head>
-  <body>
-    <div class="container mx-auto bg-white flex flex-col border-x-gray-500 px-4 min-h-screen text-base">
+  <body style="background: linear-gradient(90deg, #faf5ff, #f9fafb, #f5f2ff)">
+    <div class="mx-auto bg-transparent flex flex-col border-x-gray-500 px-4 min-h-screen text-base">
       <div class="h-24"></div>
       <div class="text-center text-5xl text-indigo-700 my-8 font-bold select-none">xyzwps</div>
       <SearchInput />
