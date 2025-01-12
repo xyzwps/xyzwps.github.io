@@ -18,6 +18,10 @@ export default function App() {
           <Input placeholder="xxx" />
           <Input size="sm" placeholder="xxx" />
         </div>
+        <div className="flex gap-2 items-center my-2">
+          <Input varient="error" placeholder="xxx" />
+          <Input varient="error" size="sm" placeholder="xxx" />
+        </div>
       </div>
       <div>
         <h2 className="text-3xl font-bold mt-6 mb-4">Panel</h2>
