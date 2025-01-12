@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/linux/os-and-kernel"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>查看系统与内核信息</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.CqRaPPEG.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>查看系统与内核信息</h1>  <h2 id="查看系统信息">查看系统信息</h2>
+<h3 id="uname"><code>uname</code></h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#6A737D"># 显示所有内核信息，包括内核版本、系统架构、主机名、操作系统名称等</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> uname</span><span style="color:#79B8FF"> -a</span></span>
+<span class="line"><span style="color:#B392F0">Linux</span><span style="color:#9ECBFF"> xyzwps-PC</span><span style="color:#9ECBFF"> 6.9.6-amd64-desktop-rolling</span><span style="color:#6A737D"> #23.01.01.02 SMP PREEMPT_DYNAMIC Tue Jul 23 12:20:02 CST 2024 x86_64 GNU/Linux</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 仅显示内核版本</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> uname</span><span style="color:#79B8FF"> -r</span></span>
+<span class="line"><span style="color:#B392F0">6.9.6-amd64-desktop-rolling</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 显示系统架构，如x86_64、i686等</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> uname</span><span style="color:#79B8FF"> -m</span></span>
+<span class="line"><span style="color:#B392F0">x86_64</span></span></code></pre>
+<h3 id="etcos-release"><code>/etc/os-release</code></h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/os-release</span></span>
+<span class="line"><span style="color:#E1E4E8">PRETTY_NAME</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&quot;Deepin 23&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">NAME</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&quot;Deepin&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">VERSION_ID</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&quot;23&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">VERSION</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&quot;23&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">ID</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">deepin</span></span>
+<span class="line"><span style="color:#E1E4E8">HOME_URL</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&quot;https://www.deepin.org/&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">BUG_REPORT_URL</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&quot;https://bbs.deepin.org&quot;</span></span>
+<span class="line"><span style="color:#E1E4E8">VERSION_CODENAME</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">beige</span></span></code></pre>
+<h3 id="hostnamectl"><code>hostnamectl</code></h3>
+<p><code>hostnamectl</code> 命令不仅可以显示和设置系统的主机名，还可以显示操作系统的相关信息，如名称、版本、架构等。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> hostnamectl</span></span>
+<span class="line"><span style="color:#B392F0"> Static</span><span style="color:#9ECBFF"> hostname:</span><span style="color:#9ECBFF"> xyzwps-PC</span></span>
+<span class="line"><span style="color:#B392F0">       Icon</span><span style="color:#9ECBFF"> name:</span><span style="color:#9ECBFF"> computer-desktop</span></span>
+<span class="line"><span style="color:#B392F0">         Chassis:</span><span style="color:#9ECBFF"> desktop</span><span style="color:#9ECBFF"> 🖥️</span></span>
+<span class="line"><span style="color:#B392F0">      Machine</span><span style="color:#9ECBFF"> ID:</span><span style="color:#9ECBFF"> df76f4c6bd26446d96b7a83e15be1287</span></span>
+<span class="line"><span style="color:#B392F0">         Boot</span><span style="color:#9ECBFF"> ID:</span><span style="color:#9ECBFF"> a1c6a19cdb3b419fa743575ba1372036</span></span>
+<span class="line"><span style="color:#B392F0">Operating</span><span style="color:#9ECBFF"> System:</span><span style="color:#9ECBFF"> Deepin</span><span style="color:#79B8FF"> 23</span></span>
+<span class="line"><span style="color:#B392F0">          Kernel:</span><span style="color:#9ECBFF"> Linux</span><span style="color:#9ECBFF"> 6.9.6-amd64-desktop-rolling</span></span>
+<span class="line"><span style="color:#B392F0">    Architecture:</span><span style="color:#9ECBFF"> x86-64</span></span>
+<span class="line"><span style="color:#B392F0"> Hardware</span><span style="color:#9ECBFF"> Vendor:</span><span style="color:#9ECBFF"> AZW</span></span>
+<span class="line"><span style="color:#B392F0">  Hardware</span><span style="color:#9ECBFF"> Model:</span><span style="color:#9ECBFF"> GTR</span></span>
+<span class="line"><span style="color:#B392F0">Firmware</span><span style="color:#9ECBFF"> Version:</span><span style="color:#9ECBFF"> GTR6_P5C4V21</span></span>
+<span class="line"><span style="color:#B392F0">   Firmware</span><span style="color:#9ECBFF"> Date:</span><span style="color:#9ECBFF"> Fri</span><span style="color:#9ECBFF"> 2023-03-10</span></span>
+<span class="line"><span style="color:#B392F0">    Firmware</span><span style="color:#9ECBFF"> Age:</span><span style="color:#9ECBFF"> 1y</span><span style="color:#9ECBFF"> 8month</span><span style="color:#9ECBFF"> 1w</span><span style="color:#9ECBFF"> 5d</span></span></code></pre>
+<h3 id="procversion"><code>/proc/version</code></h3>
+<p>该文件用于包含当前Linux内核的版本号和编译日期等信息。虽然它主要显示内核信息，但也可以间接反映操作系统的版本。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /proc/version</span></span>
+<span class="line"><span style="color:#B392F0">Linux</span><span style="color:#9ECBFF"> version</span><span style="color:#9ECBFF"> 6.9.6-amd64-desktop-rolling</span><span style="color:#E1E4E8"> (root@deepinci-amd7) (</span><span style="color:#B392F0">gcc</span><span style="color:#E1E4E8"> (Deepin </span><span style="color:#9ECBFF">13.2.0-3deepin3</span><span style="color:#E1E4E8">) 13.2.0, GNU ld (</span><span style="color:#B392F0">GNU</span><span style="color:#9ECBFF"> Binutils</span><span style="color:#9ECBFF"> for</span><span style="color:#9ECBFF"> Deepin</span><span style="color:#E1E4E8">) 2.41) </span><span style="color:#6A737D">#23.01.01.02 SMP PREEMPT_DYNAMIC Tue Jul 23 12:20:02 CST 2024</span></span></code></pre>
+<h2 id="查看发行版信息">查看发行版信息</h2>
+<h3 id="lsb_release"><code>lsb_release</code></h3>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#6A737D"># 显示所有发行版信息，包括发行版名称、版本号、描述等</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> lsb_release</span><span style="color:#79B8FF"> -a</span></span>
+<span class="line"><span style="color:#B392F0">No</span><span style="color:#9ECBFF"> LSB</span><span style="color:#9ECBFF"> modules</span><span style="color:#9ECBFF"> are</span><span style="color:#9ECBFF"> available.</span></span>
+<span class="line"><span style="color:#B392F0">Distributor</span><span style="color:#9ECBFF"> ID:</span><span style="color:#9ECBFF">	Deepin</span></span>
+<span class="line"><span style="color:#B392F0">Description:</span><span style="color:#9ECBFF">	Deepin</span><span style="color:#79B8FF"> 23</span></span>
+<span class="line"><span style="color:#B392F0">Release:</span><span style="color:#79B8FF">	23</span></span>
+<span class="line"><span style="color:#B392F0">Codename:</span><span style="color:#9ECBFF">	beige</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 仅显示发行版描述</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> lsb_release</span><span style="color:#79B8FF"> -d</span></span>
+<span class="line"><span style="color:#B392F0">No</span><span style="color:#9ECBFF"> LSB</span><span style="color:#9ECBFF"> modules</span><span style="color:#9ECBFF"> are</span><span style="color:#9ECBFF"> available.</span></span>
+<span class="line"><span style="color:#B392F0">Description:</span><span style="color:#9ECBFF">	Deepin</span><span style="color:#79B8FF"> 23</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D"># 仅显示发行版名称</span></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> lsb_release</span><span style="color:#79B8FF"> -s</span></span>
+<span class="line"><span style="color:#B392F0">No</span><span style="color:#9ECBFF"> LSB</span><span style="color:#9ECBFF"> modules</span><span style="color:#9ECBFF"> are</span><span style="color:#9ECBFF"> available</span></span></code></pre>
+<p>注意：并非所有Linux发行版都支持lsb_release命令，这取决于是否安装了LSB（Linux Standard Base）模块。</p>
+<h3 id="etcissue"><code>/etc/issue</code></h3>
+<p>该文件也包含了系统的版本信息，但格式可能因发行版而异：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/issue</span></span>
+<span class="line"><span style="color:#B392F0">Deepin</span><span style="color:#9ECBFF"> GNU/Linux</span><span style="color:#79B8FF"> 23</span><span style="color:#79B8FF"> \n</span><span style="color:#79B8FF"> \l</span></span></code></pre>
+<h3 id="etcdebian_version"><code>/etc/debian_version</code></h3>
+<p>仅适用于给予 debian 的系统，如 ubuntu 等：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cat</span><span style="color:#9ECBFF"> /etc/debian_version</span></span>
+<span class="line"><span style="color:#B392F0">bookworm/sid</span></span></code></pre> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/linux">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#查看系统信息">查看系统信息</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#uname">uname</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#etcos-release">/etc/os-release</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#hostnamectl">hostnamectl</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#procversion">/proc/version</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#查看发行版信息">查看发行版信息</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#lsb_release">lsb_release</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#etcissue">/etc/issue</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#etcdebian_version">/etc/debian_version</a> </li> </ol>  </div> </div> </div> </div> </body></html>
