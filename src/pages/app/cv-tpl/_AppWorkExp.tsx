@@ -1,5 +1,5 @@
 import { TbSquarePlus } from "react-icons/tb";
-import { useCVData } from "./store";
+import { useCVData } from "./_store";
 
 export default function AppWorkExp() {
   const { workExp, setEduExp } = useCVData();

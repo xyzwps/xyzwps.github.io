@@ -1,5 +1,5 @@
 import Input from "../../../react/Input";
-import { useCVData } from "./store";
+import { useCVData } from "./_store";
 
 export default function AppPersonalInformation() {
   const { birthYear, gender, xueli, email, phone } = useCVData((state) => state.personalInfomation);

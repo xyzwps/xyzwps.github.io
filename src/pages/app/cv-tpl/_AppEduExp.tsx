@@ -1,6 +1,6 @@
 import { useFloating } from "@floating-ui/react";
-import { useCVData } from "./store";
-import type { EduStage } from "./types";
+import { useCVData } from "./_store";
+import type { EduStage } from "./_types";
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeading, DialogDescription, DialogClose } from "../../../react/Dialog";
 import Input, { TextArea } from "../../../react/Input";

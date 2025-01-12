@@ -1,9 +1,9 @@
-import AppIntention from "./AppIntention";
-import AppPersonalInformation from "./AppPersonalInformation";
-import AppTitle from "./AppTitle";
-import AppEduExp from "./AppEduExp";
-import AppBlock from "./AppBlock";
-import AppWorkExp from "./AppWorkExp";
+import AppIntention from "./_AppIntention";
+import AppPersonalInformation from "./_AppPersonalInformation";
+import AppTitle from "./_AppTitle";
+import AppEduExp from "./_AppEduExp";
+import AppBlock from "./_AppBlock";
+import AppWorkExp from "./_AppWorkExp";
 
 export default function CVTplApp() {
   return (

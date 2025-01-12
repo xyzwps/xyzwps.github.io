@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { EduStage, WorkStage } from './types'
+import type { EduStage, WorkStage } from './_types'
 
 interface CVData {
   title: string,
