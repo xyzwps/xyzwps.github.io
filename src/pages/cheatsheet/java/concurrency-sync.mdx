@@ -3,7 +3,7 @@ layout: ../../../layouts/MdxLayout.astro
 title: synchronized
 parent:
   name: 返回上级
-  path: /cheatsheet/java/thread
+  path: /cheatsheet/java/concurrency
 ---
 
 **同步**（_synchronization_）是一种线程间通信机制。Java 语言中同步使用**监视器**（_monitor_）实现的。每个 Java 对象都有一个与之关联的监视器，线程可以对监视器**加锁**（_lock_）或者**解锁**（_unlock_）。在同一时刻，一个对象上的锁，只有一个线程可以持有。如果一个监视器锁被某个线程持有，其他线程若要尝试对那个监视器加锁，就会**被阻塞**（_blocked_），直到锁被释放掉为止。一个线程可以对一个监视器加锁多次，对应地，也应该解锁对应的。

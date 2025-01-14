@@ -3,12 +3,12 @@ layout: ../../../layouts/MdxLayout.astro
 title: wai、notify 和 notifyAll
 parent:
   name: 返回上级
-  path: /cheatsheet/java/thread
+  path: /cheatsheet/java/concurrency
 ---
 
 ## 等待集合
 
-每个 Java 对象上都有一个[监视器](/cheatsheet/java/thread-sync)，每个监视器都有一个与之关联的**等待集合**（_wait set_）。一个等待集合是一个线程的集合。
+每个 Java 对象上都有一个[监视器](/cheatsheet/java/concurrency-sync)，每个监视器都有一个与之关联的**等待集合**（_wait set_）。一个等待集合是一个线程的集合。
 
 对象创建时，等待集合是空集。向等待集合中增加或者删除线程的操作都是原子操作。操作等待集合的方法只有以下几个：
 
@@ -19,9 +19,9 @@ parent:
 ## wait、notify 和 notifyAll 
 
 `Object` 类中提供了这样一组方法 `wait`、`notify`、`notifyAll`。
-这组方法配合[监视器锁](/cheatsheet/java/thread-sync)，可以进行线程执行顺序的编排。
+这组方法配合[监视器锁](/cheatsheet/java/concurrency-sync)，可以进行线程执行顺序的编排。
 
-- `wait` 方法执行后，当前线程进入 `WAITING` 状态，等待其他线程唤醒。
+- `wait` 方法执行后，当前线程进入 `WAITING` 状态，等待其他线程唤醒。此时线程会让出其对监视器锁的持有权。
 - `notify` 方法执行后，在监视器锁上唤醒任意一个 `WAITING` 状态的线程。
 - `notifyAll` 方法执行后，在监视器锁上唤醒所有 `WAITING` 状态的线程。
 
@@ -96,5 +96,5 @@ The end.
 
 ## 参考
 
-- [监视器锁](/cheatsheet/java/thread-sync)
+- [监视器锁](/cheatsheet/java/concurrency-sync)
 - [Java 语言规范：Threads and Locks](https://docs.oracle.com/javase/specs/jls/se23/html/jls-17.html#jls-17.1)

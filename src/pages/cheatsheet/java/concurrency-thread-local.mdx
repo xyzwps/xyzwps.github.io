@@ -1,0 +1,29 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: ThreadLocal
+parent:
+  name: 返回上级
+  path: /cheatsheet/java/concurrency
+---
+
+`ThreadLocal` 用于在线程上下文中共享变量。
+
+## 使用 `ThreadLocal`
+
+## 继承
+
+TODO:
+
+## `ThreadLocal` 的问题
+
+`ThreadLocal` 有一些问题：
+
+- `ThreadLocal` 变量是可变的。这意味着，我们可以在线程执行过程中的任何位置去修改 `ThreadLocal` 变量。不正确地修改共享变量会导致意想不到的问题。
+
+- 生命周期无限制。`ThreadLocal` 的生命周期与线程绑定。`ThreadLocal` 变量创建之后，手动调用 `remove()` 方法清理，要么等待线程执行结束。在长时间运行的线程中，忘记调用 `remove()` 是一个常见的错误。
+
+- `ThreadLocal` 的继承机制开销太大。如果开发者创建一个子线程来继承父线程的 `ThreadLocal` 变量时，子线程要把父线程的所有 `ThreadLocal` 变量都复制到自己的 `ThreadLocal` 中。正常的想法是子线程共享父线程的内存不就行了嘛？不这么做的原因是，`ThreadLocal` API 要求在一个线程中对 `ThreadLocal` 变量的改变对其他线程不可见。在每个 Java 应用只有几百、几千个线程的时代，这些都是可以接收的。有了虚拟线程后，程序可以轻松创建几十万、几百万个虚拟线程，这种复制的代价极高，会消耗大量的内存。
+
+## 参考
+
+- [JEP 487: Scoped Values (Fourth Preview)](https://openjdk.org/jeps/487)

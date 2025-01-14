@@ -3,7 +3,7 @@ layout: ../../../layouts/MdxLayout.astro
 title: 线程基础
 parent:
   name: 返回上级
-  path: /cheatsheet/java/thread
+  path: /cheatsheet/java/concurrency
 ---
 
 ## 线程与进程
@@ -16,7 +16,7 @@ parent:
 
 ## Java 中的线程
 
-Java 中的线程有两类：**平台线程**（_platform thread_）和**虚拟线程**（_virtual thread_）。
+Java 中的线程有两类：**平台线程**（_platform thread_）和[**虚拟线程**（_virtual thread_）](/cheatsheet/java/concurrency-virtual-thread)。
 从 Java 21 开始引入了虚拟线程，在之前版本只有平台线程。
 简单来说，Java 中每个平台线程对应于一个操作系统原生线程；虚拟线程是 Java/JVM 提供的功能，
 虚拟线程中的任务，需要具体的平台线程来执行。
@@ -75,7 +75,7 @@ t.start();
 
 - `NEW`：`Thread` 对象创建出来后，但是没有调用 `start()` 方法时，线程处于此状态。
 - `RUNNABLE`：线程在 JVM 中执行过程中，如果在等待操作系统资源（比如 CPU），那么线程就处于此状态。
-- `BLOCKED`：线程等待[监视器锁](/cheatsheet/java/thread-sync)时，处于此状态。
+- `BLOCKED`：线程等待[监视器锁](/cheatsheet/java/concurrency-sync)时，处于此状态。
 - `WAITING`：处于此状态的线程，在等待另一个线程来指定特定操作。在一个线程中执行以下操作会进入此状态：
   - `Object.wait` 不带超时时间。调用此方法后，等待其他线程调用 `Object.notify()` 或者 `Object.notifyAll()`。
   - `Thread.join` 不带超时时间。
@@ -127,15 +127,13 @@ TODO: getThreadGroup
 
 静态方法 `Thread.dumpStack` 用来打印当前线程栈。
 
-静态方法 `Thread.holdsLock` 用来判断当前线程是否持有指定对象上的[监视器锁](/cheatsheet/java/thread-sync)。
+静态方法 `Thread.holdsLock` 用来判断当前线程是否持有指定对象上的[监视器锁](/cheatsheet/java/concurrency-sync)。
 
 实例方法 `start()` 启动一个线程。
 
 实例方法 `run()` 用于实现 `Runnable` 接口。此方法在设计上不用于直接调用，启动线程应使用 `start()` 方法。
 
-实例方法 [`interrupt`](/cheatsheet/java/thread-interrupt) 可以打断别的线程。
-
-戳这里查看[实例方法 `wait/notify/notifyAll` 的用法](/cheatsheet/java/thread-wait-notify)。 
+实例方法 [`interrupt`](/cheatsheet/java/concurrency-thread-interrupt) 可以打断别的线程。
 
 TODO: join
 

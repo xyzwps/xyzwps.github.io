@@ -1,0 +1,80 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 虚拟线程
+parent:
+  name: 返回上级
+  path: /cheatsheet/java/concurrency
+---
+
+## 平台线程与虚拟线程
+
+在虚拟线程（_virtual thread_）出现之前（Java 21 之前），所有的 Java 线程都是平台线程（_platform thread_），即它们是对 JVM 的运行（操作系统）平台线程的包装。
+
+平台线程的问题是开销大。平台线程需要数千条 CPU 指令才能启动。每个平台线程需要占用几兆字节的内存。Java 有很多 API（尤其是网络 I/O 和磁盘 I/O）是阻塞式的，在进行 I/O 操作期间，线程被阻塞。网络服务器应用程序通常要处理很大的并发请求。常见的方式是使用线程池来支持并发（线程池用来避免频繁创建和销毁线程带来的开销），但是线程池占用的内存很大，一个小型服务器应用启动后就要占用数百兆字节内存经常被人诟病；或者使用异步 API（使用这些 API 的任务，最终也是运行在某个线程池上），但是 Java 的提供的异步 I/O API 都非常复杂。
+
+虚拟线程可以很好的解决这些问题。虚拟线程非常轻，我们可以轻易创建大量的虚拟线程，建议虚拟线程用完即抛，不要尝试共享虚拟线程（比如搞虚拟线程池）。JDK 为了虚拟线程，使很多原来的阻塞式 API 适配了虚拟线程，我们可以在虚拟线程里愉快地使用原来那些阻塞式 I/O API 而不用操心平台线程的阻塞问题。虚拟线程也完全支持原来的 `Thread` API，不过有些略微的区别，后面介绍。
+
+## 创建虚拟线程
+
+使用 `Thread.ofVirtual` 方法来构造虚拟线程：
+
+```java
+var vt = Thread.ofVirtual().unstarted(() -> {
+    // do some task
+});
+```
+
+然后使用 `Thread.start` 方法启动虚拟线程：
+
+```java
+vt.start();
+```
+
+这就可以了！
+
+## 载体线程
+
+虚拟线程调度器把虚拟线程挂在到载体线程（_carrier thread_）上。这些载体线程是平台线程。默认情况下，载体线程的数量与 CPU 内核的数量一样多。我们可以使用 `jdk.virtualThreadScheduler.parallelism` 选项调整载体线程的数量。
+
+当一个虚拟线程执行阻塞操作时，会被从载体线程中卸载，然后载体线程可以执行其他的虚拟线程。但在某些情况下，这种卸载是不可能的。在某些情况下，虚拟线程调度程序会通过启动另一个载体线程来进行补偿。比如，在JDK 21中，许多文件 I/O 操作都会发生这种情况，调用 `Object.wait` 时也会发生这种情况。我们可以使用 `jdk.virtualThreadScheduler.maxPoolSize` 选项来控制载体线程的最大数量。
+
+因为虚拟线程最终还是运行在少数载体线程上，所以对虚拟线程的调度开销并不会减少。这意味着，虚拟线程并不适用于 CPU 密集型计算任务。对于 CPU 密集型任务，请优先考虑平台线程；虚拟线程更加适合 I/O 密集型任务。 
+
+## 虚拟线程固定
+
+以下情况下，虚拟线程会被固定（_pinned_）到载体线程上：
+
+- 执行 `synchronized` 方法或语句时
+- 调用本地方法（_native method_）或者外部函数（_foreign function_）时
+
+被固定本身并不坏。但是当被固定的线程阻塞时，它不能被卸载，进而阻塞载体线程。如果使用 `synchronized` 来避免内存操作中的竞争条件，则固定是无害的。但如果有阻塞调用，最好将 `synchronized` 替换为 `ReentrantLock`。
+
+要找出被固定的线程，可以使用 `jdk.tracePinnedThreads` 选项：
+
+```
+-Djdk.tracePinnedThreads=short
+-Djdk.tracePinnedThreads=full
+```
+
+JVM 最终将会使得 `synchronized` 方法或者语句不被固定，但现在还不行。 TODO: 查一下 JEP
+
+## 虚拟线程与平台线程 API 的一些区别
+
+- 所有虚拟线程都在一个[线程组](/cheatsheet/java/concurrency-thread-group)中。
+- 所有虚拟线程的优先级都一样，为 `NORM_PRIORITY`。在虚拟线程上使用 `setPriority` 会被忽略。
+- 所有虚拟线程都是守护线程。在虚拟线程上使用 `setDaemon` 会被忽略。
+
+没有 API 来获取运行虚拟线程的载体线程。
+
+## `ThreadLocal` 和 `ScopedValue`
+
+虚拟线程的出现，给 `ThreadLocal` 出现了很大的问题，见 [`ThreadLocal` 部分](/cheatsheet/java/concurrency-thread-local)。解决这个问题的办法，是使用 `Scopedvalue`。
+
+截至 Java 24，`ScopedValue` 还处于预览状态，预计到 Java 25 的时候可以正式使用。
+
+要定位虚拟线程对 `ThreadLocal` 变量的使用，可以使用 `jdk.traceVirtualThreadLocals` 选项。
+
+## 参考
+
+- [JEP 487: Scoped Values (Fourth Preview)](https://openjdk.org/jeps/487)
+- [Virtual Threads](https://dev.java/learn/new-features/virtual-threads/)
