@@ -1,0 +1,73 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 打断线程
+parent:
+  name: 返回上级
+  path: /cheatsheet/java/thread
+---
+
+使用 `Thread.interrupt` 方法可以打断线程执行。
+
+## 打断其他线程
+
+下面的程序演示主线程打断线程 `t`：
+
+```java
+public static void main(String[] args) throws InterruptedException {
+    var t = Thread.ofPlatform().start(() -> {
+        System.out.println("Thread start.");
+        try {
+            Thread.sleep(10_000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    });
+    
+    Thread.sleep(1000);
+    System.out.printf("Thread %d interrupted: %s\n", t.threadId(), t.isInterrupted());
+    t.interrupt();
+    System.out.printf("Thread %d interrupted: %s\n", t.threadId(), t.isInterrupted());
+}
+```
+
+## 打断自己
+
+下面代码演示线程打断自己的效果：
+
+```java
+class InterruptSelf {
+    Thread t;
+
+    void doTask() {
+        System.out.println("Thread started.");
+        System.out.printf("Current thread is %d.\n", Thread.currentThread().threadId());
+        System.out.printf("Thread t is %d.\n", t.threadId());
+        System.out.printf("Thread interrupted: %s\n", t.isInterrupted());
+        t.interrupt();
+        System.out.printf("Thread interrupted: %s\n", t.isInterrupted());
+        System.out.println("Thread terminated.");
+    }
+
+    public static void main(String[] args) {
+        var task = new InterruptSelf();
+        var t = Thread.ofPlatform().unstarted(() -> {
+            task.doTask();
+        });
+        task.t = t;
+        t.start();
+    }
+}
+```
+
+上面的示例使用 Java 23 执行结果如下：
+
+```
+Thread started.
+Current thread is 34.
+Thread t is 34.
+Thread interrupted: false
+Thread interrupted: true
+Thread terminated.
+```
+
+可以看到线程打断自己并没有什么效果，但是会把打断状态给修改了。要谨慎考虑线程打断自己对执行流程的影响。

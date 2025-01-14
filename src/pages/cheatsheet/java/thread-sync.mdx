@@ -1,0 +1,134 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: synchronized
+parent:
+  name: 返回上级
+  path: /cheatsheet/java/thread
+---
+
+**同步**（_synchronization_）是一种线程间通信机制。Java 语言中同步使用**监视器**（_monitor_）实现的。每个 Java 对象都有一个与之关联的监视器，线程可以对监视器**加锁**（_lock_）或者**解锁**（_unlock_）。在同一时刻，一个对象上的锁，只有一个线程可以持有。如果一个监视器锁被某个线程持有，其他线程若要尝试对那个监视器加锁，就会**被阻塞**（_blocked_），直到锁被释放掉为止。一个线程可以对一个监视器加锁多次，对应地，也应该解锁对应的。
+
+Java 中使用监视器锁有两种方式：`synchronized` 语句和 `synchronized` 方法。
+
+## `synchronized` 语句
+
+对于 `synchronized` 语句，有时会简称同步语句块，或者同步块。这个语句使用下面这种方式：
+
+```java
+var monitor = someJavaObject;
+synchronized(monitor) {
+  // do some task
+}
+```
+
+代码执行进入同步块时，对 `monitor` 加锁，在离开同步块时释放锁，不管是正常离开，还是不正常离开（如抛异常，线程被打断等）。
+
+举个例子。我们希望编写一个计数器：
+
+```java
+class Counter {
+    int value;
+    void incr() { value++; }
+    void decr() { value--; }
+}
+```
+
+我们使用两个线程对其测试：
+
+```java
+public static void main(String[] args) throws InterruptedException {
+    var counter = new Counter();
+    var times = 10000;
+    var t1 = Thread.ofPlatform().start(() -> {
+        for (int i = 0; i < times; i++) {
+            counter.incr();
+        }
+    });
+    var t2 = Thread.ofPlatform().start(() -> {
+        for (int i = 0; i < times; i++) {
+            counter.decr();
+        }
+    });
+    t1.join();
+    t2.join();
+    System.out.println(counter.value);
+}
+```
+
+上面的测试程序最后一行大概率不会输出 0，因为 `++` 和 `--` 不是原子操作。为了使其正常工作，我们尝试把 `Counter` 改成加锁的版本：
+
+```java
+
+class Counter {
+    int value;
+    private final Object monitor = new Object();
+
+    void incr() {
+        synchronized(monitor) { value++; }
+    }
+
+    void decr() {
+        synchronized(monitor) { value--; }
+    }
+}
+```
+
+再次运行上面的测试程序，就可以稳定看到输出 0 了。
+
+我们注意到 `this` 关键字是指向对象自己的引用，所以上面版本的 `Counter` 中可以不必单独创建一个 `monitor` 用作监视器锁，直接使用 `this` 做监视器锁即可，可以把代码改成如下形式：
+
+```java
+class Counter {
+    int value;
+
+    void incr() {
+        synchronized(this) { value++; }
+    }
+
+    void decr() {
+        synchronized(this) { value--; }
+    }
+}
+```
+
+### 可重入性
+
+监视器锁是**可重入的**，换句话说，就是持有锁的线程可以再次对监视器进行加锁。比如下面的代码是合法的：
+
+```java
+var t = new Object();
+synchronized(t) {
+    synchronized(t) {
+        System.out.println("made it!");
+    }
+}
+```
+
+如果监视器锁不可重入，那么上面的代码就会引起死锁。。
+
+## `synchronized` 方法
+
+可以在方法上加上 `synchronized` 关键字。
+
+对于 `synchronized` 的实例方法，其使用 `this` 作为监视器锁。下面的代码：
+
+```java
+synchronized void incr() { value++; }
+```
+
+等价于
+
+```java
+void incr() {
+    synchronized(this) { value++; }
+}
+```
+
+对于 `synchronized` 的静态方法，其使用所在类的 `Class` 对象作为监视器锁。
+
+
+## 参考
+
+- [Java 语言规范：`synchronized` Methods](https://docs.oracle.com/javase/specs/jls/se23/html/jls-8.html#jls-8.4.3.6)
+- [Java 语言规范：Threads and Locks](https://docs.oracle.com/javase/specs/jls/se23/html/jls-17.html#jls-17.1)
+- [Java 语言规范：The `synchronized` Statement](https://docs.oracle.com/javase/specs/jls/se23/html/jls-14.html#jls-14.19)

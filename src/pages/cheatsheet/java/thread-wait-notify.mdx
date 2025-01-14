@@ -1,0 +1,100 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: wai、notify 和 notifyAll
+parent:
+  name: 返回上级
+  path: /cheatsheet/java/thread
+---
+
+## 等待集合
+
+每个 Java 对象上都有一个[监视器](/cheatsheet/java/thread-sync)，每个监视器都有一个与之关联的**等待集合**（_wait set_）。一个等待集合是一个线程的集合。
+
+对象创建时，等待集合是空集。向等待集合中增加或者删除线程的操作都是原子操作。操作等待集合的方法只有以下几个：
+
+- `Object.wait`
+- `Object.notify`
+- `Object.notifyAll`
+
+## wait、notify 和 notifyAll 
+
+`Object` 类中提供了这样一组方法 `wait`、`notify`、`notifyAll`。
+这组方法配合[监视器锁](/cheatsheet/java/thread-sync)，可以进行线程执行顺序的编排。
+
+- `wait` 方法执行后，当前线程进入 `WAITING` 状态，等待其他线程唤醒。
+- `notify` 方法执行后，在监视器锁上唤醒任意一个 `WAITING` 状态的线程。
+- `notifyAll` 方法执行后，在监视器锁上唤醒所有 `WAITING` 状态的线程。
+
+这些方法要配合监视器锁（`synchronized` 关键字）一起使用。下面是一个例子：先启动 5
+个线程，这些线程打印一句话后进入 `WAITING` 状态。之后主线程每隔一秒唤醒一个线程，连续唤醒 3
+个线程。之后唤醒剩下的线程：
+
+```java
+public static void main(String[] args) throws InterruptedException {
+    var monitor = new Object();
+
+    for (int i = 0; i < 5; i++) {
+        var name = "wait-" + (i + 1);
+        Thread.ofPlatform().name(name)
+            .start(() -> {
+                System.out.printf("Thread %s started.\n", name);
+                synchronized (monitor) {
+                    try {
+                        monitor.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+                System.out.printf("-> Thread %s woked up.\n", name);
+            });
+    }
+
+    for (int i = 0; i < 3; i++) {
+        Thread.sleep(1000);
+        synchronized (monitor) {
+            System.out.println("# nofify");
+            monitor.notify();
+        }
+    }
+
+    Thread.sleep(1000);
+    synchronized (monitor) {
+        System.out.println("# notify all");
+        monitor.notifyAll();
+    }
+}
+```
+
+`wait` 方法可以加一个超时时间，表示要么被别的线程唤醒，要么到时间我自己醒。比如下例：
+
+```java
+public static void main(String[] args) throws InterruptedException {
+    var monitor = new Object();
+    Thread.ofPlatform().start(() -> {
+        synchronized (monitor) {
+            System.out.println("Thread started.");
+            try {
+                monitor.wait(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Thread terminated.");
+        }
+    });
+
+    Thread.sleep(2500);
+    System.out.println("The end.");
+}
+```
+
+输出：
+
+```
+Thread started.
+Thread terminated.
+The end.
+```
+
+## 参考
+
+- [监视器锁](/cheatsheet/java/thread-sync)
+- [Java 语言规范：Threads and Locks](https://docs.oracle.com/javase/specs/jls/se23/html/jls-17.html#jls-17.1)

@@ -1,0 +1,144 @@
+---
+layout: ../../../layouts/MdxLayout.astro
+title: 线程基础
+parent:
+  name: 返回上级
+  path: /cheatsheet/java/thread
+---
+
+## 线程与进程
+
+以下问题请直接向 AI 助手提问了解即可：
+
+- 什么是进程？
+- 什么是线程？
+- 进程与线程有什么区别？
+
+## Java 中的线程
+
+Java 中的线程有两类：**平台线程**（_platform thread_）和**虚拟线程**（_virtual thread_）。
+从 Java 21 开始引入了虚拟线程，在之前版本只有平台线程。
+简单来说，Java 中每个平台线程对应于一个操作系统原生线程；虚拟线程是 Java/JVM 提供的功能，
+虚拟线程中的任务，需要具体的平台线程来执行。
+
+从 `main` 方法进入执行代码的那个线程一般叫做主线程。
+
+## 如何创建线程
+
+Java 的线程本身是一个 `java.lang.Thread` 对象，创建线程就是创建一个 `Thread` 对象。
+
+可以通过 `Thread` 的构造器来创建线程。`Thread` 类的构造方法有很多个，可以去看源码了解每个构造器的使用方法。
+下面是一个通过构造器 `Thread(Runnable)` 来创建线程的例子：
+
+```java
+var t = new Thread(() -> {
+    // do some task
+});
+```
+
+`Thread` 类不是 `final` 的，这意味着你可以通过继承 `Thread` 类来增加功能。这样一来，你就可以通过这个子类来创建线程了。
+
+通过以上两种方式创建的线程都是平台线程。
+还可以通过 `Thread.ofPlatform()` 静态方法创建平台线程。
+
+如果需要创建虚拟线程，可以使用 `Thread.ofVirtual()` 静态方法来创建。如：
+
+```java
+// 创建一个未执行的虚拟线程
+var t = Thread.ofVirtual().unstarted(() -> {
+    // do some task
+});
+```
+
+使线程开始执行，需要调用线程的 `Thread` 的 `start()` 方法即可：
+
+```java
+t.start();
+```
+
+## `Runnable`
+
+注意，有些人会说，可以通过 `java.lang.Runnable` 接口来创建线程。这话对也不对。
+
+`Runnable` 接口在语义上表示一个不接受参数，也不返回结果的操作。
+一个 `Runnable` 对象也只是一个对象而已，和线程本身并无直接关系。
+如果你愿意，你可以把 `Runnable` 对象用在任何地方。
+
+说它可以创建线程的原因我猜可能有两个：
+
+1. `Thread` 类实现了 `Runnable` 接口。
+1. `Thread` 类中有这样一个构造器 `Thread(Runnable)`。
+
+## 线程的状态
+
+线程的状态是有限的，定义在 `Thread.State` 枚举类中。有以下几种：
+
+- `NEW`：`Thread` 对象创建出来后，但是没有调用 `start()` 方法时，线程处于此状态。
+- `RUNNABLE`：线程在 JVM 中执行过程中，如果在等待操作系统资源（比如 CPU），那么线程就处于此状态。
+- `BLOCKED`：线程等待[监视器锁](/cheatsheet/java/thread-sync)时，处于此状态。
+- `WAITING`：处于此状态的线程，在等待另一个线程来指定特定操作。在一个线程中执行以下操作会进入此状态：
+  - `Object.wait` 不带超时时间。调用此方法后，等待其他线程调用 `Object.notify()` 或者 `Object.notifyAll()`。
+  - `Thread.join` 不带超时时间。
+  - `LockSupport.park`
+- `TIMED_WAITING`：线程处于等待状态，并且有一个指定的等待时长。执行以下操作后线程会进入此状态：
+  - `Thread.sleep`
+  - `Object.wait` 指定了超时时间
+  - `Thread.join` 指定了超时时间
+  - `LockSupport.parkNanos`
+  - `LockSupport.parkUntil`
+- `TERMINATED`：线程执行完后处于此状态。
+
+## 当前线程
+
+可以在代码执行过程中，调用静态方法 `Thread.currentThread()` 来获取执行当前代码的 `Thread` 对象。
+
+## 线程的属性
+
+每个线程都有一个 ID。在 Java 19 之前，可以通过实例方法 `getId` 来获取；
+Java 19 及其之后，使用 `threadId` 获取。
+
+实例方法 `isVirtual` 用来判断是否是虚拟线程。
+
+实例方法 `isAlive` 用来判单一个线程是否“活着”。一个线程在启动后但是没有结束时，就说它“活着”。
+
+实例方法 `setPriority` 用来改变一个平台线程的优先级。值越小优先级越高。
+虚拟线程的优先级固定为 `Thread.NORM_PRIORITY`，修改会被忽略。
+实例方法 `getPriority` 用来获取线程优先级。
+
+实例方法 `setName` 和 `getName` 用来线程名称。
+
+实例方法 `setDaemon` 和 `isDaemon` 用来设置线程是否是守护线程，判断线程是否是守护线程。
+虚拟线程永远是守护线程，并且不可以 `setDaemon(false)`。
+守护线程是一种特殊的线程，它的生命周期依赖于非守护线程。当所有的非守护线程结束时，守护线程会自动终止，无论它是否完成了任务。
+
+实例方法 `getState` 获取线程当前的状态。
+
+线程执行的任务可能因为抛异常而结束。
+静态方法 `Thread.setDefaultUncaughtExceptionHandler` 用于设置一个默认的回调函数来接收未被捕获的异常。
+实例方法 `setUncaughtExceptionHandler` 用来给指定线程设置特定的回调来接收未被捕获的异常。
+
+TODO: getThreadGroup
+
+## 线程的操作
+
+静态方法 `Thread.sleep` 使当前线程“睡眠”一段时间。
+
+静态方法 `Thread.ofPlatform` 和 `Thread.ofVirtual` 用来创建平台线程和虚拟线程。
+
+静态方法 `Thread.dumpStack` 用来打印当前线程栈。
+
+静态方法 `Thread.holdsLock` 用来判断当前线程是否持有指定对象上的[监视器锁](/cheatsheet/java/thread-sync)。
+
+实例方法 `start()` 启动一个线程。
+
+实例方法 `run()` 用于实现 `Runnable` 接口。此方法在设计上不用于直接调用，启动线程应使用 `start()` 方法。
+
+实例方法 [`interrupt`](/cheatsheet/java/thread-interrupt) 可以打断别的线程。
+
+戳这里查看[实例方法 `wait/notify/notifyAll` 的用法](/cheatsheet/java/thread-wait-notify)。 
+
+TODO: join
+
+## 参考
+
+- [JEP 444: Virtual Threads](https://openjdk.org/jeps/444)。
