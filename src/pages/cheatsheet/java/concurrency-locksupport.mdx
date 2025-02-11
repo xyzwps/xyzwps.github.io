@@ -1,1 +1,41 @@
-TODO:
+---
+layout: ../../../layouts/MdxLayout.astro
+title: LockSupport
+parent:
+  name: 返回上级
+  path: /cheatsheet/java/concurrency
+---
+
+此类提供了基本的线程阻塞原语，用于实现锁或者其他同步类。
+
+它提供了两个方法：`park` 和 `unpark`。其中 `park` 方法有几种变体。
+
+## `park` 方法
+
+调用方法阻塞当前线程，直到以下情况之一发生为止：
+
+- 一个对应的 `unpark` 调用发生；
+- 一个对应的 `unpark` 调用已经发生过；
+- 线程被中断；
+- 过期时长已用尽（对应 `parkNanos` 方法）；
+- 阻塞时间超过截止时刻（对应 `parkUntil` 方法）；
+- 虚假唤醒，即无明确原因地返回。
+
+请注意最后一个条件，有点坑，所以这个方法不适合替代 `Thread.sleep`，主要用于优化**忙等待**（_buzy wait_）。
+`park` 方法的设计目的是仅用于以下形式：
+
+```java
+while (!canProceed()) {
+  // ensure request to unpark is visible to other threads
+  ...
+  LockSupport.park(..);
+}
+```
+
+## `unpark` 方法
+
+如上面所述，它用于解除一个因 `park` 被阻塞的线程。
+
+## Blocker
+
+`LockSupport` 方法中使用了一个 blocker 对象，可以在 `park` 阻塞前写入到被阻塞的线程对象中，在阻塞解除后从线程对象中清除。这个对象主要用在调试和诊断工具上，没事不要使用。

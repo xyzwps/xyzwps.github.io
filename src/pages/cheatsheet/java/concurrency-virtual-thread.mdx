@@ -32,6 +32,38 @@ vt.start();
 
 这就可以了！
 
+直接一点可以这样：
+
+```java
+Thread.ofVirtual().start(() -> {
+    // do some task
+});
+```
+
+还可以更直接一点：
+
+```java
+var t = Thread.startVirtualThread(() -> {
+    // do some task
+});
+```
+
+另外，`Thread.ofVirtual().factory()` 会返回一个 `ThreadFactory`，可以用它的 `newThread` 方法来创建未开始的线程：
+
+```java
+var factory = Thread.ofVirtual().factory();
+var t = factory.newThread(() -> {
+    // do some task
+});
+t.start();
+```
+
+还可以为从这个工厂创建的线程，取形如 `${prefix}${seq}` 形式的线程名称：
+
+```java
+var factory = Thread.ofVirtual().name("task-", 1).factory();
+```
+
 ## 载体线程
 
 虚拟线程调度器把虚拟线程挂在到载体线程（_carrier thread_）上。这些载体线程是平台线程。默认情况下，载体线程的数量与 CPU 内核的数量一样多。我们可以使用 `jdk.virtualThreadScheduler.parallelism` 选项调整载体线程的数量。
@@ -73,6 +105,15 @@ JVM 最终将会使得 `synchronized` 方法或者语句不被固定，但现在
 截至 Java 24，`ScopedValue` 还处于预览状态，预计到 Java 25 的时候可以正式使用。
 
 要定位虚拟线程对 `ThreadLocal` 变量的使用，可以使用 `jdk.traceVirtualThreadLocals` 选项。
+
+## 总结
+
+我们总结一下虚拟线程的使用要点：
+
+- 虚拟线程不适用于 CPU 密集型任务，适用于 I/O 密集型任务。
+- 虚拟线程很轻，建议即用即抛，不要搞虚拟线程池。
+- 使用虚拟线程要避免线程被固定。当前阶段，避免在虚拟线程中使用 `synchronized` 包裹阻塞 API。使用 `ReentrantLock` 替代。
+- 尽可能避免在虚拟线程中使用 `ThreadLocal`。可以先尝鲜使用 `ScopedValue` 替代（谁让它当前没有 release 呢）。
 
 ## 参考
 
