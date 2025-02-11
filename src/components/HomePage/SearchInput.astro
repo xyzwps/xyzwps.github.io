@@ -18,9 +18,10 @@
 <script>
   const searchInput = document.getElementById('search-input') as HTMLInputElement;
   const search = () => {
-    const value = searchInput.value;
-    if (value && value.trim()) {
-      location.href = `https://cn.bing.com/search?q=${encodeURI(value)}`;
+    const value = (searchInput.value || '').trim();
+    if (value) {
+      const qs = encodeURI(value.split(' ').filter(it => it).join('+'));
+      location.href = `https://cn.bing.com/search?q=${qs}`;
     }
   };
   searchInput.addEventListener('keyup', (e) => {
