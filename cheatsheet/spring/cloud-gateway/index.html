@@ -1,0 +1,257 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/spring/cloud-gateway"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spring MVC 中如何编写 Controller</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.B49diLuX.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>Spring MVC 中如何编写 Controller</h1>  <h2 id="项目搭建">项目搭建</h2>
+<p>pom.xml 文件中需要增加 <em>spring-cloud-starter-gateway</em> 依赖。建议从 <a href="https://start.spring.io/">https://start.spring.io/</a>
+上生成一个项目，并加上 gateway 依赖，然后浏览生成的 pom.xml 文件，从里面抄需要的部分。</p>
+<h2 id="如何配置网关转发请求">如何配置网关转发请求？</h2>
+<ol>
+<li>配置到 <em>application.yml</em> 文件中。比如：
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="yml"><code><span class="line"><span style="color:#85E89D">spring</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">  cloud</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">    gateway</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#85E89D">      routes</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">      - </span><span style="color:#85E89D">id</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">after_route</span></span>
+<span class="line"><span style="color:#85E89D">        uri</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">https://example.org</span></span>
+<span class="line"><span style="color:#85E89D">        predicates</span><span style="color:#E1E4E8">:</span></span>
+<span class="line"><span style="color:#E1E4E8">        - </span><span style="color:#9ECBFF">Cookie=mycookie,mycookievalue</span></span></code></pre>
+具体的配置细节建议去查 spring cloud gateway 的手册。</li>
+<li>手动编写 dsl。就是注册一个 <code>RouteLocator</code> bean，然后在其中编写配置项。类似与这种：
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Bean</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> RouteLocator </span><span style="color:#B392F0">customRouteLocator</span><span style="color:#E1E4E8">(RouteLocatorBuilder builder) {</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">routes</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">      .</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;prefix-match&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/apis/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">             .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">      .</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;rewrite&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/api-v1/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">             .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f.</span><span style="color:#B392F0">rewritePath</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/api-v1/(?&lt;segment&gt;[a-zA-Z0-9_-]*)&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;/apis/${segment}&quot;</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">             .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">      .</span><span style="color:#B392F0">build</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+这个东西下文会做解释。</li>
+</ol>
+<p>因为使用 dsl 可以更加灵活，所以本文主要使用这种方式来描述。</p>
+<h2 id="gateway-和-gateway-mvc-有什么区别"><code>gateway</code> 和 <code>gateway-mvc</code> 有什么区别？</h2>
+<p><code>gateway</code> 是基于 spring webflux 异步框架的，底层是 netty；<code>gateway-mvc</code>
+是基于 spring mvc 的，底层是 servlet 容器。</p>
+<p>在网关场景下，主要工作是做请求的转发，主要瓶颈在于网络 IO。所以这里推荐使用
+<code>gateway</code> 而非 <code>gateway-mvc</code>。使用 <code>gateway</code> 的话，建议简单学习下
+<a href="https://projectreactor.io/">Reactor 项目</a>，因为几乎所有基于 webflux
+的开发都是如何编写 reactive operator 的。</p>
+<p>本文基于 <code>gateway</code>。</p>
+<h2 id="gateway-如何工作的">Gateway 如何工作的？</h2>
+<p><img src="/assets/img/cheatsheet/spring/cloud-gateway-how-it-works.png" alt="how cloud gateway works"/></p>
+<h2 id="如何编写全局-filter">如何编写全局 Filter？</h2>
+<p>在 Gateway 中，全局 filter 是一个 <code>GlobalFilter</code> 实例。要协调多个 filter 之间的执行顺序，只需要实现
+<code>Ordered</code> 接口即可。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> com.google.common.util.concurrent.RateLimiter;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> com.xyzwps.cheatsheet.cloudgateway.FilterOrder;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> lombok.extern.slf4j.Slf4j;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.cloud.gateway.filter.GatewayFilterChain;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.cloud.gateway.filter.GlobalFilter;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.core.Ordered;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.http.HttpHeaders;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.http.HttpStatus;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.http.MediaType;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.stereotype.Component;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.server.ServerWebExchange;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> reactor.core.publisher.Mono;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Slf4j</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">SuppressWarnings</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;UnstableApiUsage&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Component</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> ThrottleFilter</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> GlobalFilter</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">Ordered</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> static</span><span style="color:#F97583"> final</span><span style="color:#E1E4E8"> RateLimiter rateLimiter </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> RateLimiter.</span><span style="color:#B392F0">create</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">); </span><span style="color:#6A737D">// 每秒1次</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Mono&lt;</span><span style="color:#F97583">Void</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(ServerWebExchange </span><span style="color:#FFAB70">exchange</span><span style="color:#E1E4E8">, GatewayFilterChain </span><span style="color:#FFAB70">chain</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        var</span><span style="color:#E1E4E8"> req </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> exchange.</span><span style="color:#B392F0">getRequest</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        log.</span><span style="color:#B392F0">info</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;[{}] Try to throttle: {} {}&quot;</span><span style="color:#E1E4E8">, FilterOrder.THROTTLE_FILTER, req.</span><span style="color:#B392F0">getMethod</span><span style="color:#E1E4E8">(), req.</span><span style="color:#B392F0">getPath</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (rateLimiter.</span><span style="color:#B392F0">tryAcquire</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> chain.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(exchange);</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">        var</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> exchange.</span><span style="color:#B392F0">getResponse</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        res.</span><span style="color:#B392F0">setStatusCode</span><span style="color:#E1E4E8">(HttpStatus.TOO_MANY_REQUESTS);</span></span>
+<span class="line"><span style="color:#E1E4E8">        res.</span><span style="color:#B392F0">getHeaders</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> exchange.</span><span style="color:#B392F0">getResponse</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">writeWith</span><span style="color:#E1E4E8">(Mono.</span><span style="color:#B392F0">just</span><span style="color:#E1E4E8">(res.</span><span style="color:#B392F0">bufferFactory</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">wrap</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;{</span><span style="color:#79B8FF">\&quot;</span><span style="color:#9ECBFF">error</span><span style="color:#79B8FF">\&quot;</span><span style="color:#9ECBFF">:</span><span style="color:#79B8FF">\&quot;</span><span style="color:#9ECBFF">Too Many Requests</span><span style="color:#79B8FF">\&quot;</span><span style="color:#9ECBFF">}&quot;</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">getBytes</span><span style="color:#E1E4E8">())));</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> int</span><span style="color:#B392F0"> getOrder</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> FilterOrder.THROTTLE_FILTER;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="解释一下上文中的-route-方法">解释一下上文中的 <code>route</code> 方法</h2>
+<p>对于这个例子：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;prefix-match&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#6A737D">// 1</span></span>
+<span class="line"><span style="color:#E1E4E8">      r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/apis/**&quot;</span><span style="color:#E1E4E8">).</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">)) </span><span style="color:#6A737D">// 2</span></span></code></pre>
+<p>在 <code>route</code> 方法中</p>
+<ol>
+<li>可以在第一个参数中指定路由 id，如果不指定，则使用随机 id。这里 id 是 <em>prefix-match</em>。</li>
+<li>之后跟一个函数 <code>Function&lt;PredicateSpec, Buildable&lt;Route&gt;&gt;</code>。在这里用来做请求匹配、请求转发、对请求和响应本身做修改等等。这里是把所有
+<code>/apis/</code> 开头的请求都转发到 <code>http://localhost:3000</code> 这个服务器中去。</li>
+</ol>
+<p>上例中 <code>r</code> 的类型是 <code>PredicateSpec</code>，它提供了很多方法用来匹配进入 Gateway 的请求，它继承了 <code>BooleanSpec</code>
+接口，其中提供了一些逻辑运算方法用于更灵活的配置。具体可以查看其 Javadoc。</p>
+<h2 id="如何为指定的-route-添加-filter">如何为指定的 <code>route</code> 添加 Filter？</h2>
+<p><code>PredicateSpec</code> 中有很多匹配请求的方法都返回 <code>BooleanSpec</code>。<code>BooleanSpec</code> 提供了一个 <code>filters</code> 方法，可以在其中添加各种各样的
+<code>GatewayFilter</code>。比如我们有一个这样的 <code>GatewayFilter</code>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> lombok.AllArgsConstructor;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> lombok.extern.slf4j.Slf4j;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.cloud.gateway.filter.GatewayFilter;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.cloud.gateway.filter.GatewayFilterChain;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.server.ServerWebExchange;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> reactor.core.publisher.Mono;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Slf4j</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">AllArgsConstructor</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> DemoGatewayFilter</span><span style="color:#F97583"> implements</span><span style="color:#B392F0"> GatewayFilter</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> final</span><span style="color:#E1E4E8"> String name;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Mono&lt;</span><span style="color:#F97583">Void</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(ServerWebExchange </span><span style="color:#FFAB70">exchange</span><span style="color:#E1E4E8">, GatewayFilterChain </span><span style="color:#FFAB70">chain</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        log.</span><span style="color:#B392F0">info</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;A gateway filter - {}&quot;</span><span style="color:#E1E4E8">, name);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> chain.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(exchange);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>我们就可以这样使用：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">gatewayFilter</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;prefix-match&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/apis/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f</span></span>
+<span class="line"><span style="color:#E1E4E8">                    .</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> DemoGatewayFilter</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;1&quot;</span><span style="color:#E1E4E8">), </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">                    .</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> DemoGatewayFilter</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;2&quot;</span><span style="color:#E1E4E8">), </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>上例中的 <code>f</code> 是一个 <code>GatewayFilterSpec</code>，除了可以往里加入自定义的 <code>GatewayFilter</code> 之外，
+它本身还提供了众多的方法，包括但不限于</p>
+<ul>
+<li>操作请求和响应的各种参数，比如 HTTP 头、search params、请求路径、payload 等等</li>
+<li>调用失败重试</li>
+<li>缓存</li>
+<li>重定向</li>
+<li>断路器</li>
+<li>限速器</li>
+</ul>
+<p>等等。比如，我们可以在请求被转发到被代理的服务器之前，为请求增加一个 search param，可以这样操作：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">addRequestParam</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;prefix-match&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/apis/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f.</span><span style="color:#B392F0">addRequestParameter</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;add&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;123&quot;</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="gatewayfilter-和-globalfilter-之间有什么区别"><code>GatewayFilter</code> 和 <code>GlobalFilter</code> 之间有什么区别？</h2>
+<p>这两个接口除了名字之外，长得一模一样。但是 <code>GlobalFilter</code> 发生在路由匹配之前，是为应用于全局；<code>GatewayFilter</code>
+发生在路由匹配之后，作用于一个个具体的 <code>route</code>。</p>
+<p>在使用它们时，要注意各个 filter 之间的顺序编排。</p>
+<h2 id="如何重写请求路径">如何重写请求路径？</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">rewrite</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;rewrite&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/api-v1/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f.</span><span style="color:#B392F0">rewritePath</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/api-v1/(?&lt;segment&gt;.*)&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;/apis/${segment}&quot;</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>上例中，把 Gateway 接受到的以 <code>/api-v1/</code> 开头的请求，都改成 <code>/apis/</code> 开头，然后转发到 <code>http://localhost:3000</code>。使用</p>
+<h2 id="如何重定向">如何重定向？</h2>
+<p>下面的方法把所有匹配的请求都重定向到固定地址：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">redirect</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;redirect&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/npm/*&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f.</span><span style="color:#B392F0">redirect</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">301</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;https://mirrors.cloud.tencent.com&quot;</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;no://op&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>因为请求被重定向走了，所以 <code>uri</code> 部分应该填 <code>no://op</code>。这种做法比较尴尬，原因是只能重定向到固定地址。
+如果希望重定向地址是动态的，可以参考 <code>RedirectToGatewayFilterFactory</code> 的写法自己实现 <code>GatewayFilter</code>。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">customRedirect</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;custom-redirect&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/npm/*&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> RedirectGatewayFilter</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">                    Pattern.</span><span style="color:#B392F0">compile</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/npm/(?&lt;package&gt;.*)&quot;</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#9ECBFF">                    &quot;https://mirrors.cloud.tencent.com/npm/{package}&quot;</span><span style="color:#E1E4E8">)))</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;no://op&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/// 自定义的重定向 filter</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> record</span><span style="color:#B392F0"> RedirectGatewayFilter</span><span style="color:#E1E4E8">(Pattern pathPattern, String toTemplate) </span><span style="color:#F97583">implements</span><span style="color:#B392F0"> GatewayFilter</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Mono&lt;</span><span style="color:#F97583">Void</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(ServerWebExchange </span><span style="color:#FFAB70">exchange</span><span style="color:#E1E4E8">, GatewayFilterChain </span><span style="color:#FFAB70">chain</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">        var</span><span style="color:#E1E4E8"> path </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> exchange.</span><span style="color:#B392F0">getRequest</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">getURI</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">getPath</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#E1E4E8">exchange.</span><span style="color:#B392F0">getResponse</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">isCommitted</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#B392F0">            setResponseStatus</span><span style="color:#E1E4E8">(exchange, HttpStatus.</span><span style="color:#B392F0">valueOf</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">301</span><span style="color:#E1E4E8">)); </span><span style="color:#6A737D">// 使用 301 重定向</span></span>
+<span class="line"><span style="color:#F97583">            var</span><span style="color:#E1E4E8"> location </span><span style="color:#F97583">=</span><span style="color:#B392F0"> format</span><span style="color:#E1E4E8">(path, pathPattern, toTemplate); </span><span style="color:#6A737D">// 获取重定向地址</span></span>
+<span class="line"><span style="color:#F97583">            var</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> exchange.</span><span style="color:#B392F0">getResponse</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">            res.</span><span style="color:#B392F0">getHeaders</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">set</span><span style="color:#E1E4E8">(HttpHeaders.LOCATION, location); </span><span style="color:#6A737D">// 设置 location 头</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> res.</span><span style="color:#B392F0">setComplete</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> Mono.</span><span style="color:#B392F0">empty</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#6A737D">    // 其他方法省略</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何重试">如何重试？</h2>
+<p>在 Gateway 转发的请求失败需要重试的时候，可以使用 <code>GatewayFilterSpec</code> 提供的 <code>retry</code> 方法。
+默认情况下对 5xx 的 GET 请求进行重试，不过相关参数都是可以修改的。这个重试功能，是使用 reactor 自带的 retry 实现的。</p>
+<h2 id="如何使用-circuit-breaker">如何使用 Circuit Breaker？</h2>
+<p><code>GatewayFilterSpec</code> 提供了 <code>circuitBreaker</code> 方法，目前它是根据状态码来决定是否断路，
+之后把请求 fallback 到另一个 URI。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">circuitBreaker</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;circuit-breaker&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/apis/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f.</span><span style="color:#B392F0">circuitBreaker</span><span style="color:#E1E4E8">((config) </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">                config.</span><span style="color:#B392F0">addStatusCode</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;404&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">                config.</span><span style="color:#B392F0">setFallbackUri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;forward:/apis/demo/get-user&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">            }))</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>当前，仅支持 fallback 到另一个 URI。如果你希望 fallback 到一个固定地方，比如一个空数组、固定对象，或者自定义
+fallback 发生的条件，可以参照 <code>SpringCloudCircuitBreakerFilterFactory</code> 来自己实现一版。
+Gateway 提供了一个基于 resilience4j 的 circuit breaker。</p>
+<h2 id="如何使用-rate-limiter">如何使用 Rate Limiter？</h2>
+<p>如果是全局限流，可以在 <code>GlobalFilter</code> 中自己实现。</p>
+<p>如果是指定 route 的限流，可以使用 <code>GatewayFilterSpec</code> 提供了 <code>requestRateLimiter</code> 方法。
+Gateway 提供了一个基于 redis 的限流器。</p>
+<h2 id="如何使用-metadata">如何使用 Metadata？</h2>
+<p>可以在 route 上设置一些元数据，这些元数据可以在 <code>GatewayFilter</code> 使用。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">metadata</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;metadata&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/apis/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">filters</span><span style="color:#E1E4E8">(f </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> f.</span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> MetadataGatewayFilter</span><span style="color:#E1E4E8">(om)))</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">metadata</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;foo&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;bar&quot;</span><span style="color:#E1E4E8">)            </span><span style="color:#6A737D">// 元数据 foo</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">metadata</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;aha&quot;</span><span style="color:#E1E4E8">, List.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">)) </span><span style="color:#6A737D">// 元数据 aha</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;no://op&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> record</span><span style="color:#B392F0"> MetadataGatewayFilter</span><span style="color:#E1E4E8">(ObjectMapper om) </span><span style="color:#F97583">implements</span><span style="color:#B392F0"> GatewayFilter</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Override</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Mono&lt;</span><span style="color:#F97583">Void</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">filter</span><span style="color:#E1E4E8">(ServerWebExchange </span><span style="color:#FFAB70">exchange</span><span style="color:#E1E4E8">, GatewayFilterChain </span><span style="color:#FFAB70">chain</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        Route route </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> exchange.</span><span style="color:#B392F0">getAttribute</span><span style="color:#E1E4E8">(GATEWAY_ROUTE_ATTR);</span></span>
+<span class="line"><span style="color:#F97583">        if</span><span style="color:#E1E4E8"> (route </span><span style="color:#F97583">==</span><span style="color:#79B8FF"> null</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#E1E4E8"> Mono.</span><span style="color:#B392F0">error</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> RuntimeException</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Impossible&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">        var</span><span style="color:#E1E4E8"> res </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> exchange.</span><span style="color:#B392F0">getResponse</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">        var</span><span style="color:#E1E4E8"> buffer </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Mono.</span><span style="color:#B392F0">just</span><span style="color:#E1E4E8">(route)</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(Route</span><span style="color:#F97583">::</span><span style="color:#E1E4E8">getMetadata) </span><span style="color:#6A737D">// 通过 route 获取全部元数据</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">flatMap</span><span style="color:#E1E4E8">(it </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">                    try</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">                        return</span><span style="color:#E1E4E8"> Mono.</span><span style="color:#B392F0">just</span><span style="color:#E1E4E8">(om.</span><span style="color:#B392F0">writeValueAsBytes</span><span style="color:#E1E4E8">(it));</span></span>
+<span class="line"><span style="color:#E1E4E8">                    } </span><span style="color:#F97583">catch</span><span style="color:#E1E4E8"> (JsonProcessingException </span><span style="color:#FFAB70">e</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#F97583">                        return</span><span style="color:#E1E4E8"> Mono.</span><span style="color:#B392F0">error</span><span style="color:#E1E4E8">(e);</span></span>
+<span class="line"><span style="color:#E1E4E8">                    }</span></span>
+<span class="line"><span style="color:#E1E4E8">                })</span></span>
+<span class="line"><span style="color:#E1E4E8">                .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(bytes </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> res.</span><span style="color:#B392F0">bufferFactory</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">wrap</span><span style="color:#E1E4E8">(bytes));</span></span>
+<span class="line"><span style="color:#E1E4E8">        res.</span><span style="color:#B392F0">getHeaders</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">setContentType</span><span style="color:#E1E4E8">(MediaType.APPLICATION_JSON);</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> res.</span><span style="color:#B392F0">writeWith</span><span style="color:#E1E4E8">(buffer);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何设置超时">如何设置超时？</h2>
+<p>在 <code>HttpClientProperties</code> 中定义了两个配置项，用于全局超时配置：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">Integer connectTimeout;</span></span>
+<span class="line"><span style="color:#E1E4E8">Duration responseTimeout;</span></span></code></pre>
+<p>可以在 <code>application.properties</code> 中增加以下配置设置全局超时控制：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="properties"><code><span class="line"><span style="color:#F97583">spring.cloud.gateway.httpclient.connect-timeout</span><span style="color:#E1E4E8">=1000</span></span>
+<span class="line"><span style="color:#F97583">spring.cloud.gateway.httpclient.response-timeout</span><span style="color:#E1E4E8">=5s</span></span></code></pre>
+<p>如果希望在 route 上设置超时配置，则需通过 metadata 来设置。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Builder </span><span style="color:#B392F0">timeout</span><span style="color:#E1E4E8">(Builder builder) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> builder.</span><span style="color:#B392F0">route</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;timeout&quot;</span><span style="color:#E1E4E8">, r </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> r.</span><span style="color:#B392F0">path</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/apis/**&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">metadata</span><span style="color:#E1E4E8">(RouteMetadataUtils.CONNECT_TIMEOUT_ATTR, </span><span style="color:#79B8FF">200</span><span style="color:#E1E4E8">) </span><span style="color:#6A737D">// ms</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">metadata</span><span style="color:#E1E4E8">(RouteMetadataUtils.RESPONSE_TIMEOUT_ATTR, </span><span style="color:#79B8FF">200</span><span style="color:#E1E4E8">) </span><span style="color:#6A737D">// ms</span></span>
+<span class="line"><span style="color:#E1E4E8">            .</span><span style="color:#B392F0">uri</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;http://localhost:3000&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>TODO: 负载均衡如何做？</p>
+<h2 id="示例">示例</h2>
+<p><a href="https://gitee.com/xyzwps/cheatsheet-spring/tree/master/cloud-gateway">戳这里查看示例代码</a>。</p> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/spring">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#项目搭建">项目搭建</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何配置网关转发请求">如何配置网关转发请求？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#gateway-和-gateway-mvc-有什么区别">gateway 和 gateway-mvc 有什么区别？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#gateway-如何工作的">Gateway 如何工作的？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何编写全局-filter">如何编写全局 Filter？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#解释一下上文中的-route-方法">解释一下上文中的 route 方法</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何为指定的-route-添加-filter">如何为指定的 route 添加 Filter？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#gatewayfilter-和-globalfilter-之间有什么区别">GatewayFilter 和 GlobalFilter 之间有什么区别？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何重写请求路径">如何重写请求路径？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何重定向">如何重定向？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何重试">如何重试？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何使用-circuit-breaker">如何使用 Circuit Breaker？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何使用-rate-limiter">如何使用 Rate Limiter？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何使用-metadata">如何使用 Metadata？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何设置超时">如何设置超时？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#示例">示例</a> </li> </ol>  </div> </div> </div> </div> </body></html>

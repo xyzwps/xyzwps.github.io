@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/java/concurrency-thread"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>线程基础</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.B49diLuX.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>线程基础</h1>  <h2 id="线程与进程">线程与进程</h2>
+<p>以下问题请直接向 AI 助手提问了解即可：</p>
+<ul>
+<li>什么是进程？</li>
+<li>什么是线程？</li>
+<li>进程与线程有什么区别？</li>
+</ul>
+<h2 id="java-中的线程">Java 中的线程</h2>
+<p>Java 中的线程有两类：<strong>平台线程</strong>（<em>platform thread</em>）和<a href="/cheatsheet/java/concurrency-virtual-thread"><strong>虚拟线程</strong>（<em>virtual thread</em>）</a>。
+从 Java 21 开始引入了虚拟线程，在之前版本只有平台线程。
+简单来说，Java 中每个平台线程对应于一个操作系统原生线程；虚拟线程是 Java/JVM 提供的功能，
+虚拟线程中的任务，需要具体的平台线程来执行。</p>
+<p>从 <code>main</code> 方法进入执行代码的那个线程一般叫做主线程。</p>
+<h2 id="如何创建线程">如何创建线程</h2>
+<p>Java 的线程本身是一个 <code>java.lang.Thread</code> 对象，创建线程就是创建一个 <code>Thread</code> 对象。</p>
+<p>可以通过 <code>Thread</code> 的构造器来创建线程。<code>Thread</code> 类的构造方法有很多个，可以去看源码了解每个构造器的使用方法。
+下面是一个通过构造器 <code>Thread(Runnable)</code> 来创建线程的例子：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> t </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Thread</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // do some task</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p><code>Thread</code> 类不是 <code>final</code> 的，这意味着你可以通过继承 <code>Thread</code> 类来增加功能。这样一来，你就可以通过这个子类来创建线程了。</p>
+<p>通过以上两种方式创建的线程都是平台线程。
+还可以通过 <code>Thread.ofPlatform()</code> 静态方法创建平台线程。</p>
+<p>如果需要创建虚拟线程，可以使用 <code>Thread.ofVirtual()</code> 静态方法来创建。如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 创建一个未执行的虚拟线程</span></span>
+<span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> t </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Thread.</span><span style="color:#B392F0">ofVirtual</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">unstarted</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#6A737D">    // do some task</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>使线程开始执行，需要调用线程的 <code>Thread</code> 的 <code>start()</code> 方法即可：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">t.</span><span style="color:#B392F0">start</span><span style="color:#E1E4E8">();</span></span></code></pre>
+<h2 id="runnable"><code>Runnable</code></h2>
+<p>注意，有些人会说，可以通过 <code>java.lang.Runnable</code> 接口来创建线程。这话对也不对。</p>
+<p><code>Runnable</code> 接口在语义上表示一个不接受参数，也不返回结果的操作。
+一个 <code>Runnable</code> 对象也只是一个对象而已，和线程本身并无直接关系。
+如果你愿意，你可以把 <code>Runnable</code> 对象用在任何地方。</p>
+<p>说它可以创建线程的原因我猜可能有两个：</p>
+<ol>
+<li><code>Thread</code> 类实现了 <code>Runnable</code> 接口。</li>
+<li><code>Thread</code> 类中有这样一个构造器 <code>Thread(Runnable)</code>。</li>
+</ol>
+<h2 id="线程的状态">线程的状态</h2>
+<p>线程的状态是有限的，定义在 <code>Thread.State</code> 枚举类中。有以下几种：</p>
+<ul>
+<li><code>NEW</code>：<code>Thread</code> 对象创建出来后，但是没有调用 <code>start()</code> 方法时，线程处于此状态。</li>
+<li><code>RUNNABLE</code>：线程在 JVM 中执行过程中，如果在等待操作系统资源（比如 CPU），那么线程就处于此状态。</li>
+<li><code>BLOCKED</code>：线程等待<a href="/cheatsheet/java/concurrency-sync">监视器锁</a>时，处于此状态。</li>
+<li><code>WAITING</code>：处于此状态的线程，在等待另一个线程来指定特定操作。在一个线程中执行以下操作会进入此状态：
+<ul>
+<li><code>Object.wait</code> 不带超时时间。调用此方法后，等待其他线程调用 <code>Object.notify()</code> 或者 <code>Object.notifyAll()</code>。</li>
+<li><code>Thread.join</code> 不带超时时间。</li>
+<li><code>LockSupport.park</code></li>
+</ul>
+</li>
+<li><code>TIMED_WAITING</code>：线程处于等待状态，并且有一个指定的等待时长。执行以下操作后线程会进入此状态：
+<ul>
+<li><code>Thread.sleep</code></li>
+<li><code>Object.wait</code> 指定了超时时间</li>
+<li><code>Thread.join</code> 指定了超时时间</li>
+<li><code>LockSupport.parkNanos</code></li>
+<li><code>LockSupport.parkUntil</code></li>
+</ul>
+</li>
+<li><code>TERMINATED</code>：线程执行完后处于此状态。</li>
+</ul>
+<h2 id="当前线程">当前线程</h2>
+<p>可以在代码执行过程中，调用静态方法 <code>Thread.currentThread()</code> 来获取执行当前代码的 <code>Thread</code> 对象。</p>
+<h2 id="线程的属性">线程的属性</h2>
+<p>每个线程都有一个 ID。在 Java 19 之前，可以通过实例方法 <code>getId</code> 来获取；
+Java 19 及其之后，使用 <code>threadId</code> 获取。</p>
+<p>实例方法 <code>isVirtual</code> 用来判断是否是虚拟线程。</p>
+<p>实例方法 <code>isAlive</code> 用来判单一个线程是否“活着”。一个线程在启动后但是没有结束时，就说它“活着”。</p>
+<p>实例方法 <code>setPriority</code> 用来改变一个平台线程的优先级。值越小优先级越高。
+虚拟线程的优先级固定为 <code>Thread.NORM_PRIORITY</code>，修改会被忽略。
+实例方法 <code>getPriority</code> 用来获取线程优先级。</p>
+<p>实例方法 <code>setName</code> 和 <code>getName</code> 用来线程名称。</p>
+<p>实例方法 <code>setDaemon</code> 和 <code>isDaemon</code> 用来设置线程是否是守护线程，判断线程是否是守护线程。
+虚拟线程永远是守护线程，并且不可以 <code>setDaemon(false)</code>。
+守护线程是一种特殊的线程，它的生命周期依赖于非守护线程。当所有的非守护线程结束时，守护线程会自动终止，无论它是否完成了任务。</p>
+<p>实例方法 <code>getState</code> 获取线程当前的状态。</p>
+<p>线程执行的任务可能因为抛异常而结束。
+静态方法 <code>Thread.setDefaultUncaughtExceptionHandler</code> 用于设置一个默认的回调函数来接收未被捕获的异常。
+实例方法 <code>setUncaughtExceptionHandler</code> 用来给指定线程设置特定的回调来接收未被捕获的异常。</p>
+<p>TODO: getThreadGroup</p>
+<h2 id="线程的操作">线程的操作</h2>
+<p>静态方法 <code>Thread.sleep</code> 使当前线程“睡眠”一段时间。</p>
+<p>静态方法 <code>Thread.ofPlatform</code> 和 <code>Thread.ofVirtual</code> 用来创建平台线程和虚拟线程。</p>
+<p>静态方法 <code>Thread.dumpStack</code> 用来打印当前线程栈。</p>
+<p>静态方法 <code>Thread.holdsLock</code> 用来判断当前线程是否持有指定对象上的<a href="/cheatsheet/java/concurrency-sync">监视器锁</a>。</p>
+<p>实例方法 <code>start()</code> 启动一个线程。</p>
+<p>实例方法 <code>run()</code> 用于实现 <code>Runnable</code> 接口。此方法在设计上不用于直接调用，启动线程应使用 <code>start()</code> 方法。</p>
+<p>实例方法 <a href="/cheatsheet/java/concurrency-thread-interrupt"><code>interrupt</code></a> 可以打断别的线程。</p>
+<p>TODO: join</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://openjdk.org/jeps/444">JEP 444: Virtual Threads</a>。</li>
+</ul> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/java/concurrency">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#线程与进程">线程与进程</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#java-中的线程">Java 中的线程</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何创建线程">如何创建线程</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#runnable">Runnable</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#线程的状态">线程的状态</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#当前线程">当前线程</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#线程的属性">线程的属性</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#线程的操作">线程的操作</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#参考">参考</a> </li> </ol>  </div> </div> </div> </div> </body></html>

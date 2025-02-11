@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/cloud-patterns/backends-for-frontends"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Backends for Frontends pattern</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.B49diLuX.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>Backends for Frontends pattern</h1> <div class="border-2 p-4 rounded-lg"><strong>提示</strong>：本文翻译自 <strong><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/backends-for-frontends" target="_blank">Backends for Frontends pattern - Azure Architecture Center</a></strong>。本文不保证翻译质量，并可能有删改。若你自觉英语尚可，强烈建议尝试看一下原文。</div> <p>创建单独的后端服务以供特定的前端应用程序或接口使用。
+你若希望避免为多个 UI 自定义单个后端时，此模式非常有用。此模式首先由 Sam Newman 描述。</p>
+<h2 id="问题上下文">问题上下文</h2>
+<p>应用程序可能最开始只针对桌面 web UI，这时只需要一个后端服务和前段交互就可以了。
+随着应用用户群的增长，开发了移动应用程序，而它和桌面 web UI 共用同一个后端服务。
+这个后端服务就成了通用后端，它同时满足桌面端和移动端的界面需求。</p>
+<p>但是移动设备与桌面浏览器在很多方面都有很大不同，比如屏幕尺寸、性能和显示限制方面。
+因此，对移动应用后端的要求不同于桌面 web UI。</p>
+<p>这些差异导致移动端和桌面端对后端的需求产生了竞争关系。
+后端需要定期进行重大更改以服务于桌面和移动应用。
+通常，每个前端都有自己的开发团队，导致后端成为开发过程中的瓶颈。
+相互冲突的更新需求，以及保持服务为两个前端工作的需要，可能会导致在单个可部署资源上花费大量精力。</p>
+<h2 id="解决方案">解决方案</h2>
+<p>每个用户交互界面创建一个后端。微调每个后端的行为和性能，以最好地匹配前端环境的需求，而不必担心影响其他前端体验。</p>
+<p>因为每个后端都特定于一个前段，所以可以针对该接口进行优化。
+因此，它将更小，复杂度也更低，并且可能比试图满足所有前端要求的通用后端更快。
+每个接口团队都有控制自己后端的自主权，不依赖于集中的后端开发团队。
+这使得接口团队在语言选择、发布节奏、工作负载优先级和后端功能集成方面具有灵活性。</p>
+<h2 id="实现考量">实现考量</h2>
+<ul>
+<li>考虑有多少个不同的后端要部署。</li>
+<li>如果不同的前端会发出相同的请求，请考虑是否有必要为每个前端实现一个后端，单个后端是否就足够了。</li>
+<li>实现此模式时，跨服务的代码重复很可能发生。</li>
+<li>以前端为中心的后端服务应仅包含特定于客户端的逻辑和行为。一般业务逻辑和其他全局功能应在应用程序的其他地方进行管理。</li>
+<li>考虑一下这种模式如何反映在开发团队的职责中。</li>
+<li>考虑实现这种模式需要多长时间。当你继续支持现有的通用后端时，构建新后端的工作会产生技术债务吗？</li>
+</ul>
+<h2 id="何时使用">何时使用</h2>
+<p>以下场景可使用：</p>
+<ul>
+<li>通用后端在应付不同的前端逻辑时耗费了大量开发精力。</li>
+<li>你希望为特定的客户端需求来优化后端。</li>
+<li>对通用后端进行了自定义以适应多个前端。</li>
+<li>编程语言更适合特定用户交互界面的后端，但不是所有用户界面。</li>
+</ul>
+<p>此模式可能不适用的情况：</p>
+<ul>
+<li>当前端向后端发出相同或相似的请求时。</li>
+<li>当只使用一个前端与后端交互时。</li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://samnewman.io/patterns/architectural/bff/">Sam Newman - Backends For Frontends</a></li>
+</ul> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/cloud-patterns/">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#问题上下文">问题上下文</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#解决方案">解决方案</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#实现考量">实现考量</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#何时使用">何时使用</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#参考">参考</a> </li> </ol>  </div> </div> </div> </div> </body></html>

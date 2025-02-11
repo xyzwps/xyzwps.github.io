@@ -1,0 +1,111 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/spring/hello-world"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spring Boot Hello World</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.B49diLuX.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+[data-astro-image]{width:100%;height:auto;-o-object-fit:var(--fit);object-fit:var(--fit);-o-object-position:var(--pos);object-position:var(--pos);aspect-ratio:var(--w) / var(--h)}[data-astro-image=responsive]{max-width:calc(var(--w) * 1px);max-height:calc(var(--h) * 1px)}[data-astro-image=fixed]{width:calc(var(--w) * 1px);height:calc(var(--h) * 1px)}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>Spring Boot Hello World</h1>  <p>万事开头难。不过 spring boot 开头现在已经不难了。</p>
+<p>本项目目标是得到一个最基本的代码框架，并写出一个返回 hello world 的 HTTP 接口。步骤如下：</p>
+<h2 id="步骤一生成项目手脚架">步骤一：生成项目手脚架</h2>
+<p>手脚架是通过 spring initializr 生成的。在其中只要填写表单，就能生成整个手脚架了</p>
+<ol>
+<li>
+<p>打开 spring initializr 网址 <a href="https://start.spring.io/">https://start.spring.io/</a> （国内可访问，无需魔法）</p>
+</li>
+<li>
+<p>在网站中填写表单</p>
+<ul>
+<li><strong>Project</strong> 项勾选 Maven
+<blockquote>
+<p>如果你熟悉 Gradle 的话，也可勾选。不熟悉的话，就选择 Maven 吧，它很简单，不折腾。</p>
+</blockquote>
+</li>
+<li><strong>Language</strong> 项勾选 Java
+<blockquote>
+<p>如果你熟悉 Groovy 或者 Kotlin，或者正打算学习，可以勾选。这里选择 Java，因为你决定看了本文，那么你必然会一点 Java 语言。</p>
+</blockquote>
+</li>
+<li><strong>Spring Boot</strong> 项勾选最新的正式版
+<blockquote>
+<p>如果版本号后面有 SNAPSHOT 或者 RC+数字，那么它不是正式版，建议只用于尝鲜。</p>
+</blockquote>
+</li>
+<li><strong>Project Metadata</strong> 下
+<ul>
+<li><strong>Group</strong> 自己随便填一个，也可以使用默认的</li>
+<li><strong>Artifact</strong> 是模块名，这里填 helloworld
+<blockquote>
+<p>Group 和 artifact 填写好之后，<strong>name</strong> 和 <strong>package name</strong> 会自动拼好，一般不用管。</p>
+</blockquote>
+</li>
+<li><strong>Description</strong> 中是项目的描述，可以保持默认，也可以随便写点什么。</li>
+<li><strong>Packaging</strong> 是打包方式，这里勾选 jar</li>
+<li><strong>Java</strong> 是指 Java 版本，看喜好随便勾选。我选最新版。</li>
+</ul>
+</li>
+<li>右侧 <strong>dependencies</strong> 中，点击 ADD 按钮，在弹出的对话框上面，输入 “web” 搜索，勾选 “Spring Web”。</li>
+</ul>
+<p>最终效果如下图：</p>
+<p><img src="/assets/img/cheatsheet/spring/spring-boot-hello-world-init.png" alt/></p>
+</li>
+<li>
+<p>点击下方的 GENERATE 按钮，下载项目手脚架，是一个 .zip 文件。按照上图的方式，得到的是一个 helloworld.zip 文件。</p>
+</li>
+</ol>
+<h2 id="步骤二导入手脚架">步骤二：导入手脚架</h2>
+<p>就是把上面下载的 .zip 文件解压后，导入到 IDE 中。</p>
+<blockquote>
+<p>这里推荐使用 IntelliJ IDEA 社区版，原因是免费。现在使用 Eclipse 和 NetBeans 的人较少，新手遇到问题难搞，不推荐使用。
+VSCode 也可以，但不推荐新手使用，如果你在看本文，那么不推荐你使用。如果你非常喜欢 VSCode，并希望用它来编写 Java 程序，可参见
+<a href="https://code.visualstudio.com/docs/java/java-tutorial">VSCode 官方的 Java 教程</a>。</p>
+</blockquote>
+<ol>
+<li>
+<p>如果你本地没有安装 IntelliJ IDEA 社区版，请<a href="https://www.jetbrains.com/idea/download/">戳这里去官网下载</a>并安装。</p>
+<blockquote>
+<p>如果你本机没有安装 JDK 也没关系。</p>
+</blockquote>
+</li>
+<li>
+<p>解压 helloworld.zip 文件后，得到 helloworld 文件夹。其下应该有一个 pom.xml 文件和一些其他文件、文件夹。</p>
+</li>
+<li>
+<p>使用 IntelliJ IDEA 导入 hello world 项目。选择 <code>File</code> &gt; <code>New</code> &gt;
+<code>Project from Existing Sources...</code>，在弹出的对话框里选择 helloworld 文件夹后，点击下方 OK 按钮。</p>
+</li>
+<li>
+<p>在弹出的 <em>Import Project</em> 对话框中，默认应该选择了 <em>Import project from external model</em>
+和 <em>Maven</em>。如果不是，请按此选择。之后点击下方 Create 按钮，导入项目。</p>
+<ul>
+<li>如果弹出 <em>Trust and Open Project xxx</em> 对话框，选择信任。</li>
+<li>如果弹出 <em>New Project</em> 对话框问你是否在再新窗口中打开项目，请选择 New Window 按钮。主要是省事。</li>
+<li>导入之后，如果 IDEA 右下角弹出气泡询问是否希望 windows defender 信任此项目，选择信任。</li>
+</ul>
+</li>
+</ol>
+<p>此时，项目导入完成，IDEA 会做一些环境准备工作。IDEA 大致会做几件事情：</p>
+<ul>
+<li>根据 .mvn/wrapper 目录下的 maven-wrapper.properties 文件中的地址，下载指定版本的 Maven。</li>
+<li>根据 pom.xml 文件中的配置下载依赖和相关插件。</li>
+</ul>
+<p>如果你本地没有安装上面选择的 JDK 版本，可以通过 File &gt; Project Structure 中，Project 项里下载对应版本的 JDK，并选择。</p>
+<p>你可以看一下 pom.xml 文件中的信息，并和之前在 spring initializr 中填写的信息做对比。</p>
+<h2 id="步骤三编写-hello-world">步骤三：编写 Hello World</h2>
+<p>现在正式写代码。</p>
+<ol>
+<li>在 src/main/java 下面找到 HelloworldApplication.java 文件。可以看到其中有一个 main 方法，这是我们等下启动项目时的入口。</li>
+<li>在和 <code>HelloworldApplication</code> 类同一个包下创建 <code>HelloWorldController</code>:
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.annotation.GetMapping;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.annotation.RestController;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RestController</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> HelloWorldController</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/hello-world&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> String </span><span style="color:#B392F0">hello</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#9ECBFF"> &quot;Hello World!&quot;</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+</li>
+<li>运行 <code>HelloworldApplication</code> 类中的 main 方法</li>
+<li>在浏览器访问 <code>http://localhost:8080/hello-world</code>，浏览器窗口应该显示 <code>Hello World!</code>。</li>
+</ol>
+<h2 id="源代码">源代码</h2>
+<p>源代码见：<a href="https://gitee.com/xyzwps/cheatsheet-spring/tree/helloworld">https://gitee.com/xyzwps/cheatsheet-spring/tree/helloworld</a></p> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/spring">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#步骤一生成项目手脚架">步骤一：生成项目手脚架</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#步骤二导入手脚架">步骤二：导入手脚架</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#步骤三编写-hello-world">步骤三：编写 Hello World</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#源代码">源代码</a> </li> </ol>  </div> </div> </div> </div> </body></html>
