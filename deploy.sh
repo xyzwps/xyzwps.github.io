@@ -2,7 +2,7 @@
 
 rm -rf dist
 
-npm run build
+pnpm build
 
 cd dist
 
@@ -12,7 +12,9 @@ git add -A
 
 git commit -m "deploy $(date)"
 
-git push -f git@github.com:xyzwps/xyzwps.github.io.git master:deploy
+git checkout -b deploy
+
+git push -f git@github.com:xyzwps/xyzwps.github.io.git deploy
 
 cd ..
 
