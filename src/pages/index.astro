@@ -3,7 +3,7 @@ import SearchInput from "../components/HomePage/SearchInput.astro";
 
 const list = [
   { title: "DeepSeek", href: "https://www.deepseek.com/" },
-  { title: "通义千问", href: "https://tongyi.aliyun.com/qianwen/" },
+  { title: "Emoji", href: "/emoji" },
   { title: "知乎", href: "https://www.zhihu.com/" },
 ];
 ---
@@ -16,23 +16,29 @@ const list = [
     <script is:inline>
       var _hmt = _hmt || [];
       (function () {
-        var hm = document.createElement('script');
-        hm.src = 'https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374';
-        var s = document.getElementsByTagName('script')[0];
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+        var s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(hm, s);
       })();
     </script>
   </head>
   <body style="background: linear-gradient(90deg, #faf5ff, #f9fafb, #f5f2ff)">
-    <div class="mx-auto bg-transparent flex flex-col border-x-gray-500 px-4 min-h-screen text-base">
+    <div
+      class="mx-auto bg-transparent flex flex-col border-x-gray-500 px-4 min-h-screen text-base"
+    >
       <div class="h-24"></div>
-      <div class="text-center text-5xl text-indigo-700 my-8 font-bold select-none">xyzwps</div>
+      <div
+        class="text-center text-5xl text-indigo-700 my-8 font-bold select-none"
+      >
+        xyzwps
+      </div>
       <SearchInput />
       <div class="text-center m-8 text-sm text-gray-500 text-light">
         {
           list.map((it, i) => (
             <>
-              {i > 0 ? <>&emsp;|&emsp;</> : ''}
+              {i > 0 ? <>&emsp;|&emsp;</> : ""}
               <a href={it.href} target="_blank">
                 {it.title}
               </a>

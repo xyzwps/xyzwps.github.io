@@ -1,0 +1,112 @@
+---
+import DefaultLayout from "../layouts/DefaultLayout.astro";
+import emojis from "../data/emojis";
+
+const categories = [];
+
+for (const category in emojis) {
+  const types = [];
+  for (const type in emojis[category]) {
+    types.push({ type, emojis: emojis[category][type] });
+  }
+
+  categories.push({ category, types });
+}
+---
+
+<style>
+  .emoji {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    margin: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
+  }
+
+  .emoji:hover {
+    border: 1px solid slateblue;
+    border-radius: 4px;
+  }
+
+  .emoji-type {
+    white-space: normal;
+    border: 1px dashed indigo;
+    padding: 24px 24px 16px;
+    border-radius: 8px;
+    font-size: 24px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .emoji-type-title {
+    margin-bottom: -12px;
+    margin-left: 32px;
+  }
+  .emoji-type-title span {
+    background-color: indigo;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: small;
+  }
+  .category {
+    font-size: x-large;
+    font-weight: bold;
+    padding: 32px 0 8px;
+  }
+</style>
+
+<DefaultLayout title="Emoji 符号大全">
+  <div style="padding: 32px 0; color: indigo;">
+    <h1
+      style="display: flex; justify-content: center; font-size: xx-large; font-weight: bold; padding: 24px;"
+    >
+      Emoji 符号大全
+    </h1>
+
+    <div style="display: flex; margin: 0 auto; max-width: 900px; gap: 16px;">
+      <div style="max-width: 800px; padding: 16px;">
+        {
+          categories.map((cat) => (
+            <div>
+              <h2 class="category" id={cat.category}>
+                {cat.category}
+              </h2>
+              <ul>
+                {cat.types.map((type) => (
+                  <li
+                    style="margin: 8px 0;"
+                    id={cat.category + "-" + type.type}
+                  >
+                    <div class="emoji-type-title">
+                      <span>{type.type}</span>
+                    </div>
+                    <div class="emoji-type">
+                      {type.emojis.map((e) => (
+                        <div class="emoji">{e}</div>
+                      ))}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+      <div style="font-size: small;" class="mt-10">
+        <ul class="sticky top-0 pt-16">
+          {
+            categories.map((cat) => (
+              <li>
+                <a href={"#" + cat.category}>{cat.category}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</DefaultLayout>
