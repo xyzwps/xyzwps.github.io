@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/java/concurrency-sync"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>synchronized</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.DpL9t_Op.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>synchronized</h1>  <p><strong>同步</strong>（<em>synchronization</em>）是一种线程间通信机制。Java 语言中同步使用<strong>监视器</strong>（<em>monitor</em>）实现的。每个 Java 对象都有一个与之关联的监视器，线程可以对监视器<strong>加锁</strong>（<em>lock</em>）或者<strong>解锁</strong>（<em>unlock</em>）。在同一时刻，一个对象上的锁，只有一个线程可以持有。如果一个监视器锁被某个线程持有，其他线程若要尝试对那个监视器加锁，就会<strong>被阻塞</strong>（<em>blocked</em>），直到锁被释放掉为止。一个线程可以对一个监视器加锁多次，对应地，也应该解锁对应的。</p>
+<p>Java 中使用监视器锁有两种方式：<code>synchronized</code> 语句和 <code>synchronized</code> 方法。</p>
+<h2 id="synchronized-语句"><code>synchronized</code> 语句</h2>
+<p>对于 <code>synchronized</code> 语句，有时会简称同步语句块，或者同步块。这个语句使用下面这种方式：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> monitor </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> someJavaObject;</span></span>
+<span class="line"><span style="color:#F97583">synchronized</span><span style="color:#E1E4E8">(monitor) {</span></span>
+<span class="line"><span style="color:#6A737D">  // do some task</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>代码执行进入同步块时，对 <code>monitor</code> 加锁，在离开同步块时释放锁，不管是正常离开，还是不正常离开（如抛异常，线程被打断等）。</p>
+<p>举个例子。我们希望编写一个计数器：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Counter</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#F97583">    void</span><span style="color:#B392F0"> incr</span><span style="color:#E1E4E8">() { value</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#F97583">    void</span><span style="color:#B392F0"> decr</span><span style="color:#E1E4E8">() { value</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>我们使用两个线程对其测试：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] args) throws InterruptedException {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> counter </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Counter</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> times </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 10000</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> t1 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Thread.</span><span style="color:#B392F0">ofPlatform</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">start</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8"> times; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            counter.</span><span style="color:#B392F0">incr</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> t2 </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Thread.</span><span style="color:#B392F0">ofPlatform</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">start</span><span style="color:#E1E4E8">(() </span><span style="color:#F97583">-&gt;</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">        for</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 0</span><span style="color:#E1E4E8">; i </span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8"> times; i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">            counter.</span><span style="color:#B392F0">decr</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">        }</span></span>
+<span class="line"><span style="color:#E1E4E8">    });</span></span>
+<span class="line"><span style="color:#E1E4E8">    t1.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    t2.</span><span style="color:#B392F0">join</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(counter.value);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>上面的测试程序最后一行大概率不会输出 0，因为 <code>++</code> 和 <code>--</code> 不是原子操作。为了使其正常工作，我们尝试把 <code>Counter</code> 改成加锁的版本：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Counter</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#F97583"> final</span><span style="color:#E1E4E8"> Object monitor </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Object</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    void</span><span style="color:#B392F0"> incr</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        synchronized</span><span style="color:#E1E4E8">(monitor) { value</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    void</span><span style="color:#B392F0"> decr</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        synchronized</span><span style="color:#E1E4E8">(monitor) { value</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>再次运行上面的测试程序，就可以稳定看到输出 0 了。</p>
+<p>我们注意到 <code>this</code> 关键字是指向对象自己的引用，所以上面版本的 <code>Counter</code> 中可以不必单独创建一个 <code>monitor</code> 用作监视器锁，直接使用 <code>this</code> 做监视器锁即可，可以把代码改成如下形式：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> Counter</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    int</span><span style="color:#E1E4E8"> value;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    void</span><span style="color:#B392F0"> incr</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        synchronized</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">) { value</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    void</span><span style="color:#B392F0"> decr</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        synchronized</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">) { value</span><span style="color:#F97583">--</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h3 id="可重入性">可重入性</h3>
+<p>监视器锁是<strong>可重入的</strong>，换句话说，就是持有锁的线程可以再次对监视器进行加锁。比如下面的代码是合法的：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">var</span><span style="color:#E1E4E8"> t </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Object</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#F97583">synchronized</span><span style="color:#E1E4E8">(t) {</span></span>
+<span class="line"><span style="color:#F97583">    synchronized</span><span style="color:#E1E4E8">(t) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;made it!&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>如果监视器锁不可重入，那么上面的代码就会引起死锁。。</p>
+<h2 id="synchronized-方法"><code>synchronized</code> 方法</h2>
+<p>可以在方法上加上 <code>synchronized</code> 关键字。</p>
+<p>对于 <code>synchronized</code> 的实例方法，其使用 <code>this</code> 作为监视器锁。下面的代码：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">synchronized</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> incr</span><span style="color:#E1E4E8">() { value</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">; }</span></span></code></pre>
+<p>等价于</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">void</span><span style="color:#B392F0"> incr</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    synchronized</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">this</span><span style="color:#E1E4E8">) { value</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>对于 <code>synchronized</code> 的静态方法，其使用所在类的 <code>Class</code> 对象作为监视器锁。</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se23/html/jls-8.html#jls-8.4.3.6">Java 语言规范：<code>synchronized</code> Methods</a></li>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se23/html/jls-17.html#jls-17.1">Java 语言规范：Threads and Locks</a></li>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se23/html/jls-14.html#jls-14.19">Java 语言规范：The <code>synchronized</code> Statement</a></li>
+</ul> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/java/concurrency">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#synchronized-语句">synchronized 语句</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#可重入性">可重入性</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#synchronized-方法">synchronized 方法</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#参考">参考</a> </li> </ol>  </div> </div> </div> </div> </body></html>

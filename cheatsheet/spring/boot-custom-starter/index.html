@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/spring/boot-custom-starter"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spring Boot 如何创建自己的 Starter</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.DpL9t_Op.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>Spring Boot 如何创建自己的 Starter</h1>  <p>一般来说，每个 starter 都属于一个单独的模块。</p>
+<p>有几种方式创建自己的 starter：</p>
+<h2 id="创建-enable-风格的-starter">创建 Enable* 风格的 Starter</h2>
+<p>这种方式需要你在 starter 中创建一个 <code>@EnableXXX</code> 注解，然后把指定的配置文件给 <code>@Import</code> 进去就可以了。比如：</p>
+<p>EnableStarterA.java</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Target</span><span style="color:#E1E4E8">(ElementType.TYPE)</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Retention</span><span style="color:#E1E4E8">(RetentionPolicy.RUNTIME)</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Documented</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Import</span><span style="color:#E1E4E8">(StarterAConfiguration.class)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> @</span><span style="color:#F97583">interface</span><span style="color:#F97583"> EnableStarterA</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>StarterAConfiguration.java</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Configuration</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> StarterAConfiguration</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Bean</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> StarterAService </span><span style="color:#B392F0">starterAService</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> StarterAService</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在使用时，只需要把 <code>@EnableStarterA</code> 的注解标记到 <code>@SpringBootApplication</code>
+旁边，就可以在应用中自动注入 <code>StarterAService</code> 了。</p>
+<p><a href="https://gitee.com/xyzwps/cheatsheet-spring/tree/master/boot-starter-a">戳这里查看完整代码</a>。</p>
+<h2 id="创建自动配置的-starter">创建自动配置的 Starter</h2>
+<p>这种方式使用 <code>@AutoConfiguration</code> 注解，主要把标记的此注解的类放到
+<code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code>
+文件中即可。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">// 此类全名应写入 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports 文件中</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">AutoConfiguration</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> StarterBConfiguration</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Bean</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> StarterBService </span><span style="color:#B392F0">starterBService</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> StarterBService</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>在使用时，只需把此 starter 模块加入依赖，就可以自动注入 <code>StarterBService</code> 了。</p>
+<p><a href="https://gitee.com/xyzwps/cheatsheet-spring/tree/master/boot-starter-b">戳这里查看完整代码</a>。</p>
+<blockquote>
+<p>在 Spring Boot 2.x 版本早期，官方文档中描写的是使用文件 <a href="https://docs.spring.io/spring-boot/docs/2.0.0.M3/reference/html/boot-features-developing-auto-configuration.html"><code>META-INF/spring.factories</code></a>。
+在 Spring Boot 3.x 中，使用的是
+<a href="https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html"><code>META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports</code></a>。
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.7-Release-Notes#building-jars-with-maven-shade-plugin-and-gradle-shadow-plugin">这个变化发生在 Spring Boot 2.7 中</a>。</p>
+</blockquote>
+<h2 id="使用自定义-starter">使用自定义 Starter</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">SpringBootApplication</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RestController</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">EnableStarterA</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> StartersApp</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Autowired</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> StarterAService starterA;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Autowired</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> StarterBService starterB;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/messages&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> List&lt;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">getMessages</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> List.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(starterA.</span><span style="color:#B392F0">getMessage</span><span style="color:#E1E4E8">(), starterB.</span><span style="color:#B392F0">getMessage</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        SpringApplication.</span><span style="color:#B392F0">run</span><span style="color:#E1E4E8">(StartersApp.class, args);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><a href="https://gitee.com/xyzwps/cheatsheet-spring/blob/master/boot-use-custom-starters">戳这里查看完整代码</a>。</p> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/spring">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#创建-enable-风格的-starter">创建 Enable* 风格的 Starter</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#创建自动配置的-starter">创建自动配置的 Starter</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#使用自定义-starter">使用自定义 Starter</a> </li> </ol>  </div> </div> </div> </div> </body></html>
