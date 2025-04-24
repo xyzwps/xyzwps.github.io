@@ -16,8 +16,8 @@ for (const category in emojis) {
 
 <style>
   .emoji {
-    width: 32px;
-    height: 32px;
+    width: 42px;
+    height: 42px;
     padding: 4px;
     margin: 4px;
     display: flex;
@@ -27,8 +27,9 @@ for (const category in emojis) {
   }
 
   .emoji:hover {
-    border: 1px solid slateblue;
+    border: 1px solid #ddd;
     border-radius: 4px;
+    cursor: pointer;
   }
 
   .emoji-type {
@@ -110,3 +111,13 @@ for (const category in emojis) {
     </div>
   </div>
 </DefaultLayout>
+
+<script>
+  const nodes = document.getElementsByClassName("emoji");
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i] as HTMLElement;
+    node.addEventListener("click", () => {
+      navigator.clipboard.writeText(node.innerText);
+    });
+  }
+</script>
