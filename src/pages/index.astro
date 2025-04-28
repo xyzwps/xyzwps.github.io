@@ -2,9 +2,8 @@
 import SearchInput from "../components/HomePage/SearchInput.astro";
 
 const list = [
-  { title: "DeepSeek", href: "https://www.deepseek.com/" },
   { title: "Emoji", href: "/emoji" },
-  { title: "知乎", href: "https://www.zhihu.com/" },
+  { title: "Markdown", href: "/markdown" },
 ];
 ---
 
@@ -39,7 +38,7 @@ const list = [
           list.map((it, i) => (
             <>
               {i > 0 ? <>&emsp;|&emsp;</> : ""}
-              <a href={it.href} target="_blank">
+              <a href={it.href}>
                 {it.title}
               </a>
             </>
