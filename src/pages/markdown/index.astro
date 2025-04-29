@@ -4,5 +4,11 @@ import MarkdownEditor from "./MarkdownEditor";
 ---
 
 <DefaultLayout title="Markdown Editor">
-  <MarkdownEditor client:load />
+  <MarkdownEditor client:only />
 </DefaultLayout>
+
+<style is:global>
+  [id^="mermaid-"] {
+    margin: 0 auto;
+  }
+</style>

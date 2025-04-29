@@ -1,33 +1,31 @@
 import { useEffect, useState } from "react";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import rehypeRaw from "rehype-raw";
+import rehypeMermaid from "rehype-mermaid";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
-async function renderMarkdown(text: string): Promise<string> {
-  const file = await unified()
-    .use(remarkParse)
-    .use(remarkFrontmatter)
-    .use(remarkGfm)
-    .use(remarkRehype, { allowDangerousHtml: true })
-    .use(rehypeRaw)
-    .use(rehypeSanitize, {
-      ...defaultSchema,
-      attributes: {
-        "*": ["style"],
-      },
-    })
-    .use(rehypeStringify)
-    .process(text);
+import mermaid from "mermaid";
 
-  return String(file);
+mermaid.initialize({ startOnLoad: true });
+
+const processer = unified()
+  .use(remarkParse)
+  .use(remarkFrontmatter)
+  .use(remarkGfm)
+  .use(remarkRehype, { allowDangerousHtml: true })
+  .use(rehypeRaw)
+  .use(rehypeMermaid, { strategy: "inline-svg" })
+  .use(rehypeStringify);
+async function renderMarkdown(text: string): Promise<string> {
+  const { value } = await processer.process(text);
+  return String(value);
 }
 
-// TODO: localstorge
+const KEY = "___xyzwps_markdown__";
 
 const DEFAULT_MD = `# Markdown Editor
 
@@ -54,15 +52,18 @@ export default function MarkdownEditor() {
   const [text, setText] = useState(DEFAULT_MD);
   const [html, setHtml] = useState("");
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    renderMarkdown(text).then(setHtml);
+    const x = localStorage.getItem(KEY) || "";
+    setText(x);
+    renderMarkdown(x).then(setHtml);
   }, []);
 
-  
-  
+  useEffect(() => {
+    localStorage.setItem(KEY, text);
+  }, [text]);
+
   return (
-    <div className="w-full grid grid-cols-2 gap-4 h-screen font-mono text-sm">
+    <div className="w-full grid grid-cols-2 gap-1 h-screen font-mono text-sm">
       <textarea
         className="h-full p-4"
         value={text}
@@ -72,7 +73,7 @@ export default function MarkdownEditor() {
         }}
       />
       <div
-        className="prose prose-slate mt-4"
+        className="prose prose-slate m-8"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
         dangerouslySetInnerHTML={{ __html: html }}
       />
