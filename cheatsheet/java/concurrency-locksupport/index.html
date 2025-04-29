@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/java/concurrency-locksupport"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>LockSupport</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.DTHqZQP3.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>LockSupport</h1>  <p>此类提供了基本的线程阻塞原语，用于实现锁或者其他同步类。</p>
+<p>它提供了两个方法：<code>park</code> 和 <code>unpark</code>。其中 <code>park</code> 方法有几种变体。</p>
+<h2 id="park-方法"><code>park</code> 方法</h2>
+<p>调用方法阻塞当前线程，直到以下情况之一发生为止：</p>
+<ul>
+<li>一个对应的 <code>unpark</code> 调用发生；</li>
+<li>一个对应的 <code>unpark</code> 调用已经发生过；</li>
+<li>线程被中断；</li>
+<li>过期时长已用尽（对应 <code>parkNanos</code> 方法）；</li>
+<li>阻塞时间超过截止时刻（对应 <code>parkUntil</code> 方法）；</li>
+<li>虚假唤醒，即无明确原因地返回。</li>
+</ul>
+<p>请注意最后一个条件，有点坑，所以这个方法不适合替代 <code>Thread.sleep</code>，主要用于优化<strong>忙等待</strong>（<em>buzy wait</em>）。
+<code>park</code> 方法的设计目的是仅用于以下形式：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">while</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">!</span><span style="color:#B392F0">canProceed</span><span style="color:#E1E4E8">()) {</span></span>
+<span class="line"><span style="color:#6A737D">  // ensure request to unpark is visible to other threads</span></span>
+<span class="line"><span style="color:#E1E4E8">  ...</span></span>
+<span class="line"><span style="color:#E1E4E8">  LockSupport.</span><span style="color:#B392F0">park</span><span style="color:#E1E4E8">(..);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="unpark-方法"><code>unpark</code> 方法</h2>
+<p>如上面所述，它用于解除一个因 <code>park</code> 被阻塞的线程。</p>
+<h2 id="blocker">Blocker</h2>
+<p><code>LockSupport</code> 方法中使用了一个 blocker 对象，可以在 <code>park</code> 阻塞前写入到被阻塞的线程对象中，在阻塞解除后从线程对象中清除。这个对象主要用在调试和诊断工具上，没事不要使用。</p> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/java/concurrency">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#park-方法">park 方法</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#unpark-方法">unpark 方法</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#blocker">Blocker</a> </li> </ol>  </div> </div> </div> </div> </body></html>

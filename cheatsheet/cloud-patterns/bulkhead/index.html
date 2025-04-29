@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/cloud-patterns/bulkhead"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>隔板模式</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.DTHqZQP3.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>隔板模式</h1> <div class="border-2 p-4 rounded-lg"><strong>提示</strong>：本文翻译自 <strong><a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/bulkhead" target="_blank">Bulkhead pattern - Azure Architecture Center</a></strong>。本文不保证翻译质量，并可能有删改。若你自觉英语尚可，强烈建议尝试看一下原文。</div> <p><strong>隔板</strong>（<em>Bulkhead</em>）模式是一种可以容忍故障的应用程序设计。
+在隔板架构中，也称为基于单元的架构（<em>cell-based architecture</em>），应用程序的元素被隔离到池中，
+这样如果一个出现故障，其他元素将继续运行。
+它以船体的分段隔板命名。如果船体受损，只有受损部分充满水，这可以防止船沉没。</p>
+<h2 id="问题上下文">问题上下文</h2>
+<p>一个云应用程序可能包括多个服务，每个服务都有一个或多个消费者。服务过载或故障将影响服务的所有消费者。</p>
+<p>此外，消费者可能会同时向多个服务发送请求，每个请求都消耗资源。
+当消费者向配置错误或没有响应的服务发送请求时，客户端请求使用的资源可能无法及时释放。
+随着对服务的请求继续，这些资源可能会耗尽。
+例如，客户端的连接池可能会耗尽。此时，消费者对其他服务的请求会受到影响。
+最终消费者无法再向其他服务发送请求，而不仅仅是原来的无响应服务。</p>
+<p>同样的资源耗尽问题会影响具有多个消费者的服务。
+来自一个客户端的大量请求可能会耗尽服务中的可用资源。
+其他消费者不再能够使用该服务，从而导致级联故障效应。</p>
+<h2 id="解决方案">解决方案</h2>
+<p>根据消费者负载和可用性要求将服务实例划分为不同的组。
+这种设计有助于隔离故障，并允许您为部分消费者维持服务功能，即使在故障期间也是如此。</p>
+<p>消费者还可以对资源进行分区，以确保用于调用一个服务的资源不会影响用于调用另一个服务的资源。
+例如，调用多个服务的消费者可能会为每个服务分配一个连接池。
+如果一个服务开始失败，它只会影响为该服务分配的连接池，允许消费者继续使用其他服务。</p>
+<p>这种模式有的好处包括：</p>
+<ul>
+<li>将消费者和服务与级联故障隔离开来。影响消费者或服务的问题可以在其自身的隔板内隔离，从而防止整个解决方案失败。</li>
+<li>允许您在服务失败时保留某些功能。应用程序的其他服务和功能将继续工作。</li>
+<li>允许您在部署为不同的消费者提供不同服务质量。可以将高优先级消费者池配置为使用高优先级服务。</li>
+</ul>
+<p>下图显示了围绕调用单个服务的连接池构建的隔板。
+如果服务A发生故障或导致其他问题，连接池将被隔离，因此只有使用分配给服务A的线程池的工作负载会受到影响。
+使用服务B和C的工作负载不受影响，并且可以继续工作而不会中断。</p>
+<img alt="Diagram" decoding="async" loading="lazy" src="/gen/d2/cheatsheet/cloud-patterns/bulkhead-0.svg" width="453" height="312"/>
+<p>下一个图显示了多个客户端调用单个服务。
+每个客户端都被分配了一个单独的服务实例。客户端1发出了太多请求，使其实例不堪重负。
+因为每个服务实例都与其他服务实例隔离，所以其他客户端可以继续进行调用。</p>
+<img alt="Diagram" decoding="async" loading="lazy" src="/gen/d2/cheatsheet/cloud-patterns/bulkhead-1.svg" width="493" height="307"/>
+<h2 id="实现考量">实现考量</h2>
+<ul>
+<li>围绕应用程序的业务和技术需求定义分区。</li>
+<li>如果使用战术DDD设计微服务，分区边界应与有界上下文保持一致。</li>
+<li>在将服务或消费者划分为隔板时，请考虑技术提供的隔离级别以及成本、性能和可管理性方面的开销。</li>
+<li>考虑将隔板与重试、断路器和节流模式相结合，以提供更复杂的故障处理。</li>
+<li>将消费者划分为隔板时，请考虑使用进程、线程池和信号量。<a href="https://github.com/resilience4j/resilience4j">resilience4j</a> 和
+<a href="https://github.com/App-vNext/Polly">Polly</a> 等项目提供了一个创建消费者隔板的框架。</li>
+<li>将服务划分为隔板时，请考虑将它们部署到单独的虚拟机、容器或进程中。容器以相当低的开销提供了资源隔离的良好平衡。</li>
+<li>使用异步消息进行通信的服务可以通过不同的队列集进行隔离，每个队列上可以有一组处理消息的专用实例，也可以有一组使用算法进行出队和分派处理的实例。</li>
+<li>确定隔板的颗粒度级别。例如，如果您想跨分区分配租户，您可以将每个租户放入单独的分区，或将多个租户放入一个分区。</li>
+<li>监控每个分区的性能和SLA。</li>
+</ul>
+<h2 id="何时使用">何时使用</h2>
+<p>使用此模式来：</p>
+<ul>
+<li>隔离用于使用一组后端服务的资源，特别是如果应用程序可以提供某种级别的功能，即使其中一个服务没有响应。</li>
+<li>将关键消费者与标准消费者隔离开来。</li>
+<li>保护应用程序免受级联故障的影响。</li>
+</ul>
+<p>此模式在以下场景不适用：</p>
+<ul>
+<li>在项目中，资源使用效率较低可能是不可接受的。</li>
+<li>增加的复杂性是不必要的。</li>
+</ul> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/cloud-patterns/">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#问题上下文">问题上下文</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#解决方案">解决方案</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#实现考量">实现考量</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#何时使用">何时使用</a> </li> </ol>  </div> </div> </div> </div> </body></html>

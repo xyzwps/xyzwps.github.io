@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/spring/mvc-controller"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spring MVC 中如何编写 Controller</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.DTHqZQP3.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>Spring MVC 中如何编写 Controller</h1>  <p>现在的 Spring 应用程序很少是传统 MVC 那种形式了。一般而言，现在多使用 <code>@RestController</code> 注解来编写 HTTP API 的实现。
+默认情况下，<code>@RestController</code> 类下的 handler，接受 <code>application/json</code> 格式的数据，返回 <code>application/json</code> 格式的数据。</p>
+<h2 id="controller-路由的两种写法">Controller 路由的两种写法</h2>
+<p>一种是在 controller 类上加 <code>@RequestMapping</code> 注解。比如下例中，发起 HTTP 请求 <a href="http://localhost:8080/demo/get-persons">http://localhost:8080/demo/get-persons</a>
+后，会调用 <code>getPersons</code> 方法处理请求。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> com.xyzwps.cheatsheet.controller.model.Person;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.annotation.GetMapping;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.annotation.RequestMapping;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.annotation.RestController;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> java.util.List;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RestController</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RequestMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/demo&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> DemoController</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/get-persons&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> List&lt;</span><span style="color:#F97583">Person</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">getPersons</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> List.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Amy&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;aa972211-5f71-4c42-a05b-1adf62ff2de3&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>另一种是不在 controller 类上加 <code>@RequestMapping</code> 注解，把完整路由写道 handler 方法上。比如下例中，
+发起 HTTP 请求 <a href="http://localhost:8080/hello/world">http://localhost:8080/hello/world</a> 后，会调用 <code>hello</code> 方法处理请求。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RestController</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> HelloWorldController</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/hello/world&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> Map&lt;</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">, </span><span style="color:#F97583">Object</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">hello</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> Map.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;hello&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;world&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>使用哪种全看个人喜好。</p>
+<h2 id="如何创建一个-http-api-handler">如何创建一个 HTTP API Handler ？</h2>
+<p>一种是使用 <code>@RequestMapping</code> 注解，在注解的 <code>method</code> 字段中指明 <code>GET</code>。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">RequestMapping</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">value</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> &quot;/get-persons&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">method</span><span style="color:#F97583"> =</span><span style="color:#E1E4E8"> RequestMethod.GET)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> List</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">Person</span><span style="color:#F97583">&gt;</span><span style="color:#B392F0"> getPersons</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> List.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Amy&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;aa972211-5f71-4c42-a05b-1adf62ff2de3&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>另一种是使用 <code>@GetMapping</code> 注解。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/get-persons-short&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> List</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">Person</span><span style="color:#F97583">&gt;</span><span style="color:#B392F0"> getPersonsShort</span><span style="color:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> List.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Amy&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;aa972211-5f71-4c42-a05b-1adf62ff2de3&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>对于 POST、PUT、DELETE、PATCH 等方法类似。</p>
+<h2 id="如何接受请求体-http-api-handler">如何接受请求体 HTTP API Handler ？</h2>
+<p>使用 <code>@RequestBody</code> 注解，框架会尝试把请求体转换成对应的 Java 对象。如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">PostMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/create-persons&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Person </span><span style="color:#B392F0">createPersonShort</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">RequestBody</span><span style="color:#E1E4E8"> CreatePerson payload) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(payload.</span><span style="color:#B392F0">getName</span><span style="color:#E1E4E8">(), UUID.</span><span style="color:#B392F0">randomUUID</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">toString</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何获取-search-parameter">如何获取 Search Parameter？</h2>
+<p>使用 <code>@RequestParams</code> 注解。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/get-person-by-id?id=dddd</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;name&quot;:&quot;Name of dddd&quot;,&quot;id&quot;:&quot;dddd&quot;}</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/get-person-by-id&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Person </span><span style="color:#B392F0">getPersonById</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">RequestParam</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;id&quot;</span><span style="color:#E1E4E8">) String id) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Name of &quot;</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> id, id);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何获取-http-header">如何获取 HTTP Header？</h2>
+<p>使用 <code>@RequestHeader</code> 注解。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/get-current-person -H &quot;Authorization: A-TOKEN&quot;</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;name&quot;:&quot;Token of A-TOKEN&quot;,&quot;id&quot;:&quot;A-TOKEN&quot;}</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/get-current-person&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Person </span><span style="color:#B392F0">getCurrentPerson</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">RequestHeader</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Authorization&quot;</span><span style="color:#E1E4E8">) String token) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Token of &quot;</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> token, token);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何获取-cookie">如何获取 Cookie？</h2>
+<p>使用 <code>@CookieValue</code> 注解。例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/get-current-person-v2 -H &quot;Cookie: sid=qwerty&quot;</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;name&quot;:&quot;Session of qwerty&quot;,&quot;id&quot;:&quot;qwerty&quot;}</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/get-current-person-v2&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Person </span><span style="color:#B392F0">getPersonCookie</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">CookieValue</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;sid&quot;</span><span style="color:#E1E4E8">) String sid) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Session of &quot;</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> sid, sid);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何获取-path-variable">如何获取 Path Variable？</h2>
+<p>使用 <code>@PathVariable</code> 注解。例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/persons/123</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;name&quot;:&quot;Name of 123&quot;,&quot;id&quot;:&quot;123&quot;}</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/persons/{id}&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Person </span><span style="color:#B392F0">getPersonInfo</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">PathVariable</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;id&quot;</span><span style="color:#E1E4E8">) String id) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Name of &quot;</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> id, id);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何获取-httpservletrequest-和-httpservletresponse">如何获取 <code>HttpServletRequest</code> 和 <code>HttpServletResponse</code>？</h2>
+<p>直接把 <code>HttpServletRequest</code> 参数声明到请求 handler 方法参数中即可。例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/get-http-servlet-request -H &quot;X-TEST: 123&quot;</span></span>
+<span class="line"><span style="color:#6A737D">/// 123</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/get-http-servlet-request&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> String </span><span style="color:#B392F0">getPersonAvatar</span><span style="color:#E1E4E8">(HttpServletRequest req) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> req.</span><span style="color:#B392F0">getHeader</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;X-TEST&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>获取 <code>HttpServletResponse</code> 的方式一样。</p>
+<h2 id="如何上传文件">如何上传文件？</h2>
+<p>上传文件一般是通过 <code>multipart/form-data</code> 来进行的。使用 <code>@RequestPart</code> 注解来访问其中的文件参数：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl -X POST -F &quot;file=@demo.csv&quot; http://localhost:8080/demo/upload-csv</span></span>
+<span class="line"><span style="color:#6A737D">/// [[&quot;Name&quot;,&quot;Age&quot;],[&quot;Amber&quot;,&quot;16&quot;],[&quot;Keqing&quot;,&quot;18&quot;]]</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">PostMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/upload-csv&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> List</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">List</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">String</span><span style="color:#F97583">&gt;&gt;</span><span style="color:#B392F0"> uploadCsv</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">RequestPart</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;file&quot;</span><span style="color:#E1E4E8">) MultipartFile file) throws IOException {</span></span>
+<span class="line"><span style="color:#E1E4E8">    CSVParser parser </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> CSVParser</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> InputStreamReader</span><span style="color:#E1E4E8">(file.</span><span style="color:#B392F0">getInputStream</span><span style="color:#E1E4E8">()), CSVFormat.DEFAULT);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> parser.</span><span style="color:#B392F0">stream</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(CSVRecord</span><span style="color:#F97583">::</span><span style="color:#E1E4E8">toList).</span><span style="color:#B392F0">toList</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>上面示例中，<code>@RequestPart</code> 注解可以替换成 <code>@RequestParam</code>：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl -X POST -F &quot;file=@demo.csv&quot; http://localhost:8080/demo/upload-csv-v2</span></span>
+<span class="line"><span style="color:#6A737D">/// [[&quot;Name&quot;,&quot;Age&quot;],[&quot;Amber&quot;,&quot;16&quot;],[&quot;Keqing&quot;,&quot;18&quot;]]</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">PostMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/upload-csv-v2&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> List</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">List</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">String</span><span style="color:#F97583">&gt;&gt;</span><span style="color:#B392F0"> uploadCsvV2</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">RequestParam</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;file&quot;</span><span style="color:#E1E4E8">) MultipartFile file) throws IOException {</span></span>
+<span class="line"><span style="color:#E1E4E8">    CSVParser parser </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> CSVParser</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> InputStreamReader</span><span style="color:#E1E4E8">(file.</span><span style="color:#B392F0">getInputStream</span><span style="color:#E1E4E8">()), CSVFormat.DEFAULT);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> parser.</span><span style="color:#B392F0">stream</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(CSVRecord</span><span style="color:#F97583">::</span><span style="color:#E1E4E8">toList).</span><span style="color:#B392F0">toList</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>可以把 <code>MultipartFile</code> 放到对象里，以便整体性获取整个 form：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Data</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> UploadForm</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> String type;</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> MultipartFile file;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl -X POST -F &quot;type=csv&quot; -F &quot;file=@demo.csv&quot; http://localhost:8080/demo/upload-csv-v3</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;type&quot;:&quot;csv&quot;,&quot;csv&quot;:[[&quot;Name&quot;,&quot;Age&quot;],[&quot;Amber&quot;,&quot;16&quot;],[&quot;Keqing&quot;,&quot;18&quot;]]}</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">PostMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/upload-csv-v3&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Map</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">String, Object</span><span style="color:#F97583">&gt;</span><span style="color:#B392F0"> uploadCsvV3</span><span style="color:#E1E4E8">(UploadForm form) throws IOException {</span></span>
+<span class="line"><span style="color:#E1E4E8">    CSVParser parser </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> CSVParser</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> InputStreamReader</span><span style="color:#E1E4E8">(form.file.</span><span style="color:#B392F0">getInputStream</span><span style="color:#E1E4E8">()), CSVFormat.DEFAULT);</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> Map.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#9ECBFF">            &quot;csv&quot;</span><span style="color:#E1E4E8">, parser.</span><span style="color:#B392F0">stream</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(CSVRecord</span><span style="color:#F97583">::</span><span style="color:#E1E4E8">toList).</span><span style="color:#B392F0">toList</span><span style="color:#E1E4E8">(),</span></span>
+<span class="line"><span style="color:#9ECBFF">            &quot;type&quot;</span><span style="color:#E1E4E8">, form.type</span></span>
+<span class="line"><span style="color:#E1E4E8">    );</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>Spring 提供的 <code>MultipartFile</code> 可以被替换成 <code>jakarta.servlet.http.Part</code>。</p>
+<h2 id="如何下载文件">如何下载文件？</h2>
+<p>直接把文件的二进制表示写到 <code>HttpServletResponse</code> 的输出流中即可。记得设置对应的 HTTP header：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/text/xx100.txt</span></span>
+<span class="line"><span style="color:#6A737D">/// xx100</span></span>
+<span class="line"><span style="color:#6A737D">/// xx100</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/text/{fileName}.txt&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> getTextFile</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">PathVariable</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;fileName&quot;</span><span style="color:#E1E4E8">) String fileName, HttpServletResponse res) throws IOException {</span></span>
+<span class="line"><span style="color:#E1E4E8">    res.</span><span style="color:#B392F0">setHeader</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Content-Type&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;text/plain&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> bytes </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> fileName.</span><span style="color:#B392F0">getBytes</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    res.</span><span style="color:#B392F0">setHeader</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Content-Length&quot;</span><span style="color:#E1E4E8">, (bytes.length </span><span style="color:#F97583">*</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">) </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> &quot;&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> os </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> res.</span><span style="color:#B392F0">getOutputStream</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">    os.</span><span style="color:#B392F0">write</span><span style="color:#E1E4E8">(bytes);</span></span>
+<span class="line"><span style="color:#E1E4E8">    os.</span><span style="color:#B392F0">write</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&#39;</span><span style="color:#79B8FF">\n</span><span style="color:#9ECBFF">&#39;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    os.</span><span style="color:#B392F0">write</span><span style="color:#E1E4E8">(bytes);</span></span>
+<span class="line"><span style="color:#E1E4E8">    os.</span><span style="color:#B392F0">flush</span><span style="color:#E1E4E8">();</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<h2 id="如何做数据校验">如何做数据校验？</h2>
+<p>首先要在 pom.xml 文件中引入相关依赖：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#E1E4E8">&lt;</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">&gt;</span></span>
+<span class="line"><span style="color:#E1E4E8">    &lt;</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">&gt;org.springframework.boot&lt;/</span><span style="color:#85E89D">groupId</span><span style="color:#E1E4E8">&gt;</span></span>
+<span class="line"><span style="color:#E1E4E8">    &lt;</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">&gt;spring-boot-starter-validation&lt;/</span><span style="color:#85E89D">artifactId</span><span style="color:#E1E4E8">&gt;</span></span>
+<span class="line"><span style="color:#E1E4E8">&lt;/</span><span style="color:#85E89D">dependency</span><span style="color:#E1E4E8">&gt;</span></span></code></pre>
+<p>如果要检查请求体，可以像下面这样：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">Data</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> UpdatePersonPayload</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">NotEmpty</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">message</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> &quot;Person id cannot be null or empty.&quot;</span><span style="color:#E1E4E8">) </span><span style="color:#6A737D">// 1</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> String id;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">NotNull</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">message</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> &quot;Person name cannot be null.&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">Size</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">min</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">max</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> 20</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">message</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> &quot;Person name length must be between {min} and {max}.&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">    private</span><span style="color:#E1E4E8"> String name;</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl -X POST -d &#39;{&quot;name&quot;:&quot;a&quot;, &quot;id&quot;:&quot;abc&quot;}&#39; \</span></span>
+<span class="line"><span style="color:#6A737D">///                -H &quot;Content-Type: application/json&quot; \</span></span>
+<span class="line"><span style="color:#6A737D">///                http://localhost:8080/demo/update-person</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;timestamp&quot;:&quot;2024-11-07T11:26:38.803+00:00&quot;,&quot;status&quot;:400,&quot;error&quot;:&quot;Bad Request&quot;,&quot;path&quot;:&quot;/demo/update-person&quot;}</span></span>
+<span class="line"><span style="color:#6A737D">///</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl -X POST -d &#39;{&quot;name&quot;:&quot;adddd&quot;, &quot;id&quot;:&quot;abc&quot;}&#39; \</span></span>
+<span class="line"><span style="color:#6A737D">///                -H &quot;Content-Type: application/json&quot; \</span></span>
+<span class="line"><span style="color:#6A737D">///                http://localhost:8080/demo/update-person</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;name&quot;:&quot;adddd&quot;,&quot;id&quot;:&quot;abc&quot;}</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">PostMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/update-person&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> Person </span><span style="color:#B392F0">updatePerson</span><span style="color:#E1E4E8">(@</span><span style="color:#F97583">RequestBody</span><span style="color:#E1E4E8"> @</span><span style="color:#F97583">Valid</span><span style="color:#E1E4E8"> UpdatePersonPayload payload) { </span><span style="color:#6A737D">// 2</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(payload.</span><span style="color:#B392F0">getName</span><span style="color:#E1E4E8">(), payload.</span><span style="color:#B392F0">getId</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>解释：</p>
+<ol>
+<li>在要检查的字段上，增加 jakarta validation 注解，表示对字段的要求。</li>
+<li>在被检查的请求体上，增加 <code>jakarta.validation.Valid</code> 注解。Spring MVC 会对由此注解的参数做检查。</li>
+</ol>
+<p>上面例子中可以看到，name 长度为 1 的时候抛出了 400 错误。后面会介绍如何处理错误。</p>
+<p>如果检查其他参数，只可以直接把 jakarta validation 注解直接注到参数上。例：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#6A737D">/// ```sh</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/search-person</span></span>
+<span class="line"><span style="color:#6A737D">/// {&quot;timestamp&quot;:&quot;2024-11-07T11:37:25.083+00:00&quot;,&quot;status&quot;:400,&quot;error&quot;:&quot;Bad Request&quot;,&quot;path&quot;:&quot;/demo/search-person&quot;}</span></span>
+<span class="line"><span style="color:#6A737D">///</span></span>
+<span class="line"><span style="color:#6A737D">/// $ curl http://localhost:8080/demo/search-person?name=a</span></span>
+<span class="line"><span style="color:#6A737D">/// [{&quot;name&quot;:&quot;a&quot;,&quot;id&quot;:&quot;2299e4ee-372e-4003-96e5-5d86fa80146f&quot;}]</span></span>
+<span class="line"><span style="color:#6A737D">/// ```</span></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">GetMapping</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;/search-person&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#E1E4E8"> List</span><span style="color:#F97583">&lt;</span><span style="color:#E1E4E8">Person</span><span style="color:#F97583">&gt;</span><span style="color:#B392F0"> searchPerson</span><span style="color:#E1E4E8">(</span></span>
+<span class="line"><span style="color:#E1E4E8">        @</span><span style="color:#F97583">Valid</span><span style="color:#E1E4E8"> @</span><span style="color:#F97583">NotEmpty</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">message</span><span style="color:#F97583"> =</span><span style="color:#9ECBFF"> &quot;Name CANNOT be empty.&quot;</span><span style="color:#E1E4E8">) </span><span style="color:#6A737D">// 1</span></span>
+<span class="line"><span style="color:#E1E4E8">        @</span><span style="color:#F97583">RequestParam</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;name&quot;</span><span style="color:#E1E4E8">) String name) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#E1E4E8"> List.</span><span style="color:#B392F0">of</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">new</span><span style="color:#B392F0"> Person</span><span style="color:#E1E4E8">(name, UUID.</span><span style="color:#B392F0">randomUUID</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">toString</span><span style="color:#E1E4E8">()));</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>解释：</p>
+<ol>
+<li>把 <code>@Valid</code> 注到要检查的参数上。</li>
+<li>为要检查的参数加上一条校验规则 <code>@NotEmpty</code>。</li>
+</ol>
+<p>注意到上面参数校验不通过时，返回的数据中没有具体错误信息。</p>
+<h2 id="如何处理异常">如何处理异常？</h2>
+<p>在一个 <code>@ControllerAdvice</code> 或者 <code>@Controller</code> 类中增加一个 <code>@ExceptionHandler</code> 注解的方法即可。例如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> jakarta.validation.ConstraintViolation;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> jakarta.validation.ConstraintViolationException;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.context.MessageSourceResolvable;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.http.HttpStatus;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.http.ResponseEntity;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.MissingServletRequestParameterException;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.annotation.ControllerAdvice;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.bind.annotation.ExceptionHandler;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> org.springframework.web.method.annotation.HandlerMethodValidationException;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">@</span><span style="color:#F97583">ControllerAdvice</span></span>
+<span class="line"><span style="color:#F97583">public</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> ErrorHandler</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#F97583"> record</span><span style="color:#B392F0"> ErrorResponse</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">int</span><span style="color:#E1E4E8"> code, String message) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E1E4E8">    @</span><span style="color:#F97583">ExceptionHandler</span><span style="color:#E1E4E8">(Exception.class)</span></span>
+<span class="line"><span style="color:#F97583">    public</span><span style="color:#E1E4E8"> ResponseEntity&lt;</span><span style="color:#F97583">ErrorResponse</span><span style="color:#E1E4E8">&gt; </span><span style="color:#B392F0">handle</span><span style="color:#E1E4E8">(Exception </span><span style="color:#FFAB70">ex</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">        ErrorResponse payload </span><span style="color:#F97583">=</span><span style="color:#F97583"> switch</span><span style="color:#E1E4E8"> (ex) {</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> ConstraintViolationException e </span><span style="color:#F97583">-&gt;</span></span>
+<span class="line"><span style="color:#F97583">                    new</span><span style="color:#B392F0"> ErrorResponse</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">400</span><span style="color:#E1E4E8">, e.</span><span style="color:#B392F0">getConstraintViolations</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">stream</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">                            .</span><span style="color:#B392F0">findFirst</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">                            .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(ConstraintViolation</span><span style="color:#F97583">::</span><span style="color:#E1E4E8">getMessage)</span></span>
+<span class="line"><span style="color:#E1E4E8">                            .</span><span style="color:#B392F0">orElse</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Bad request.&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> HandlerMethodValidationException e </span><span style="color:#F97583">-&gt;</span></span>
+<span class="line"><span style="color:#F97583">                    new</span><span style="color:#B392F0"> ErrorResponse</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">400</span><span style="color:#E1E4E8">, e.</span><span style="color:#B392F0">getAllErrors</span><span style="color:#E1E4E8">().</span><span style="color:#B392F0">stream</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">                            .</span><span style="color:#B392F0">findFirst</span><span style="color:#E1E4E8">()</span></span>
+<span class="line"><span style="color:#E1E4E8">                            .</span><span style="color:#B392F0">map</span><span style="color:#E1E4E8">(MessageSourceResolvable</span><span style="color:#F97583">::</span><span style="color:#E1E4E8">getDefaultMessage)</span></span>
+<span class="line"><span style="color:#E1E4E8">                            .</span><span style="color:#B392F0">orElse</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&quot;Bad request.&quot;</span><span style="color:#E1E4E8">));</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> MissingServletRequestParameterException e </span><span style="color:#F97583">-&gt;</span></span>
+<span class="line"><span style="color:#F97583">                    new</span><span style="color:#B392F0"> ErrorResponse</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">400</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">&quot;Parameter &quot;</span><span style="color:#F97583"> +</span><span style="color:#E1E4E8"> e.</span><span style="color:#B392F0">getParameterName</span><span style="color:#E1E4E8">() </span><span style="color:#F97583">+</span><span style="color:#9ECBFF"> &quot; is required.&quot;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#F97583">            case</span><span style="color:#E1E4E8"> AppException e </span><span style="color:#F97583">-&gt;</span></span>
+<span class="line"><span style="color:#F97583">                    new</span><span style="color:#B392F0"> ErrorResponse</span><span style="color:#E1E4E8">(HttpStatus.NOT_IMPLEMENTED.</span><span style="color:#B392F0">value</span><span style="color:#E1E4E8">(), e.</span><span style="color:#B392F0">getMessage</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#F97583">            default</span><span style="color:#F97583"> -&gt;</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ErrorResponse</span><span style="color:#E1E4E8">(HttpStatus.INTERNAL_SERVER_ERROR.</span><span style="color:#B392F0">value</span><span style="color:#E1E4E8">(), ex.</span><span style="color:#B392F0">getMessage</span><span style="color:#E1E4E8">());</span></span>
+<span class="line"><span style="color:#E1E4E8">        };</span></span>
+<span class="line"><span style="color:#F97583">        return</span><span style="color:#E1E4E8"> ResponseEntity.</span><span style="color:#B392F0">status</span><span style="color:#E1E4E8">(payload.</span><span style="color:#B392F0">code</span><span style="color:#E1E4E8">()).</span><span style="color:#B392F0">body</span><span style="color:#E1E4E8">(payload);</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p>现在试试：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="sh"><code><span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> curl</span><span style="color:#9ECBFF"> http://localhost:8080/demo/search-person</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span><span style="color:#B392F0">&quot;code&quot;</span><span style="color:#B392F0">:400,</span><span style="color:#B392F0">&quot;message&quot;</span><span style="color:#79B8FF">:</span><span style="color:#B392F0">&quot;Parameter name is required.&quot;</span><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> curl</span><span style="color:#9ECBFF"> http://localhost:8080/demo/search-person?name=</span></span>
+<span class="line"><span style="color:#E1E4E8">{</span><span style="color:#B392F0">&quot;code&quot;</span><span style="color:#B392F0">:400,</span><span style="color:#B392F0">&quot;message&quot;</span><span style="color:#79B8FF">:</span><span style="color:#B392F0">&quot;Name CANNOT be empty.&quot;</span><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> curl</span><span style="color:#9ECBFF"> http://localhost:8080/demo/search-person?name=</span><span style="color:#79B8FF">1</span></span>
+<span class="line"><span style="color:#E1E4E8">[{</span><span style="color:#9ECBFF">&quot;name&quot;</span><span style="color:#E1E4E8">:</span><span style="color:#9ECBFF">&quot;1&quot;</span><span style="color:#E1E4E8">,</span><span style="color:#9ECBFF">&quot;id&quot;</span><span style="color:#E1E4E8">:</span><span style="color:#9ECBFF">&quot;9e7cb5fd-d094-4efb-aed6-0fced698f8c6&quot;</span><span style="color:#E1E4E8">}]</span></span></code></pre>
+<p>TODO: sse</p>
+<h2 id="示例">示例</h2>
+<p><a href="https://gitee.com/xyzwps/cheatsheet-spring/tree/master/controller">戳这里查看完整示例</a>。</p> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/spring">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#controller-路由的两种写法">Controller 路由的两种写法</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何创建一个-http-api-handler">如何创建一个 HTTP API Handler ？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何接受请求体-http-api-handler">如何接受请求体 HTTP API Handler ？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何获取-search-parameter">如何获取 Search Parameter？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何获取-http-header">如何获取 HTTP Header？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何获取-cookie">如何获取 Cookie？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何获取-path-variable">如何获取 Path Variable？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何获取-httpservletrequest-和-httpservletresponse">如何获取 HttpServletRequest 和 HttpServletResponse？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何上传文件">如何上传文件？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何下载文件">如何下载文件？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何做数据校验">如何做数据校验？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何处理异常">如何处理异常？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#示例">示例</a> </li> </ol>  </div> </div> </div> </div> </body></html>

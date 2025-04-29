@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/java/data-types"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>数据类型</title><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/99.DTHqZQP3.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body> <div class="bg-slate-100"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> </div> <div class="container mx-auto bg-white p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"> <h1>数据类型</h1>  <p>使用合适的数据类型进行计算是编程语言中的核心问题之一。</p>
+<p>Java 支持的数据类型有两类：</p>
+<ul>
+<li>基本数据类型</li>
+<li>引用类型</li>
+</ul>
+<h2 id="基本数据类型">基本数据类型</h2>
+<p>基本数据类型（primitive types） 只有以下几种：</p>
+<ul>
+<li>数值类型
+<ul>
+<li>整数：<code>byte</code>、<code>short</code>、<code>int</code>、<code>long</code>、<code>char</code></li>
+<li>浮点数：<code>float</code>、<code>double</code></li>
+</ul>
+</li>
+<li><code>boolean</code></li>
+</ul>
+<h3 id="boolean"><code>boolean</code></h3>
+<p>布尔类型只有两个取值 <code>true</code> 和 <code>false</code>。</p>
+<p>支持的操作有：</p>
+<ul>
+<li>等值比较：<code>==</code>、<code>!=</code></li>
+<li>逻辑非：<code>!</code></li>
+<li>逻辑或 <code>|</code>、逻辑且 <code>&amp;</code>、逻辑异或 <code>^</code></li>
+<li>条件与 <code>&amp;&amp;</code>、条件或 <code>||</code></li>
+<li>作为三元运算符 <code>? :</code> 的第一个表达式</li>
+</ul>
+<p>布尔类型的值或者表达式多用于<a href="/cheatsheet/java/control-flow">条件控制语句</a>。</p>
+<h3 id="整数">整数</h3>
+<h4 id="整数的取值范围">整数的取值范围</h4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>类型</th><th>位宽</th><th>有无符号</th><th>取值范围</th></tr></thead><tbody><tr><td><code>byte</code></td><td>8</td><td>有</td><td>-128（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msup><mn>2</mn><mn>7</mn></msup></mrow><annotation encoding="application/x-tex">-2^7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span>） ~ 127（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>7</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{7}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">1</span></span></span></span>）</td></tr><tr><td><code>short</code></td><td>16</td><td>有</td><td>-32768（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msup><mn>2</mn><mn>15</mn></msup></mrow><annotation encoding="application/x-tex">-2^{15}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span></span></span></span>） ~ 32767（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>15</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{15}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">15</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">1</span></span></span></span>）</td></tr><tr><td><code>int</code></td><td>32</td><td>有</td><td>-2147483648（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msup><mn>2</mn><mn>31</mn></msup></mrow><annotation encoding="application/x-tex">-2^{31}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">31</span></span></span></span></span></span></span></span></span></span></span></span>） ~ 2147483647（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>31</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{31}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">31</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">1</span></span></span></span>）</td></tr><tr><td><code>long</code></td><td>64</td><td>有</td><td>-9223372036854775808（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo><msup><mn>2</mn><mn>63</mn></msup></mrow><annotation encoding="application/x-tex">-2^{63}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord">−</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">63</span></span></span></span></span></span></span></span></span></span></span></span>） ~ 9223372036854775807（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>63</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{63}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">63</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.6444em"></span><span class="mord">1</span></span></span></span>）</td></tr><tr><td><code>char</code></td><td>16</td><td>无</td><td><code>&#39;\u0000&#39;</code>（0） ~ <code>&#39;\uffff&#39;</code>（65535）</td></tr></tbody></table>
+<h4 id="整数字面量">整数字面量</h4>
+<p>整数有以下几种表示方式：</p>
+<ul>
+<li>十进制。如：<code>123</code>、<code>-123</code></li>
+<li>十六进制，以 <code>0x</code> 或者 <code>0X</code> 开头。如：<code>0x7B</code>、<code>-0X7b</code></li>
+<li>八进制，以 <code>0</code> 开头。如：<code>0173</code>、<code>-0173</code></li>
+<li>二进制，以 <code>0b</code> 或者 <code>0B</code> 开头。如：<code>0b1111011</code>、<code>-0B1111011</code></li>
+</ul>
+<p>默认情况下，整数字面量的类型是 <code>int</code>。如果字面的值超出 <code>int</code> 的取值范围，可以在后面加
+<code>l</code> 或者 <code>L</code> 来创建 <code>long</code> 类型的字面量（当然地，<code>long</code> 类型字面量也不应超出其取值范围）。
+如：<code>2147483648L</code>。</p>
+<p>对于过长的数字，可以使用下划线对其进行分段，使人类读起来更容易。比如：<code>123_456_789</code>、<code>0x1_2345_6789</code>。</p>
+<p><code>char</code> 类型的字面量，都用单引号圈起来。比如：<code>&#39;a&#39;</code>、<code>&#39;X&#39;</code>、<code>&#39;晴&#39;</code>。
+对于一些可能引起歧义的字符，或者一些不寻常的字符，用转义字符表示。转义字符就是以 <code>\</code> 开头的字符。
+比如：<code>&#39;\&#39;&#39;</code>、<code>&#39;\&quot;&#39;</code>、<code>&#39;\\&#39;</code>、<code>&#39;\a&#39;</code>、<code>&#39;\b&#39;</code>、<code>&#39;\s&#39;</code>、<code>&#39;\t&#39;</code>、<code>&#39;\n&#39;</code>、<code>&#39;\f&#39;</code>、<code>&#39;\r&#39;</code> 等等。
+此外，所有字符都可以用 unicode 字码转义字符表示，比如：<code>&#39;\u0027&#39;</code>。</p>
+<h4 id="整数支持的操作">整数支持的操作</h4>
+<p>所有数值类型都支持以下操作：</p>
+<ul>
+<li>比较大小：<code>&lt;</code>、<code>&lt;=</code>、<code>&gt;=</code>、<code>&gt;</code></li>
+<li>比较是否相等：<code>==</code>、<code>!=</code></li>
+</ul>
+<p>这两类比较操作的结果都是布尔值。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> ComparasionOperations</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">  public</span><span style="color:#F97583"> static</span><span style="color:#F97583"> void</span><span style="color:#B392F0"> main</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">String</span><span style="color:#E1E4E8">[] </span><span style="color:#FFAB70">args</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">1</span><span style="color:#F97583"> &gt;</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> &gt;=</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">&#39;a&#39;</span><span style="color:#F97583"> &lt;=</span><span style="color:#9ECBFF"> &#39;A&#39;</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> ==</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">    System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> !=</span><span style="color:#79B8FF"> 2</span><span style="color:#E1E4E8">);</span></span>
+<span class="line"><span style="color:#E1E4E8">  }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span></code></pre>
+<p><code>int</code> 和 <code>long</code> 还支持以下特定操作：</p>
+<ul>
+<li>一元操作符：<code>+</code>、<code>-</code></li>
+<li>加减乘除：<code>+</code>、<code>-</code>、<code>*</code>、<code>/</code></li>
+<li>求余数：<code>%</code></li>
+<li>递增递减：<code>++</code>、<code>--</code>（前缀式和后缀式）</li>
+<li>位操作：<code>&amp;</code>（按位与）、<code>|</code>（按位或）、<code>^</code>（按位异或）</li>
+<li>位移：<code>&lt;&lt;</code>（向左移动）、<code>&gt;&gt;</code>（向右移动）、<code>&gt;&gt;&gt;</code>（无符号向右移动）</li>
+<li>按位求补：<code>~</code>（<code>~x</code> 等价于 <code>(-x)-1</code>）</li>
+</ul>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>
+<p>对两个整数使用 <code>/</code> 做除法得到的结果是整数。比如 <code>10 / 4</code> 得到的结果是 2，而不是 2.5。</p>
+</li>
+<li>
+<p>递增递减这两个操作符主要用在对整数变量的操作上。比如：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> i </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#E1E4E8">System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(i</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">); </span><span style="color:#6A737D">// 输出 1</span></span>
+<span class="line"><span style="color:#E1E4E8">System.out.</span><span style="color:#B392F0">println</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">++</span><span style="color:#E1E4E8">i); </span><span style="color:#6A737D">// 输出 3</span></span></code></pre>
+<p>之所以产生这样的输出结果，是因为前缀式和后缀式计算顺序有区别。
+对于 <code>i++</code>，因为 <code>i</code> 在前面，所以先取 <code>i</code> 的值之后，再对其递增；
+对于 <code>++i</code>，因为 <code>++</code> 在前面，所以先对 <code>i</code> 递增后，再取其值。</p>
+<p>对 <code>--</code> 同理。</p>
+</li>
+</ul>
+<h3 id="浮点数">浮点数</h3>
+<p>浮点数只有两种 <code>float</code> 和 <code>double</code>。</p>
+<p>浮点数字面量都带有小数点，比如：<code>3.14</code>。浮点数字面量的值默认是 <code>double</code> 类型的，如果你愿意，可以在结尾标记上 <code>d</code> 或者 <code>D</code>。
+<code>float</code> 类型的字面量应以 <code>f</code> 或者 <code>F</code> 结尾。</p>
+<p>浮点数支持科学计数法。比如：<code>2.1e7</code> 表示 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.1</mn><mo>×</mo><msup><mn>10</mn><mn>7</mn></msup></mrow><annotation encoding="application/x-tex">2.1 \times 10^7</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em"></span><span class="mord">2.1</span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8141em"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span>，<code>2.1E-7</code> 表示 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.1</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>7</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2.1 \times 10^{-7}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em"></span><span class="mord">2.1</span><span class="mspace" style="margin-right:0.2222em"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em"></span></span><span class="base"><span class="strut" style="height:0.8141em"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em"><span style="top:-3.063em;margin-right:0.05em"><span class="pstrut" style="height:2.7em"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">7</span></span></span></span></span></span></span></span></span></span></span></span>。</p>
+<p>支持 16 进制浮点数字面量。少用，这里不再介绍，具体参见 Java 语言规范。</p>
+<h3 id="类型转化">类型转化</h3>
+<p>基本数据类型值之间的转换有两种：隐式转换和显式转换。</p>
+<p>隐式转换遵循的规则是，低精度类型值可以隐式转换成高精度类型的值。</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>byte → short</span></span>
+<span class="line"><span>            ↘</span></span>
+<span class="line"><span>              int → long → float → double</span></span>
+<span class="line"><span>            ↗</span></span>
+<span class="line"><span>        char</span></span></code></pre>
+<p>如上图，箭头左边的值可以隐式转换成右边的类型。右边的转成左边类型时，需要显式转换。下面是一个显式转换的例子：</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#F97583">int</span><span style="color:#E1E4E8"> a </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (</span><span style="color:#F97583">int</span><span style="color:#E1E4E8">)</span><span style="color:#79B8FF">12.3</span><span style="color:#E1E4E8">;</span></span></code></pre>
+<h2 id="引用类型">引用类型</h2>
+<p>除了基本数据类型之外的所有类型都是引用类型。所有的引用类型值都叫对象，它们都是 <code>java.lang.Object</code>。
+与此相关的概念有：<code>class</code>、<code>interface</code>、<code>enum</code>、<code>record</code> 等等。后面会一一介绍。</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se23/html/jls-3.html#jls-3.10.1">Java 语言规范第三章：词法结构</a></li>
+<li><a href="https://docs.oracle.com/javase/specs/jls/se23/html/jls-4.html#jls-4.2">Java 语言规范第四章：类型、值与变量</a></li>
+</ul> </div> <div class="max-lg:hidden border rounded-lg p-6 shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/java">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#基本数据类型">基本数据类型</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#boolean">boolean</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#整数">整数</a> </li><li class="ml-8 text-xs"> <a class="cursor-pointer hover:bg-indigo-100" href="#整数的取值范围">整数的取值范围</a> </li><li class="ml-8 text-xs"> <a class="cursor-pointer hover:bg-indigo-100" href="#整数字面量">整数字面量</a> </li><li class="ml-8 text-xs"> <a class="cursor-pointer hover:bg-indigo-100" href="#整数支持的操作">整数支持的操作</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#浮点数">浮点数</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#类型转化">类型转化</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#引用类型">引用类型</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#参考">参考</a> </li> </ol>  </div> </div> </div> </div> </body></html>
