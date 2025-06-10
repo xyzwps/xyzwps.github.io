@@ -1,0 +1,55 @@
+---
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+
+const list = [
+  {
+    name: "Styled Components",
+    href: "https://styled-components.com/",
+    desc: "主要用于 react",
+  },
+  {
+    name: "Emotion",
+    href: "https://emotion.sh/",
+    desc: "一个致力于用 js 编写 css 的库",
+  },
+  {
+    name: "linaria",
+    href: "https://linaria.dev/",
+    desc: "Zero-runtime CSS in JS library.",
+  },
+  {
+    name: "Compiled",
+    href: "https://compiledcssinjs.com/",
+    desc: "A familiar and performant compile time CSS-in-JS library for React.",
+  },
+  {
+    name: "Panda CSS",
+    href: "https://panda-css.com/",
+    desc: "CSS-in-JS with build time generated styles, RSC compatible, multi-variant support, and best-in-class developer experience",
+  },
+  {
+    name: "StyleX",
+    href: "https://stylexjs.com/",
+    desc: "StyleX is a CSS-in-JS library, which means that it is most useful when an app's UI is authored in JavaScript.",
+  },
+  {
+    name: "g o o b e r",
+    href: "https://goober.rocks/",
+    desc: "A less than 1KB css-in-js solution",
+  },
+  {
+    name: "Windi CSS",
+    href: "https://windicss.org/",
+    desc: "一个类似 tailwind 的 atomic css 框架",
+  },
+  {
+    name: "UnoCSS",
+    href: "https://unocss.dev/",
+    desc: "一个类似 tailwind 的 atomic css 引擎",
+  },
+];
+---
+
+<DefaultLayout title="CSS-in-JS 方案">
+  <pre><code>{JSON.stringify(list, null, 2)}</code></pre>
+</DefaultLayout>
