@@ -1,0 +1,53 @@
+---
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+
+const LIST = [
+  {
+    title: "流式渲染",
+    href: "/blogs/2025-06-12-streaming-rendering",
+    summary: "本文介绍了我使用的一种流式渲染 LLM 输出的结构化数据简单的方案。",
+  },
+  {
+    title: "集中时间段",
+    href: "/blogs/2025-06-10-jzsjd",
+    summary: "本文介绍了我使用了一种计算集中时间段的简单方法。",
+  },
+  {
+    title: "从有向图到依赖注入",
+    href: "/blogs/2024-08-27-dg-to-di",
+    summary: "本文介绍了我对依赖注入的一种看法：把它看做有向图。",
+  },
+];
+---
+
+<DefaultLayout title="文章">
+  <div class="container mx-auto px-4 py-8">
+    <h1
+      class="text-center text-indigo-700"
+      style="font-size: 1.5rem; margin: 1.5rem auto; font-weight: bold;"
+    >
+      文章列表
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        LIST.map((it) => (
+          <article class="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-500 hover:scale-105">
+            <div class="p-6">
+              <h2 class="text-xl font-semibold mb-2 text-indigo-700">
+                {it.title}
+              </h2>
+              <p class="text-gray-700 my-2 line-clamp-3">{it.summary}</p>
+              <a
+                href={it.href}
+                class="text-indigo-700 font-medium hover:text-indigo-500"
+              >
+                阅读全文 &rarr;
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</DefaultLayout>

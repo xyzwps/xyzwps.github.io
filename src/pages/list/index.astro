@@ -1,0 +1,47 @@
+---
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+
+const CATS = [
+  {
+    name: "日常办公",
+    list: [
+      { title: "字体", href: "/list/fonts" },
+      { title: "Mac OS 软件", href: "/list/softwares4mac" },
+    ],
+  },
+  {
+    name: "编程开发",
+    list: [
+      { title: "Prompt Engineering", href: "/list/prompt-engineering" },
+      { title: "数据格式", href: "/list/dataformat" },
+    ],
+  },
+];
+---
+
+<DefaultLayout title="常用工具集合">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-6 text-center text-indigo-700">
+      常用工具集合
+    </h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        CATS.map((c) => (
+          <section class="bg-white shadow-lg rounded-lg p-6 transform transition duration-500 hover:scale-105">
+            <h2 class="text-xl font-semibold mb-4 text-indigo-700">{c.name}</h2>
+            <ul class="space-y-2">
+              {c.list.map((it) => (
+                <li>
+                  <a href={it.href} class="text-gray-700 hover:text-indigo-700">
+                    {it.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</DefaultLayout>
