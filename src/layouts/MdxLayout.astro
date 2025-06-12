@@ -1,8 +1,9 @@
 ---
-import './src/styles/global.css'
-import type { MDXLayoutProps } from 'astro';
-import Toc from './_MdxLayoutToc.astro';
-import CommonHeader from '../components/CommonHeader.astro';
+import '../styles/mdx.css'
+import type { MDXLayoutProps } from "astro";
+import Toc from "./_MdxLayoutToc.astro";
+import CommonHeader from "../components/CommonHeader.astro";
+import AnalyticsBaidu from "../components/AnalyticsBaidu.astro";
 
 type Props = MDXLayoutProps<{
   // 在这里定义 frontmatter 属性
@@ -25,7 +26,11 @@ const { parent, translateFrom } = frontmatter;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{frontmatter.title}</title>
-    <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet" />
+    <AnalyticsBaidu />
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="bg-slate-100">
@@ -33,9 +38,23 @@ const { parent, translateFrom } = frontmatter;
     </div>
     <div class="container mx-auto bg-white p-4 min-h-screen">
       <div class="grid grid-cols-4 gap-4">
-        <div class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow">
+        <div
+          class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"
+        >
           <h1>{frontmatter.title}</h1>
-          {translateFrom && <div class="border-2 p-4 rounded-lg"><strong>提示</strong>：本文翻译自 <strong><a  href={translateFrom.url} target="_blank">{translateFrom.title}</a></strong>。本文不保证翻译质量，并可能有删改。若你自觉英语尚可，强烈建议尝试看一下原文。</div>}
+          {
+            translateFrom && (
+              <div class="border-2 p-4 rounded-lg">
+                <strong>提示</strong>：本文翻译自{" "}
+                <strong>
+                  <a href={translateFrom.url} target="_blank">
+                    {translateFrom.title}
+                  </a>
+                </strong>
+                。本文不保证翻译质量，并可能有删改。若你自觉英语尚可，强烈建议尝试看一下原文。
+              </div>
+            )
+          }
           <slot />
         </div>
         <div class="max-lg:hidden border rounded-lg p-6 shadow">
