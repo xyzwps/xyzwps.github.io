@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/MdxLayout.astro
+layout: ./_ListLayout.astro
 title: 数据格式
 ---
 
@@ -93,6 +93,35 @@ title: 数据格式
 </root>
 ```
 
+## 配置文件格式
+
+### [TOML](https://toml.io/cn/)
+
+```toml
+# 璃月港角色列表
+region = "璃月港"
+
+[[characters]]
+name = "重云"
+summary = '''
+方士重云以璃月为中心，四处进行驱邪活动。
+作为驱邪世家继承人，他自幼便有过人的绝技。
+然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。
+'''
+stars = 4
+element = "冰"
+weapon = "双手剑"
+tags = ["方士", "驱邪", "纯阳之体"]
+
+[[characters]]
+name = "刻晴"
+summary = "璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。"
+stars = 5
+element = "雷"
+weapon = "单手剑"
+tags = ["璃月七星", "玉衡星"]
+```
+
 ### [YAML](https://yaml.org/)
 
 虽说是一个数据序列化标记语言，但是大家似乎更喜欢用它来做配置文件。
@@ -121,35 +150,6 @@ characters:
     tags:
       - 璃月七星
       - 玉衡星
-```
-
-## 配置文件格式
-
-### [TOML](https://toml.io/cn/)
-
-```toml
-# 璃月港角色列表
-region = "璃月港"
-
-[[characters]]
-name = "重云"
-summary = '''
-方士重云以璃月为中心，四处进行驱邪活动。
-作为驱邪世家继承人，他自幼便有过人的绝技。
-然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。
-'''
-stars = 4
-element = "冰"
-weapon = "双手剑"
-tags = ["方士", "驱邪", "纯阳之体"]
-
-[[characters]]
-name = "刻晴"
-summary = "璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。"
-stars = 5
-element = "雷"
-weapon = "单手剑"
-tags = ["璃月七星", "玉衡星"]
 ```
 
 
