@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/spring/mvc-request-handling-model"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spring MVC 请求处理模型 / 拦截器 / 过滤器</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.Cd1CcWXo.css"></head> <body class="bg-indigo-50 pb-6"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li>  </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow  bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow"> <h1>Spring MVC 请求处理模型 / 拦截器 / 过滤器</h1>  <blockquote>
+<p>注在前面：本文中 <strong>拦截器</strong> 指 <em>interceptor</em> 这个单词，<strong>过滤器</strong> 指 <em>filter</em> 这个单词。</p>
+</blockquote>
+<p>Spring MVC 是运行在 servlet 容器中的 Web 框架。在一个</p>
+<h2 id="请求的处理流程">请求的处理流程</h2>
+<p>中，大致会经历这么几个阶段：</p>
+<ol>
+<li>
+<p>请求进入阶段</p>
+<ol>
+<li>请求进入 servlet 容器支持的 <code>Filter</code></li>
+<li>请求进入 Spring MVC 的 <code>DispatcherServlet</code></li>
+<li>请求进入 Spring MVC 的 <code>Interceptor</code></li>
+</ol>
+</li>
+<li>
+<p>请求执行阶段</p>
+<p>请求进入 controller 中指定路由的方法中。</p>
+</li>
+<li>
+<p>请求执行后阶段/响应阶段</p>
+<ol>
+<li>请求离开 Spring MVC 的 <code>Interceptor</code></li>
+<li>请求离开 Spring MVC 的 <code>DispatcherServlet</code></li>
+<li>请求离开 servlet 容器支持的 <code>Filter</code></li>
+</ol>
+</li>
+</ol>
+<p>其中，</p>
+<ul>
+<li><code>Filter</code> API 由 servlet 容器提供；</li>
+<li>Spring MVC 提供两种 <code>Interceptor</code>：<code>HandlerInterceptor</code> 和 <code>WebRequestInterceptor</code>。</li>
+</ul>
+<h2 id="如何编写-filter">如何编写 <code>Filter</code> ？</h2>
+<p>下面是一个 <code>Filter</code> 示例：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> jakarta.servlet.*</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> jakarta.servlet.annotation.WebServlet</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> jakarta.servlet.http.HttpServletRequest</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> lombok.extern.slf4j.Slf4j</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.core.annotation.Order</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.stereotype.Component</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> java.io.IOException</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Component</span><span style="color:#7F848E;font-style:italic"> // 1</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">WebServlet</span><span style="color:#E06C75">(</span><span style="color:#D19A66">urlPatterns</span><span style="color:#56B6C2"> =</span><span style="color:#98C379"> &quot;/**&quot;</span><span style="color:#E06C75">) </span><span style="color:#7F848E;font-style:italic">// 2</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Order</span><span style="color:#E06C75">(</span><span style="color:#D19A66">1</span><span style="color:#E06C75">) </span><span style="color:#7F848E;font-style:italic">// 3</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Slf4j</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> DemoFilter1</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> Filter</span><span style="color:#ABB2BF"> {</span><span style="color:#7F848E;font-style:italic"> // 4</span></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span><span style="color:#7F848E;font-style:italic"> // 5</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> doFilter</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">ServletRequest</span><span style="color:#E06C75;font-style:italic"> req</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">ServletResponse</span><span style="color:#E06C75;font-style:italic"> res</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">FilterChain</span><span style="color:#E06C75;font-style:italic"> chain</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> IOException</span><span style="color:#ABB2BF">,</span><span style="color:#E5C07B"> ServletException</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (req </span><span style="color:#C678DD">instanceof</span><span style="color:#E5C07B"> HttpServletRequest</span><span style="color:#ABB2BF"> request) { </span><span style="color:#7F848E;font-style:italic">// 6</span></span>
+<span class="line"><span style="color:#E5C07B">            log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} into filter 1&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">request</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">request</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#E5C07B">            chain</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">doFilter</span><span style="color:#ABB2BF">(req, res); </span><span style="color:#7F848E;font-style:italic">// 7</span></span>
+<span class="line"><span style="color:#E5C07B">            log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} out of filter 1&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">request</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">request</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">        } </span><span style="color:#C678DD">else</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">            throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> ServletException</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request is not an HttpServletRequest&quot;</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>解释：</p>
+<ol>
+<li>把 <code>Filter</code> 注册为 spring bean。Spring boot 应用启动后就可以扫描到了。</li>
+<li>指定要过滤哪些请求，这里 <code>/**</code> 过滤所有请求。</li>
+<li>多个 <code>Filter</code> 并存的话，需要指定它们执行的顺序。顺序号数字越小，执行越早。</li>
+<li><code>DemoFilter1</code> 实现 <code>jakarta.servlet.Filter</code> 接口，就算是写一个 <code>Filter</code> 了。</li>
+<li><code>Filter</code> 中 <code>doFilter</code> 是做具体事情的。</li>
+<li>我们一般只关注 <code>HttpServletRequest</code>。</li>
+<li>在请求之前做一些事情，之后通过 <code>FilterChain</code> 的 <code>doFilter</code> 方法把请求转给后面的 <code>Filter</code> 以及最后的 <code>Servlet</code> 来处理。</li>
+</ol>
+<h2 id="如何编写-handlerinterceptor">如何编写 <code>HandlerInterceptor</code> ？</h2>
+<p>下面是一个示例：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> jakarta.servlet.http.HttpServletRequest</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> jakarta.servlet.http.HttpServletResponse</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> lombok.extern.slf4j.Slf4j</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.web.servlet.HandlerInterceptor</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.web.servlet.ModelAndView</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Slf4j</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> DemoInterceptor1</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> HandlerInterceptor</span><span style="color:#ABB2BF"> {</span><span style="color:#7F848E;font-style:italic"> // 1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span><span style="color:#7F848E;font-style:italic"> // 2</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> boolean</span><span style="color:#61AFEF"> preHandle</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">HttpServletRequest</span><span style="color:#E06C75;font-style:italic"> req</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">HttpServletResponse</span><span style="color:#E06C75;font-style:italic"> res</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">Object</span><span style="color:#E06C75;font-style:italic"> handler</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> Exception</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">        log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} into interceptor 1&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#C678DD">        return</span><span style="color:#D19A66"> true</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span><span style="color:#7F848E;font-style:italic"> // 3</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> postHandle</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">HttpServletRequest</span><span style="color:#E06C75;font-style:italic"> req</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">HttpServletResponse</span><span style="color:#E06C75;font-style:italic"> res</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">Object</span><span style="color:#E06C75;font-style:italic"> handler</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">ModelAndView</span><span style="color:#E06C75;font-style:italic"> modelAndView</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> Exception</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">       log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} out of interceptor 1&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span><span style="color:#7F848E;font-style:italic"> // 4</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> afterCompletion</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">HttpServletRequest</span><span style="color:#E06C75;font-style:italic"> req</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">HttpServletResponse</span><span style="color:#E06C75;font-style:italic"> res</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">Object</span><span style="color:#E06C75;font-style:italic"> handler</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">Exception</span><span style="color:#E06C75;font-style:italic"> ex</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> Exception</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">        log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} completed in interceptor 1&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>解释：</p>
+<ol>
+<li>实现 <code>org.springframework.web.servlet.HandlerInterceptor</code> 就可以了。</li>
+<li><code>preHandle</code> 发生在 controller 中的 handler 方法执行之前。返回
+<ul>
+<li><code>true</code> 表示请求需要被后续的拦截器或 handler 方法处理。</li>
+<li><code>false</code> 表示请求已经处理完了，把它拦在这里。</li>
+</ul>
+</li>
+<li><code>postHandle</code> 发生在 controller 中的 handler 方法执行之后。</li>
+<li><code>afterCompletion</code> 发生在响应渲染之后。只有当 <code>preHandle</code> 返回 <code>true</code> 时它才会被调用。</li>
+</ol>
+<h2 id="如何编写-webrequestinterceptor">如何编写 <code>WebRequestInterceptor</code> ？</h2>
+<p>下面是一个示例：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> lombok.extern.slf4j.Slf4j</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.lang.NonNull</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.ui.ModelMap</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.web.context.request.ServletWebRequest</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.web.context.request.WebRequest</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.web.context.request.WebRequestInterceptor</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Slf4j</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> DemoWebRequestInterceptor2</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> WebRequestInterceptor</span><span style="color:#ABB2BF"> {</span><span style="color:#7F848E;font-style:italic"> // 1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span><span style="color:#7F848E;font-style:italic"> // 2</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> preHandle</span><span style="color:#ABB2BF">(@</span><span style="color:#E5C07B">NonNull</span><span style="color:#E5C07B"> WebRequest</span><span style="color:#E06C75;font-style:italic"> request</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> Exception</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (request </span><span style="color:#C678DD">instanceof</span><span style="color:#E5C07B"> ServletWebRequest</span><span style="color:#ABB2BF"> req) {</span></span>
+<span class="line"><span style="color:#E5C07B">            log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} into web request interceptor 2&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getHttpMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequest</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span><span style="color:#7F848E;font-style:italic"> // 3</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> postHandle</span><span style="color:#ABB2BF">(@</span><span style="color:#E5C07B">NonNull</span><span style="color:#E5C07B"> WebRequest</span><span style="color:#E06C75;font-style:italic"> request</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">ModelMap</span><span style="color:#E06C75;font-style:italic"> model</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> Exception</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (request </span><span style="color:#C678DD">instanceof</span><span style="color:#E5C07B"> ServletWebRequest</span><span style="color:#ABB2BF"> req) {</span></span>
+<span class="line"><span style="color:#E5C07B">            log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} out of web request interceptor 2&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getHttpMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequest</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span><span style="color:#7F848E;font-style:italic"> // 4</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> afterCompletion</span><span style="color:#ABB2BF">(@</span><span style="color:#E5C07B">NonNull</span><span style="color:#E5C07B"> WebRequest</span><span style="color:#E06C75;font-style:italic"> request</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">Exception</span><span style="color:#E06C75;font-style:italic"> ex</span><span style="color:#ABB2BF">)</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> Exception</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (request </span><span style="color:#C678DD">instanceof</span><span style="color:#E5C07B"> ServletWebRequest</span><span style="color:#ABB2BF"> req) {</span></span>
+<span class="line"><span style="color:#E5C07B">            log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Request {} {} COMPLETED in web request interceptor 2&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getHttpMethod</span><span style="color:#ABB2BF">(), </span><span style="color:#E5C07B">req</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRequest</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">getRequestURI</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>解释：</p>
+<ol>
+<li>实现 <code>org.springframework.web.servlet.WebRequestInterceptor</code> 就可以了。</li>
+<li><code>preHandle</code> 发生在 controller 中的 handler 方法执行之前。</li>
+<li><code>postHandle</code> 发生在 controller 中的 handler 方法执行之后。</li>
+<li><code>afterCompletion</code> 发生在响应渲染之后。只有当 <code>preHandle</code> 正常结束时它才会被调用。</li>
+</ol>
+<h2 id="如何注册拦截器到-spring-mvc-中">如何注册拦截器到 Spring MVC 中？</h2>
+<p>在一个实现了 <code>WebMvcConfigurer</code> 接口的配置类中，通过 <code>addInterceptors</code> 方法来注册拦截器。
+这个配置类可以是启动类。比如：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.boot.SpringApplication</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.boot.autoconfigure.SpringBootApplication</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.web.servlet.config.annotation.InterceptorRegistry</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">import</span><span style="color:#E5C07B"> org.springframework.web.servlet.config.annotation.WebMvcConfigurer</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">SpringBootApplication</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> App</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> WebMvcConfigurer</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> addInterceptors</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">InterceptorRegistry</span><span style="color:#E06C75;font-style:italic"> registry</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">        registry</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">addInterceptor</span><span style="color:#ABB2BF">(</span><span style="color:#C678DD">new</span><span style="color:#61AFEF"> DemoInterceptor2</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#E5C07B">        registry</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">addWebRequestInterceptor</span><span style="color:#ABB2BF">(</span><span style="color:#C678DD">new</span><span style="color:#61AFEF"> DemoWebRequestInterceptor2</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#E5C07B">        registry</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">addInterceptor</span><span style="color:#ABB2BF">(</span><span style="color:#C678DD">new</span><span style="color:#61AFEF"> DemoInterceptor1</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#E5C07B">        registry</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">addWebRequestInterceptor</span><span style="color:#ABB2BF">(</span><span style="color:#C678DD">new</span><span style="color:#61AFEF"> DemoWebRequestInterceptor1</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> static</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> main</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">String</span><span style="color:#ABB2BF">[] </span><span style="color:#E06C75;font-style:italic">args</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E5C07B">        SpringApplication</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">run</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">App</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">class</span><span style="color:#ABB2BF">, args);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>先被 add 进去的拦截器排在前面。</p>
+<h2 id="handlerinterceptor-和-webrequestinterceptor-有什么区别"><code>HandlerInterceptor</code> 和 <code>WebRequestInterceptor</code> 有什么区别？</h2>
+<p>在 <code>InterceptorRegistry</code> 中的 <code>addWebRequestInterceptor</code> 方法里，把 <code>WebRequestInterceptor</code> 包装成了一个
+<code>WebRequestHandlerInterceptorAdapter</code>。而 <code>WebRequestHandlerInterceptorAdapter</code> 实现了
+<code>AsyncHandlerInterceptor</code>，所以它们之间没有本质区别，只是提供的方法签名略微不同而已。</p>
+<h2 id="什么是-asynchandlerinterceptor">什么是 <code>AsyncHandlerInterceptor</code>？</h2>
+<p><code>AsyncHandlerInterceptor</code> 扩展了 <code>HandlerInterceptor</code>，增加了一个 <code>afterConcurrentHandlingStarted</code> 方法。
+这个方法主要用于异步请求的场景。当 handler 启动一个异步请求时，<code>DispatcherServlet</code> 会退出而不调用
+<code>postHandle</code> 和 <code>afterCompletion</code> 方法，这是因为它通常为同步请求调用这些方法，而异步请求的处理结果（例如 <code>ModelAndView</code>）
+可能尚未准备好，并且将从另一个线程并发生成。在这种情况下，会调用 <code>afterConcurrentHandlingStarted</code> 方法，
+允许实现类在将线程释放给 <code>Servlet</code> 容器之前执行任务，例如清理线程绑定的属性。</p>
+<h2 id="拦截器和过滤器的常见用途由哪些">拦截器和过滤器的常见用途由哪些？</h2>
+<ul>
+<li>记录请求信息。比如：记录请求内容、处理时长等。</li>
+<li>做身份认证（authentication）和访问控制（authorization）。Spring security 就是这么做的。</li>
+<li><code>FilterChain</code> 在向后传递 request 的时候，替换掉其中某些部分的实现。Spring session 就替换掉了 <code>HttpServletRequest</code> 的 session 的实现。</li>
+</ul>
+<h2 id="示例">示例</h2>
+<p><a href="https://gitee.com/xyzwps/cheatsheet-spring/tree/master/request-filter">戳这里查看示例代码</a>。</p> </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/spring">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#请求的处理流程">请求的处理流程</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何编写-filter">如何编写 Filter ？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何编写-handlerinterceptor">如何编写 HandlerInterceptor ？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何编写-webrequestinterceptor">如何编写 WebRequestInterceptor ？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#如何注册拦截器到-spring-mvc-中">如何注册拦截器到 Spring MVC 中？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#handlerinterceptor-和-webrequestinterceptor-有什么区别">HandlerInterceptor 和 WebRequestInterceptor 有什么区别？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#什么是-asynchandlerinterceptor">什么是 AsyncHandlerInterceptor？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#拦截器和过滤器的常见用途由哪些">拦截器和过滤器的常见用途由哪些？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#示例">示例</a> </li> </ol>  </div> </div> </div> </div> </body></html>
