@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/MdxLayout.astro
+layout: ./_BlogLayout.astro
 title: 集中时间段
 date: 2025-06-10
 ---
@@ -36,7 +36,7 @@ date: 2025-06-10
 
 于是我写了个 prompt 让 AI 帮我来搞。如下：
 
-```
+```md
 你是一个高可用时间集中度分析器。请严格按以下步骤处理输入数据，最终输出必须是符合指定 JSON schema 的纯 JSON 对象，不要包含任何额外文本、解释或格式符号。
 
 ### 输入数据格式
@@ -176,7 +176,11 @@ date: 2025-06-10
 
 ## 手算版算法
 
-前几天突然想到一个办法：
+前几天突然想到一个办法。
+
+### 思路
+
+是这样的：
 
 > 每次都选取序列中最大的值，把它合并到附近“区间”中。如果附近没有区间，就让最大值单独成为区间。
 
@@ -249,7 +253,11 @@ date: 2025-06-10
 
 我不知道。从我写了几十个测试用例后发现，选取中位数，然后选取区间占总体比例超过 20% 的区间，效果还行。
 
-下面是我写的一个 Java 版代码，没有做优化，不过也差不多了：
+下面是我写的一个 Java 版
+
+### 代码
+
+，没有做优化，不过也差不多了：
 
 ```java
 import java.util.ArrayList;
@@ -271,37 +279,24 @@ public final class DenseSpans {
             }
 
             public double value;
-
             public final E extra;
 
-            public double value() {
-                return value;
-            }
-
-            public E extra() {
-                return extra;
-            }
+            public double value() { return value; }
+            public E extra() { return extra; }
         }
 
         record Range<E>(LinkedList<Value<E>> values, double sum) implements Item<E> {
 
-            public Value<E> first() {
-                return values.getFirst();
-            }
-
-            public Value<E> last() {
-                return values.getLast();
-            }
+            public Value<E> first() { return values.getFirst(); }
+            public Value<E> last()  { return values.getLast();  }
 
             public String rangeStr() {
                 if (values.isEmpty()) {
                     return "";
                 }
-
                 if (values.size() == 1) {
                     return values.getFirst().extra.toString();
                 }
-
                 return String.format("%s-%s", values.getFirst().extra, values.getLast().extra);
             }
         }

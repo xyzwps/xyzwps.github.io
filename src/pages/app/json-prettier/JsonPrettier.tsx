@@ -23,11 +23,11 @@ export default function JsonPrettier() {
       <textarea
         value={json}
         onChange={(e) => setJson(e.target.value)}
-        className="w-full font-mono p-4 resize-none"
-        style={{ height: "calc(100vh - 5rem)" }}
+        className="font-mono bg-white border border-indigo-100 rounded focus:outline-0 focus:ring-2 ring-indigo-300 shadow m-4 p-4 resize-none"
+        style={{ height: "calc(100vh - 8rem)" }}
         placeholder="[1,2,3]"
       />
-      <div className="text-right">
+      <div className="text-right mr-4">
         <Button onClick={prettier}>格式化</Button>
       </div>
     </div>

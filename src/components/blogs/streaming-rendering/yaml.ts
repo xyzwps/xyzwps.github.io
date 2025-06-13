@@ -112,23 +112,3 @@ function toArray(lines: string[]): unknown[] {
 
   return result;
 }
-
-const PLAN_YAML = `
-- day: "1"
-  actions:
-    - from: "07:30"
-      to: "08:00"
-      action: "从德州东站乘坐高铁G106次前往北京南站"
-    - from: "10:30"
-      to: "11:30"
-      action: "抵达北京南站，乘坐地铁4号线直达酒店办理入住"
-    - from: "12:00"
-      to: "13:30"
-      action: "午餐：前门大街品尝老北京炸酱面"
-    - from: "14:00"
-      to: "17:30"
-      action: "游览天坛公园（祈年殿、回音壁）"
-    - from
-`;
-
-console.log(JSON.stringify(parseYaml(PLAN_YAML), null, 2));

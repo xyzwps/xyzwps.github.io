@@ -10,7 +10,14 @@ import d2 from "astro-d2";
 // https://astro.build/config
 export default defineConfig({
   integrations: [
-    mdx(),
+    mdx({
+      syntaxHighlight: {
+        type: "shiki",
+      },
+      shikiConfig: {
+        theme: "one-dark-pro"
+      }
+    }),
     react(),
     d2({
       output: "gen/d2",

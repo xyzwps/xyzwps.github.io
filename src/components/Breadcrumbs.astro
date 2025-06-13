@@ -1,0 +1,41 @@
+---
+import IconHome from "./icons/IconHome.astro";
+import IconArrowLeft from "./icons/IconArrowLeft.astro";
+
+export type BreadcrumbItem = { href: string; name: string };
+
+type Props = { items?: BreadcrumbItem[] | null | undefined };
+
+const { items } = Astro.props;
+---
+
+<div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8">
+  <nav class="flex" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a
+          href="/"
+          class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+        >
+          <IconHome />
+          主页
+        </a>
+      </li>
+      {
+        (items || []).map((it) => (
+          <li>
+            <div class="flex items-center">
+              <IconArrowLeft />
+              <a
+                href={it.href}
+                class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"
+              >
+                {it.name}
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+</div>

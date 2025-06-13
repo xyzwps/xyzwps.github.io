@@ -1,0 +1,12 @@
+---
+import MdxLayout from "../../layouts/MdxLayout.astro";
+import type { MdxLayoutProps } from "../../layouts/MdxLayoutProps";
+
+type Props = MdxLayoutProps;
+
+const props = Astro.props;
+---
+
+<MdxLayout {...props} breadcrumbs={[{ href: "/blogs", name: "文章列表" }]}>
+  <slot />
+</MdxLayout>

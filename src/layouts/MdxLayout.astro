@@ -1,23 +1,22 @@
 ---
-import '../styles/mdx.css'
-import type { MDXLayoutProps } from "astro";
+import "../styles/mdx.css";
+import type { MdxLayoutProps } from "./MdxLayoutProps";
 import Toc from "./_MdxLayoutToc.astro";
 import CommonHeader from "../components/CommonHeader.astro";
 import AnalyticsBaidu from "../components/AnalyticsBaidu.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
 
-type Props = MDXLayoutProps<{
-  // 在这里定义 frontmatter 属性
-  title: string;
-  author: string;
-  date: string;
-  parent?: { name: string; path: string } | undefined;
-  translateFrom?: { url: string; title: string } | undefined;
-}>;
+type Props = MdxLayoutProps;
 
 // 现在，`frontmatter`、`url` 和其他 Markdown 布局属性
 // 可以通过 TypeScript 类型安全地访问
-const { frontmatter, url, headings } = Astro.props;
+const { frontmatter, url, headings, breadcrumbs } = Astro.props;
 const { parent, translateFrom } = frontmatter;
+
+const PROSE_CONFIG = [
+  "prose-code:before:content-[''] prose-code:after:content-['']",
+  "prose-img:p-4 prose-img:shadow",
+].join(" ");
 ---
 
 <html lang="zh-CN">
@@ -32,14 +31,13 @@ const { parent, translateFrom } = frontmatter;
       rel="stylesheet"
     />
   </head>
-  <body>
-    <div class="bg-slate-100">
-      <CommonHeader />
-    </div>
-    <div class="container mx-auto bg-white p-4 min-h-screen">
+  <body class="bg-indigo-50 pb-6">
+    <CommonHeader />
+    <Breadcrumbs items={breadcrumbs} />
+    <div class="container mx-auto p-4 min-h-screen">
       <div class="grid grid-cols-4 gap-4">
         <div
-          class="prose prose-slate max-w-none col-span-3 max-lg:col-span-4 border rounded-lg p-6 shadow"
+          class={`prose prose-slate ${PROSE_CONFIG}  bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow`}
         >
           <h1>{frontmatter.title}</h1>
           {
@@ -57,7 +55,9 @@ const { parent, translateFrom } = frontmatter;
           }
           <slot />
         </div>
-        <div class="max-lg:hidden border rounded-lg p-6 shadow">
+        <div
+          class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"
+        >
           <div class="sticky top-4">
             {
               parent && (
