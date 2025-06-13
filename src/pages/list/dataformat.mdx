@@ -3,10 +3,171 @@ layout: ../../layouts/MdxLayout.astro
 title: 数据格式
 ---
 
-- [MessagePack](https://msgpack.org/)
-- [EDN](https://github.com/edn-format/edn)
-- [Yaml](https://yaml.org/)
-- [JSON](https://www.json.org/json-en.html)
-- [TOML](https://toml.io/cn/)
-- [JSON5](https://json5.org/)
-- [XML](https://www.w3.org/XML/)
+## 文本格式
+
+### [JSON](https://www.json.org/json-en.html)
+
+伟哉！无需多言!
+
+```json
+{
+  "region": "璃月港",
+  "characters": [
+    {
+      "name": "重云",
+      "summary": "方士重云以璃月为中心，四处进行驱邪活动。作为驱邪世家继承人，他自幼便有过人的绝技。然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。",
+      "stars": 4,
+      "element": "冰",
+      "weapon": "双手剑",
+      "tags": ["方士", "驱邪", "纯阳之体"]
+    },
+    {
+      "name": "刻晴",
+      "summary": "璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。",
+      "stars": 5,
+      "element": "雷",
+      "weapon": "单手剑",
+      "tags": ["璃月七星", "玉衡星"]
+    }
+  ]
+}
+```
+
+### [JSON5](https://json5.org/)
+
+```js
+{
+  // 璃月港角色信息
+  region: '璃月港',
+  characters: [
+    {
+      name: '重云',
+      summary: '方士重云以璃月为中心，四处进行驱邪活动。作为驱邪世家继承人，他自幼便有过人的绝技。然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。',
+      stars: 4,
+      element: '冰',
+      weapon: '双手剑',
+      tags: ['方士', '驱邪', '纯阳之体'],
+    },
+    {
+      name: '刻晴',
+      summary: '璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。',
+      stars: 5,
+      element: '雷',
+      weapon: '单手剑',
+      tags: ['璃月七星', '玉衡星'],
+    },
+  ],
+}
+```
+
+
+### [XML](https://www.w3.org/XML/)
+
+曾经的王者!
+
+```xml
+<root>
+  <!-- 璃月港角色信息 -->
+  <region>璃月港</region>
+  <characters>
+    <character name="重云" stars="4" element="冰" weapon="双手剑">
+      <summary>
+        方士重云以璃月为中心，四处进行驱邪活动。
+        作为驱邪世家继承人，他自幼便有过人的绝技。
+        然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。
+      </summary>
+      <tags>
+        <tag>方士</tag>
+        <tag>驱邪</tag>
+        <tag>纯阳之体</tag>
+      </tags>
+    </character>
+    <character name="刻晴" stars="5" element="雷" weapon="单手剑">
+      <summary>璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。</summary>
+      <tags>
+        <tag>璃月七星</tag>
+        <tag>玉衡星</tag>
+      </tags>
+    </character>
+  </characters>
+</root>
+```
+
+### [YAML](https://yaml.org/)
+
+虽说是一个数据序列化标记语言，但是大家似乎更喜欢用它来做配置文件。
+
+```yaml
+# 璃月港角色信息
+region: 璃月港
+characters:
+  - name: 重云
+    summary: |
+      方士重云以璃月为中心，四处进行驱邪活动。
+      作为驱邪世家继承人，他自幼便有过人的绝技。
+      然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。
+    stars: 4
+    element: 冰
+    weapon: 双手剑
+    tags:
+      - 方士
+      - 驱邪
+      - 纯阳之体
+  - name: 刻晴
+    summary: 璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。
+    stars: 5
+    element: 雷
+    weapon: 单手剑
+    tags:
+      - 璃月七星
+      - 玉衡星
+```
+
+## 配置文件格式
+
+### [TOML](https://toml.io/cn/)
+
+```toml
+# 璃月港角色列表
+region = "璃月港"
+
+[[characters]]
+name = "重云"
+summary = '''
+方士重云以璃月为中心，四处进行驱邪活动。
+作为驱邪世家继承人，他自幼便有过人的绝技。
+然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。
+'''
+stars = 4
+element = "冰"
+weapon = "双手剑"
+tags = ["方士", "驱邪", "纯阳之体"]
+
+[[characters]]
+name = "刻晴"
+summary = "璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。"
+stars = 5
+element = "雷"
+weapon = "单手剑"
+tags = ["璃月七星", "玉衡星"]
+```
+
+
+## 二进制格式
+
+在决定使用哪种二进制数据格式之前，要根据自己的需求、场景、偏好等做出合适的选择。这里就不举例子了。
+
+### [Avro](https://avro.apache.org/)
+
+Apache Avro™ 是先进的数据序列化格式，也是流数据管道的首选。
+它提供了出色的模式演进，并为 JVM（Java、Kotlin、Scala……）、Python、C/C++/C#、PHP、Ruby、Rust、JavaScript
+甚至 Perl 提供了实现。
+
+### [MessagePack](https://msgpack.org/)
+
+一种类似 JSON 的二进制序列化格式。
+
+### [Protobuf](https://protobuf.dev/)
+
+Protobuf 是用于序列化结构化数据的，语言中立、平台中立的可扩展机制。
+
