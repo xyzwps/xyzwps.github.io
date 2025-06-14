@@ -163,11 +163,18 @@ Apache Avro™ 是先进的数据序列化格式，也是流数据管道的首�
 它提供了出色的模式演进，并为 JVM（Java、Kotlin、Scala……）、Python、C/C++/C#、PHP、Ruby、Rust、JavaScript
 甚至 Perl 提供了实现。
 
+Avro 是一种数据和 schema 相关的序列化方案。
+
 ### [MessagePack](https://msgpack.org/)
 
-一种类似 JSON 的二进制序列化格式。
+一种类似 JSON 的二进制序列化格式。从下图中可以看到，这是一种与 schema 无关的数据序列化方案。
+
+![msgpack](https://msgpack.org/images/intro.png)
 
 ### [Protobuf](https://protobuf.dev/)
 
 Protobuf 是用于序列化结构化数据的，语言中立、平台中立的可扩展机制。
 
+Protobuf 是一种数据和 schema 相关的序列化方案。
+
+Protobuf 不支持 `null` 值。
