@@ -1,0 +1,16 @@
+---
+interface Props {
+  items: { name: string; url: string }[];
+  sep?: "br" | "comma";
+}
+const { items, sep } = Astro.props;
+---
+
+{
+  items.map((it, i) => (
+    <>
+      {i === 0 ? null : sep === "comma" ? ", " : <br />}
+      <a href={it.url}>{it.name}</a>
+    </>
+  ))
+}

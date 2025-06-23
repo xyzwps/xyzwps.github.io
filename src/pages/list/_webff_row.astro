@@ -1,0 +1,87 @@
+---
+import Cell from "./_webff_cell.astro";
+
+type Component = { name: string; url: string };
+
+type FComponent = Component & {
+  react: boolean;
+  vue: boolean;
+  solid: boolean;
+};
+
+function forAll(c: FComponent) {
+  return c.react && c.vue && c.solid;
+}
+
+interface Props {
+  common: FComponent[];
+  react: Component[];
+  vue: Component[];
+  solid: Component[];
+  title: string;
+}
+const props = Astro.props;
+
+const all = props.common.filter(forAll);
+const react = [
+  ...props.common.filter((c) => c.react).filter((c) => !forAll(c)),
+  ...props.react,
+];
+const vue = [
+  ...props.common.filter((c) => c.vue).filter((c) => !forAll(c)),
+  ...props.vue,
+];
+const solid = [
+  ...props.common.filter((c) => c.solid).filter((c) => !forAll(c)),
+  ...props.solid,
+];
+const title = props.title;
+
+const row1 = all.length > 0 ? "1" : "0";
+const row2 = react.length + vue.length + solid.length > 0 ? "1" : "0";
+const rows = row1 + row2;
+---
+
+{
+  rows === "11" ? (
+    <>
+      <tr class="border-t-4 border-indigo-300">
+        <th rowspan="2">{title}</th>
+        <td colspan="3" class="text-center">
+          <Cell items={all} sep="comma" />
+        </td>
+      </tr>
+      <tr class="border-t-2 border-indigo-100">
+        <td>
+          <Cell items={react} />
+        </td>
+        <td class="border-l-2 border-indigo-100">
+          <Cell items={vue} />
+        </td>
+        <td class="border-l-2 border-indigo-100">
+          <Cell items={solid} />
+        </td>
+      </tr>
+    </>
+  ) : rows === "10" ? (
+    <tr class="border-t-4 border-indigo-300">
+      <th>{title}</th>
+      <td colspan="3" class="text-center">
+        <Cell items={all} sep="comma" />
+      </td>
+    </tr>
+  ) : rows === "01" ? (
+    <tr class="border-t-4 border-indigo-300">
+      <th>{title}</th>
+      <td>
+        <Cell items={react} />
+      </td>
+      <td class="border-l-2 border-indigo-100">
+        <Cell items={vue} />
+      </td>
+      <td class="border-l-2 border-indigo-100">
+        <Cell items={solid} />
+      </td>
+    </tr>
+  ) : null
+}

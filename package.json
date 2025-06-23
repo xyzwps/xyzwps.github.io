@@ -20,6 +20,7 @@
     "astro": "^5.9.2",
     "astro-d2": "^0.7.0",
     "classnames": "^2.5.1",
+    "daisyui": "^5.0.43",
     "lodash": "^4.17.21",
     "mermaid": "^11.6.0",
     "react": "^19.1.0",

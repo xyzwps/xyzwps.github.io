@@ -1,0 +1,342 @@
+---
+import React from "react";
+import DefaultLayout from "../../layouts/DefaultLayout.astro";
+import Cell from "./_webff_cell.astro";
+import Row from "./_webff_row.astro";
+
+type Component = { name: string; url: string };
+
+type FComponent = Component & {
+  react: boolean;
+  vue: boolean;
+  solid: boolean;
+};
+
+function forAll(c: FComponent) {
+  return c.react && c.vue && c.solid;
+}
+
+// https://caddyserver.com/docs/install
+// https://design.dev/
+
+type FramkworkAspects = Component & {
+  ui: Component[];
+  style: Component[];
+  icons: Component[];
+  router: Component[];
+  form: Component[];
+  state: Component[];
+  dataFetching: Component[];
+  hooks: Component[];
+  diagrams: Component[];
+};
+
+const COMMON_STYLES: FComponent[] = [
+  {
+    name: "Tailwind CSS",
+    url: "https://tailwindcss.com/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+];
+
+const COMMON_UIS: FComponent[] = [
+  {
+    name: "arco.design",
+    url: "https://arco.design/",
+    react: true,
+    vue: true,
+    solid: false,
+  },
+  {
+    name: "daisyUI",
+    url: "https://daisyui.com/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "TDesign",
+    url: "https://tdesign.tencent.com/",
+    react: true,
+    vue: true,
+    solid: false,
+  },
+];
+
+const COMMON_ICONS: FComponent[] = [
+  {
+    name: "Feather",
+    url: "https://feathericons.com/",
+    react: true,
+    solid: true,
+    vue: true,
+  },
+  {
+    name: "Heroicons",
+    url: "https://heroicons.com/",
+    react: true,
+    vue: true,
+    solid: false,
+  },
+  {
+    name: "IconPark",
+    url: "https://iconpark.oceanengine.com/home",
+    react: true,
+    vue: true,
+    solid: false,
+  },
+  {
+    name: "Lucide",
+    url: "https://lucide.dev/",
+    react: true,
+    solid: true,
+    vue: true,
+  },
+  {
+    name: "RemixIcon",
+    url: "https://remixicon.com/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "Tabler",
+    url: "https://tabler.io/icons",
+    react: true,
+    vue: true,
+    solid: false,
+  },
+];
+
+const COMMON_ROUTER: FComponent[] = [
+  {
+    name: "Tanstack Router",
+    url: "https://tanstack.com/router/latest",
+    react: true,
+    vue: false,
+    solid: true,
+  },
+];
+
+const COMMON_STATE: FComponent[] = [
+  {
+    name: "Tanstack Query",
+    url: "https://tanstack.com/query/latest",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "Tanstack Store",
+    url: "https://tanstack.com/store/latest",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+];
+
+const DATA_VALIDATION: FComponent[] = [
+  {
+    name: "ArkType",
+    url: "https://arktype.io/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "joi",
+    url: "https://joi.dev/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "Valibot",
+    url: "https://valibot.dev/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "Yup",
+    url: "https://www.npmjs.com/package/yup",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  { name: "Zod", url: "https://zod.dev/", react: true, vue: true, solid: true },
+];
+
+const COMMON_FORM: FComponent[] = [
+  {
+    name: "Tanstack Form",
+    url: "https://tanstack.com/form/latest",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+];
+
+const COMMON_DATA_FETCHING: FComponent[] = [
+  {
+    name: "Axios",
+    url: "https://axios-http.com/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "fetch API",
+    url: "https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+  {
+    name: "ky",
+    url: "https://www.npmjs.com/package/ky",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+];
+
+const REACT: FramkworkAspects = {
+  name: "React",
+  url: "https://react.dev/",
+  ui: [
+    { name: "Ant Design", url: "https://ant.design/" },
+    { name: "Chakra UI", url: "https://www.chakra-ui.com/" },
+    { name: "Mantine", url: "https://mantine.dev/" },
+    { name: "Radix UI", url: "https://www.radix-ui.com/" },
+    { name: "shadcn/ui", url: "https://ui.shadcn.com/" },
+  ],
+  style: [],
+  icons: [{ name: "RadixUI Icons", url: "https://www.radix-ui.com/icons" }],
+  router: [{ name: "React Router", url: "https://reactrouter.com/" }],
+  form: [{ name: "React Hook Form", url: "https://react-hook-form.com/" }],
+  state: [{ name: "Zustand", url: "https://zustand-demo.pmnd.rs/" }],
+  hooks: [{ name: "React Use", url: "https://github.com/streamich/react-use" }],
+  dataFetching: [{ name: "SWR", url: "https://www.npmjs.com/package/swr" }],
+  diagrams: [
+    { name: "FlowGram.AI", url: "https://flowgram.ai/" },
+    { name: "React Flow", url: "https://reactflow.dev/" },
+  ],
+};
+
+const VUE: FramkworkAspects = {
+  name: "Vue",
+  url: "https://vuejs.org/",
+  ui: [{ name: "Element", url: "https://element-plus.org/en-US/" }],
+  style: [],
+  icons: [{ name: "RadixUI Icons", url: "https://www.radix-ui.com/icons" }],
+  router: [{ name: "Vue Router", url: "https://router.vuejs.org/" }],
+  form: [{ name: "Vorms", url: "https://vorms.mini-ghost.dev/" }],
+  state: [{ name: "Pinia", url: "https://pinia.vuejs.org/" }],
+  hooks: [{ name: "VueUse", url: "https://vueuse.org/" }],
+  dataFetching: [],
+  diagrams: [],
+};
+const SOLID: FramkworkAspects = {
+  name: "Solid",
+  url: "https://www.solidjs.com/",
+  ui: [],
+  style: [],
+  icons: [],
+  router: [
+    { name: "Solid Router", url: "https://docs.solidjs.com/solid-router" },
+  ],
+  form: [],
+  state: [],
+  dataFetching: [],
+  hooks: [],
+  diagrams: [],
+};
+---
+
+<DefaultLayout title="Web 前端框架组件">
+  <div class="container mx-auto py-10 text-center">
+    <h1 class="font-bold text-4xl py-10">Web 前端框架组件</h1>
+    <div class="bg-white shadow-md rounded-md m-4 p-4 w-200 mx-auto">
+      <table class="table table-pin-rows table-pin-cols">
+        <thead>
+          <tr><th>框架</th><th>React</th><th>Vue</th><th>Solid</th></tr>
+        </thead>
+        <tbody>
+          <Row
+            title="组件库"
+            common={COMMON_UIS}
+            react={REACT.ui}
+            vue={VUE.ui}
+            solid={SOLID.ui}
+          />
+          <Row
+            title="样式"
+            common={COMMON_STYLES}
+            react={REACT.style}
+            vue={VUE.style}
+            solid={SOLID.style}
+          />
+          <Row
+            title="图标"
+            common={COMMON_ICONS}
+            react={REACT.icons}
+            vue={VUE.icons}
+            solid={SOLID.icons}
+          />
+          <Row
+            title="路由"
+            common={COMMON_ROUTER}
+            react={REACT.router}
+            vue={VUE.router}
+            solid={SOLID.router}
+          />
+          <Row
+            title="表单"
+            common={COMMON_FORM}
+            react={REACT.form}
+            vue={VUE.form}
+            solid={SOLID.form}
+          />
+          <Row
+            title="数据验证"
+            common={DATA_VALIDATION}
+            react={[]}
+            vue={[]}
+            solid={[]}
+          />
+          <Row
+            title="状态管理"
+            common={COMMON_STATE}
+            react={REACT.state}
+            vue={VUE.state}
+            solid={SOLID.state}
+          />
+          <Row
+            title="数据获取"
+            common={COMMON_DATA_FETCHING}
+            react={REACT.dataFetching}
+            vue={VUE.dataFetching}
+            solid={SOLID.dataFetching}
+          />
+          <Row
+            title="钩子函数"
+            common={[]}
+            react={REACT.hooks}
+            vue={VUE.hooks}
+            solid={SOLID.hooks}
+          />
+          <Row
+            title="图表"
+            common={[]}
+            react={REACT.diagrams}
+            vue={VUE.diagrams}
+            solid={SOLID.diagrams}
+          />
+        </tbody>
+      </table>
+    </div>
+  </div>
+</DefaultLayout>
