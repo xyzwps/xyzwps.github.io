@@ -1,0 +1,341 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/mongo"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MongoDB Cheatsheet</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.Bg7YjwZs.css"></head> <body class="bg-indigo-50 pb-6"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li>  </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow  bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow"> <h1>MongoDB Cheatsheet</h1>   <h2 id="database">Database</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>目的</th><th>命令</th></tr></thead><tbody><tr><td>查看所有 db</td><td><code>show dbs</code></td></tr><tr><td>创建/使用制定 db</td><td><code>use ${dbName}</code></td></tr><tr><td>删除 db</td><td><code>db.dropDatabase()</code></td></tr></tbody></table>
+<h2 id="collection">Collection</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>目的</th><th>命令</th></tr></thead><tbody><tr><td>查看所有 collection</td><td><code>show collections</code></td></tr><tr><td>创建 collection</td><td><code>db.createCollection(&#39;${collectionName}&#39;)</code></td></tr><tr><td>删除 collection</td><td><code>db.${collectionName}.drop()</code></td></tr></tbody></table>
+<p>TODO: 固定大小集合、时间序列集合、集群化索引集合
+TODO: 文档验证
+TODO: 修改文档结构</p>
+<h2 id="数据类型">数据类型</h2>
+<p>MongoDB 使用 <a href="https://www.mongodb.com/zh-cn/docs/manual/reference/bson-types/">BSON 数据类型</a>。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>类型</th><th>数值</th><th>别名</th><th>注意</th></tr></thead><tbody><tr><td>double</td><td>1</td><td><code>&quot;double&quot;</code></td><td></td></tr><tr><td>字符串</td><td>2</td><td><code>&quot;string&quot;</code></td><td></td></tr><tr><td>对象</td><td>3</td><td><code>&quot;object&quot;</code></td><td></td></tr><tr><td>阵列</td><td>4</td><td><code>&quot;array&quot;</code></td><td></td></tr><tr><td>二进制数据</td><td>5</td><td><code>&quot;binData&quot;</code></td><td></td></tr><tr><td>未定义</td><td>6</td><td><code>&quot;undefined&quot;</code></td><td>已弃用。</td></tr><tr><td>ObjectId</td><td>7</td><td><code>&quot;objectId&quot;</code></td><td></td></tr><tr><td>布尔</td><td>8</td><td><code>&quot;bool&quot;</code></td><td></td></tr><tr><td>Date</td><td>9</td><td><code>&quot;date&quot;</code></td><td></td></tr><tr><td>null</td><td>10</td><td><code>&quot;null&quot;</code></td><td></td></tr><tr><td>正则表达式</td><td>11</td><td><code>&quot;regex&quot;</code></td><td></td></tr><tr><td>数据库指针</td><td>12</td><td><code>&quot;dbPointer&quot;</code></td><td>已弃用。</td></tr><tr><td>JavaScript</td><td>13</td><td><code>&quot;javascript&quot;</code></td><td></td></tr><tr><td>符号</td><td>14</td><td><code>&quot;symbol&quot;</code></td><td>已弃用。</td></tr><tr><td>32 位整数</td><td>16</td><td><code>&quot;int&quot;</code></td><td></td></tr><tr><td>时间戳</td><td>17</td><td><code>&quot;timestamp&quot;</code></td><td></td></tr><tr><td>64 位整型</td><td>18</td><td><code>&quot;long&quot;</code></td><td></td></tr><tr><td>Decimal128</td><td>19</td><td><code>&quot;decimal&quot;</code></td><td></td></tr><tr><td>Minkey</td><td>-1</td><td><code>&quot;minKey&quot;</code></td><td></td></tr><tr><td>Max key</td><td>127</td><td><code>&quot;maxKey&quot;</code></td><td></td></tr></tbody></table>
+<h2 id="crud">CRUD</h2>
+<ul>
+<li>插入一条
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">insertOne</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">title</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;MongoDB Tutorial&quot;</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>插入多条
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">insertMany</span><span style="color:#ABB2BF">([{ </span><span style="color:#E06C75">title</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;MongoDB Cheatsheet&quot;</span><span style="color:#ABB2BF"> }])</span></span></code></pre>
+</li>
+<li>插入时指定 ID
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">insertOne</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">_id  </span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;MongoDB-Cheatsheet&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">                        title</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;MongoDB Cheatsheet&quot;</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>查询所有
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">()</span></span></code></pre>
+</li>
+<li>限制查询结果数量
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">limit</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">)</span></span></code></pre>
+</li>
+<li>按条件查询
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">title</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;MongoDB Tutorial&quot;</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>按条件更新
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">update</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">title</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;MongoDB Tutorial&quot;</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">                   { </span><span style="color:#E06C75">$set</span><span style="color:#ABB2BF">: {</span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;DRAFT&quot;</span><span style="color:#ABB2BF"> } })</span></span></code></pre>
+</li>
+</ul>
+<p>TODO: replace、upsert、upateOne</p>
+<ul>
+<li>按条件删除
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">articles</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">deleteMany</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">title</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;MongoDB Cheatsheet&quot;</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+</ul>
+<h2 id="条件过滤器">条件过滤器</h2>
+<p>数据准备：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">insertMany</span><span style="color:#ABB2BF">([</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">item</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;journal&#39;</span><span style="color:#ABB2BF">,  </span><span style="color:#E06C75">qty</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">25</span><span style="color:#ABB2BF">,  </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">h</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">14</span><span style="color:#ABB2BF">,    </span><span style="color:#E06C75">w</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">21</span><span style="color:#ABB2BF">,    </span><span style="color:#E06C75">uom</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;cm&#39;</span><span style="color:#ABB2BF"> }, </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;A&#39;</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">item</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;notebook&#39;</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">qty</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">50</span><span style="color:#ABB2BF">,  </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">h</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">8.5</span><span style="color:#ABB2BF">,   </span><span style="color:#E06C75">w</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">11</span><span style="color:#ABB2BF">,    </span><span style="color:#E06C75">uom</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;in&#39;</span><span style="color:#ABB2BF"> }, </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;A&#39;</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">item</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;paper&#39;</span><span style="color:#ABB2BF">,    </span><span style="color:#E06C75">qty</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">100</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">h</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">8.5</span><span style="color:#ABB2BF">,   </span><span style="color:#E06C75">w</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">11</span><span style="color:#ABB2BF">,    </span><span style="color:#E06C75">uom</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;in&#39;</span><span style="color:#ABB2BF"> }, </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;D&#39;</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">item</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;planner&#39;</span><span style="color:#ABB2BF">,  </span><span style="color:#E06C75">qty</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">75</span><span style="color:#ABB2BF">,  </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">h</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">22.85</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">w</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">30</span><span style="color:#ABB2BF">,    </span><span style="color:#E06C75">uom</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;cm&#39;</span><span style="color:#ABB2BF"> }, </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;D&#39;</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">item</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;postcard&#39;</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">qty</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">45</span><span style="color:#ABB2BF">,  </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">h</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">10</span><span style="color:#ABB2BF">,    </span><span style="color:#E06C75">w</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">15.25</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">uom</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;cm&#39;</span><span style="color:#ABB2BF"> }, </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;A&#39;</span><span style="color:#ABB2BF"> }</span></span>
+<span class="line"><span style="color:#ABB2BF">])</span></span></code></pre>
+<ul>
+<li>等值匹配
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#98C379">&#39;size.uom&#39;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;in&#39;</span><span style="color:#ABB2BF"> });</span></span></code></pre>
+</li>
+<li>比较大小
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#98C379">&#39;size.h&#39;</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">$lt</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">15</span><span style="color:#ABB2BF"> } });</span></span></code></pre>
+</li>
+<li>逻辑与
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#98C379">&#39;size.h&#39;</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">$lt</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">15</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#98C379">                    &#39;size.uom&#39;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;in&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">                    status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;D&#39;</span><span style="color:#ABB2BF"> });</span></span></code></pre>
+</li>
+<li>逻辑或
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">$or</span><span style="color:#ABB2BF">: [{ </span><span style="color:#E06C75">qty</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">25</span><span style="color:#ABB2BF"> }, { </span><span style="color:#E06C75">qty</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">$gte</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">50</span><span style="color:#ABB2BF"> } }],</span></span>
+<span class="line"><span style="color:#E06C75">                    status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;A&#39;</span><span style="color:#ABB2BF"> });</span></span></code></pre>
+</li>
+<li>条件嵌套
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">h</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">14</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">w</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">21</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">uom</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;cm&#39;</span><span style="color:#ABB2BF"> } });</span></span></code></pre>
+⚠ MongoDB 不建议对嵌入式文档进行比较，因为这些操作需要与指定的 <code>&lt;value&gt;</code> 文档完全匹配，包括字段顺序。
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">w</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">21</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">h</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">14</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">uom</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;cm&#39;</span><span style="color:#ABB2BF"> } });</span></span></code></pre>
+</li>
+<li>仅获取部分字段
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;A&#39;</span><span style="color:#ABB2BF"> },       </span><span style="color:#7F848E;font-style:italic">// filter</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">item</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF"> } </span><span style="color:#7F848E;font-style:italic">// projection</span></span>
+<span class="line"><span style="color:#ABB2BF">)</span></span></code></pre>
+也不要 <code>_id</code>：
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;A&#39;</span><span style="color:#ABB2BF"> }, { </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">item</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">_id</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">0</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>排除字段
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">inventory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">find</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">status</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;A&#39;</span><span style="color:#ABB2BF"> }, { </span><span style="color:#E06C75">size</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">0</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+</ul>
+<h3 id="比较操作符">比较操作符</h3>
+<ul>
+<li>等于：<code>$eq</code></li>
+<li>大于：<code>$gt</code></li>
+<li>小于：<code>$lt</code></li>
+<li>大于或等于：<code>$gte</code></li>
+<li>小于或等于：<code>$lte</code></li>
+<li>in：<code>$in</code></li>
+<li>not in：<code>$nin</code></li>
+</ul>
+<h3 id="逻辑操作符">逻辑操作符</h3>
+<ul>
+<li><code>$and</code></li>
+<li><code>$or</code></li>
+<li><code>$not</code></li>
+<li><code>$nor</code> 等价于 <code>{ $not: { $or: [ &lt;exp1&gt;, &lt;exp2&gt;, ... ] } }</code></li>
+</ul>
+<h3 id="元素查询">元素查询</h3>
+<ul>
+<li><code>$exists</code> 判断字段是否存在 <code>{ field: { $exists: &lt;boolean&gt; } }</code></li>
+<li><code>$type</code> 判断字段的类型 <code>{ field: { $type: &lt;BSON type&gt; } }</code></li>
+</ul>
+<h3 id="表达式查询">表达式查询</h3>
+<ul>
+<li><a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/expr/"><code>$expr</code></a></li>
+<li><a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/jsonSchema/"><code>$jsonSchema</code></a></li>
+<li><a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/mod/"><code>$mod</code></a></li>
+<li><a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/regex/"><code>$regex</code></a></li>
+<li><a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query/where/"><code>$where</code></a> 已弃用</li>
+</ul>
+<h3 id="地理空间查询">地理空间查询</h3>
+<p>参见<a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query-geospatial/">地理空间查询</a>。</p>
+<h3 id="数组查询">数组查询</h3>
+<ul>
+<li><code>$all</code> 操作符选择字段值为包含所有指定元素的数组的文档。</li>
+<li><code>$elemMatch</code> 操作符匹配包含数组字段的文档，其中至少有一个元素匹配所有指定查询条件。</li>
+<li><code>$size</code> 数组长度。</li>
+</ul>
+<h3 id="按位查询">按位查询</h3>
+<p>参见<a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/query-bitwise/">按位查询</a>。</p>
+<h2 id="投影">投影</h2>
+<p>TODO: <a href="https://www.mongodb.com/zh-cn/docs/manual/reference/operator/projection/">https://www.mongodb.com/zh-cn/docs/manual/reference/operator/projection/</a></p>
+<h2 id="索引">索引</h2>
+<ul>
+<li>查看索引
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">collection</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getIndexes</span><span style="color:#ABB2BF">()</span></span></code></pre>
+</li>
+<li>在单字段上创建一个单键降序索引
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">collection</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createIndex</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>创建索引并指定名称
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">collection</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createIndex</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF"> }, { </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;NameIndex&quot;</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>创建多列索引
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">students</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createIndex</span><span style="color:#ABB2BF">({ </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">gpa</span><span style="color:#ABB2BF">: </span><span style="color:#56B6C2">-</span><span style="color:#D19A66">1</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>创建部分索引
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">restaurants</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createIndex</span><span style="color:#ABB2BF">(</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">cuisine</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF"> },</span></span>
+<span class="line"><span style="color:#ABB2BF">  { </span><span style="color:#E06C75">partialFilterExpression</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">rating</span><span style="color:#ABB2BF">: { </span><span style="color:#E06C75">$gt</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">5</span><span style="color:#ABB2BF"> } } }</span></span>
+<span class="line"><span style="color:#ABB2BF">)</span></span></code></pre>
+</li>
+<li>创建稀疏索引
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">addresses</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createIndex</span><span style="color:#ABB2BF">({ </span><span style="color:#98C379">&quot;xmpp_id&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF"> }, { </span><span style="color:#E06C75">sparse</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF"> })</span></span></code></pre>
+</li>
+<li>创建唯一索引
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E5C07B">db</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">members</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createIndex</span><span style="color:#ABB2BF">( { </span><span style="color:#98C379">&quot;user_id&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">1</span><span style="color:#ABB2BF"> }, { </span><span style="color:#E06C75">unique</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">true</span><span style="color:#ABB2BF"> } )</span></span></code></pre>
+</li>
+<li>删除索引
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#E06C75">db</span><span style="color:#ABB2BF">.</span><span style="color:#56B6C2">&lt;</span><span style="color:#E06C75">collection</span><span style="color:#56B6C2">&gt;</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">dropIndex</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;&lt;indexName&gt;&quot;</span><span style="color:#ABB2BF">) </span><span style="color:#7F848E;font-style:italic">// 删除单个索引</span></span>
+<span class="line"><span style="color:#E06C75">db</span><span style="color:#ABB2BF">.</span><span style="color:#56B6C2">&lt;</span><span style="color:#E06C75">collection</span><span style="color:#56B6C2">&gt;</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">dropIndexes</span><span style="color:#ABB2BF">([</span><span style="color:#98C379">&quot;&lt;index1&gt;&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;&lt;index2&gt;&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;&lt;index3&gt;&quot;</span><span style="color:#ABB2BF">]) </span><span style="color:#7F848E;font-style:italic">// 删除多个索引</span></span>
+<span class="line"><span style="color:#E06C75">db</span><span style="color:#ABB2BF">.</span><span style="color:#56B6C2">&lt;</span><span style="color:#E06C75">collection</span><span style="color:#56B6C2">&gt;</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">dropIndexes</span><span style="color:#ABB2BF">() </span><span style="color:#7F848E;font-style:italic">// 删除所有自建索引（除主键索引之外的所有索引）</span></span></code></pre>
+</li>
+</ul> </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/java">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#database">Database</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#collection">Collection</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#数据类型">数据类型</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#crud">CRUD</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#条件过滤器">条件过滤器</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#比较操作符">比较操作符</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#逻辑操作符">逻辑操作符</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#元素查询">元素查询</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#表达式查询">表达式查询</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#地理空间查询">地理空间查询</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#数组查询">数组查询</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#按位查询">按位查询</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#投影">投影</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#索引">索引</a> </li> </ol>  </div> </div> </div> </div> </body></html>

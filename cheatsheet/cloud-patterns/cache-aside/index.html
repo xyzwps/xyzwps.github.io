@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/cheatsheet/cloud-patterns/cache-aside"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Cache-Aside Pattern</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.Bg7YjwZs.css"></head> <body class="bg-indigo-50 pb-6"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white p-2 select-none"><span class="font-bold">CheatSheet</span><sub>@xyzwps</sub></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li>  </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow  bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow"> <h1>Cache-Aside Pattern</h1>  <div class="border-2 p-4 rounded-lg"> <strong>提示</strong>：本文翻译自  <strong> <a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside" target="_blank"> Cache-Aside pattern - Azure Architecture Center </a> </strong>
+。本文不保证翻译质量，并可能有删改。若你自觉英语尚可，强烈建议尝试看一下原文。
+</div> <p>按需把数据存储中的数据加载进缓存中，可以提高性能。</p>
+<h2 id="问题上下文">问题上下文</h2>
+<p>若应用程序需要重复地从数据存储中读取信息，就可以使用缓存来提升性能。
+不过，期望缓存中的数据，始终与数据存储中的数据完全一致，是不切实际的。
+应用程序不仅要检测和处理缓存中的数据过期的情况，还要采取措施，确保缓存中的数据尽可能最新的。</p>
+<h2 id="解决方案">解决方案</h2>
+<p>许多商业缓存系统提供 read-through 和 write-through/write-behind 操作。
+在这些系统中，应用程序通过缓存来获取数据。
+如果数据不在缓存中，则从数据存储中读取数据，并将数据加载到缓存中。
+任何对缓存中保存的数据的修改，也会自动写回数据存储。</p>
+<p>对于不提供此功能的缓存，使用缓存的应用程序来负责维护数据。</p>
+<p>应用程序可以通过实现 cache-aside 模式，来模拟 read-through 缓存的功能。
+此模式按需将数据加载到缓存中。步骤如下：</p>
+<ol>
+<li>确定数据是否存在缓存中。</li>
+<li>如果数据不存在缓存中，就从数据存储中读数据。</li>
+<li>把读到的数据存放在缓存中。</li>
+</ol>
+<p>如果应用更新信数据，就使用以下策略：</p>
+<ol>
+<li>保存变更到数据存储。</li>
+<li>使缓存中的相应数据无效。</li>
+</ol>
+<p>当下一次需要该数据时，使用 cache-aside 模式，把更新过的数据从数据存储中查出来，并将其加到缓存中。</p>
+<h2 id="实现考量">实现考量</h2>
+<p>在实现此模式时，应考虑以下几点：</p>
+<h3 id="缓存数据的寿命">缓存数据的寿命</h3>
+<p>许多缓存都有过期策略：如果在指定时间段内未访问数据，则使数据无效并将其从缓存中删除。
+要使此模式有效，应确保过期策略与使用数据的应用程序的访问模式相匹配。
+过期时间不应太短，因为这会导致应用程序不断从数据存储中检索数据并将其添加到缓存中。
+同样，过期时间不应过长，否则缓存的数据可能会变得陈旧。</p>
+<p>请记住，缓存最适合相对静态的数据，或经常读取的数据。</p>
+<h3 id="驱逐缓存">驱逐缓存</h3>
+<p>与数据来源的数据存储相比，大多数缓存的大小都是有限的。如果需要，它们会驱逐数据。
+大多数缓存采用 LRU 策略来选择要驱逐的项目，但也可能支持自定义的。
+配置缓存的全局过期属性和其他属性，以及每个缓存项的过期属性，以确保缓存具有成本效益。
+对缓存中的每个数据项都应用全局驱逐策略，并不总是合适的。
+例如，如果从数据存储中查询缓存项的代价很高，那么相比于访问虽然频繁但是查询成本更低的项，将此项保留在缓存中可能是有益的。</p>
+<h3 id="启动缓存">启动缓存</h3>
+<p>许多方案喜欢在应用程序在启动过程中，把可能需要的数据预先填入缓存。
+如果其中的数据过期或者被驱逐，此模式依然有用。</p>
+<h3 id="一致性">一致性</h3>
+<p>实现此模式并不保证数据存储和缓存之间的一致性。
+外部过程可以随时更改数据存储中的数据项，并且在下次加载该项目之前，此更改可能不会反映在缓存中。
+在跨数据存储复制数据的系统中，如果频繁发生同步，此问题可能会变得严重。</p>
+<h3 id="本地缓存内存缓存">本地缓存/内存缓存</h3>
+<p>应用程序可以把缓存放到自己的本地内存中。
+如果应用程序重复访问相同的数据，则本地缓存就会非常有效。
+不过，本地缓存是私有的，因此不同的应用程序实例可能每个都有相同缓存数据的副本。
+这时，可考虑使用共享或分布式缓存。</p>
+<h2 id="何时使用">何时使用</h2>
+<p>以下场景可使用：</p>
+<ul>
+<li>缓存不提供原生的 read-through 和 write-through 操作时。</li>
+<li>资源需求是不可预测的。这种模式使应用程序能够按需加载数据。它不假设应用程序将提前需要哪些数据。</li>
+</ul>
+<p>以下场景可能不适用：</p>
+<ul>
+<li>当缓存的数据集是静态的。如果数据使用的缓存空间足够，应在启动时加载数据到缓存并防止数据过期。</li>
+<li>For caching session state information in a web application hosted in a web farm.
+In this environment, you should avoid introducing dependencies based on client-server affinity.</li>
+</ul>
+<p>TODO: 搞清楚缓存的其他问题，比如写策略，等等</p>
+<h2 id="数据更新">数据更新</h2>
+<p>缓存数据更新有几种策略：</p>
+<ul>
+<li><em>Write-through</em>：不管缓存中是否有对应的数据，都先把数据写入缓存，再写入数据存储。</li>
+<li><em>Write-around</em>：如果缓存中有对应的数据，就先更新缓存，再更新数据存储；如果没有，就直接更新数据存储。</li>
+<li><em>Write-behind</em>/<em>Write-back</em>：不管缓存中是否有对应的数据，都先把数据写入缓存，之后再想办法写入数据存储。</li>
+</ul>
+<h2 id="其他参考">其他参考</h2>
+<ul>
+<li><a href="https://www.baeldung.com/cs/cache-write-policy">Cache Write Policy | Baeldung on Computer Science</a></li>
+</ul> </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4"> <div class="text-indigo-600 font-bold"> <a href="/cheatsheet/cloud-patterns/">返回上级</a> </div>  <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#问题上下文">问题上下文</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#解决方案">解决方案</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#实现考量">实现考量</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#缓存数据的寿命">缓存数据的寿命</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#驱逐缓存">驱逐缓存</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#启动缓存">启动缓存</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#一致性">一致性</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#本地缓存内存缓存">本地缓存/内存缓存</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#何时使用">何时使用</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#数据更新">数据更新</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer hover:bg-indigo-100" href="#其他参考">其他参考</a> </li> </ol>  </div> </div> </div> </div> </body></html>
