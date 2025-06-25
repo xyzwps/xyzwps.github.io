@@ -1,0 +1,104 @@
+---
+layout: ./_BlogLayout.astro
+title: Spring AOP @annotation
+date: 2025-06-25
+---
+
+事情是这样的。
+
+## 背景
+
+今天我为 Controller 中的 HTTP handler 写了两个切面，如下：
+
+```java
+@Aspect
+@Component
+@Order(AspectOrders.REQUIRED_PERMS_ASPECT_ORDER) // 1002
+public class RequiredPermsAspect {
+    @Before("@annotation(requiredPerms)")
+    @SneakyThrows
+    public void checkPermission(RequiredPerms requiredPerms) {
+        // 忽略具体实现
+    }
+}
+
+@Aspect
+@Component
+@Order(AspectOrders.LOG_ACTION_ASPECT_ORDER) // 1001
+public class LogActionAspect {
+    @Around("@annotation(logAction)")
+    @SneakyThrows
+    public Object logAction(ProceedingJoinPoint joinPoint, LogAction anno) {
+        // 省略具体实现
+    }
+}
+```
+
+如果一个 handler 方法上如果同时注解有 `@RequiredPerms` 和 `@LogAction`，那么按照预期，
+`@LogAction` 的切面会先执行，然后 `@RequiredPerms` 的切面才会执行。
+
+可是！实际运行时，`checkPermission` 确实执行了，`logAction` 却未执行！见了鬼了。怎么办呢？
+
+## 解决 `logAction` 的执行问题
+
+我看反复看了代码，没看出来任何问题。
+
+本着我遇到的问题别人也会遇到的原则，我开始尝试找原因。
+先是问了各种强悍的人工智能助手，然后用搜索引擎去淘别人的经验，最后还查看了
+Spring 官方文档和 AspectJ 的相关文档。
+一无所获，半个下午就这么过去了。一看时间 6 点多了，先下班吧。
+
+回到家有空之后，我又重新对比了两段代码，猜测和 `logAction` 方法的参数名有关。
+于是，我把代码改成了下面这样，结果就正常了：
+
+```java
+//                       +-------------------------------------------+
+//                       ↓                                           |
+@Around("@annotation(logAction)") //                                 |
+@SneakyThrows                     //                                 ↓
+public Object logAction(ProceedingJoinPoint joinPoint, LogAction logAction) {
+```
+
+就是把参数名改成和 `@annotation` 的参数一样。
+
+就这。
+
+## 这个东西该怎么理解？
+
+其实在 Spring 框架的文档中是记载有这种用法的，下面是官方文档中提供的一个例子：
+
+```java
+@Before("com.xyz.Pointcuts.publicMethod() && @annotation(auditable)")
+public void audit(Auditable auditable) {
+	AuditCode code = auditable.value();
+	// ...
+}
+```
+
+但是文档中对 `@annotation` 参数的用法没有详细说明，只是举例子。既然这东西是 AspectJ
+声明切面的语法，那么 AspectJ 官方文档中总该有对此的详细说明吧？可是 AspectJ
+这老（牌的）东西官方文档居然一团糟，没有找到相关说明。既然如此，那社区里应该有人对
+`@annotation` 的用法有很深的了解，并输出文章了吧？很遗憾，也没有。
+社区里的文章对此描述也很含糊，好像这是理所当然一样。
+
+搞不清楚就先别费神了。就酱吧先，改天再调查。
+
+## 其他写法
+
+Spring 官方文档中，有 `@annotation` 参数是注解全限定名的用法。
+不过对于这种用法，我们就得自己手动写代码来解析注解了。比如：
+
+```java
+@Around("@annotation(com.xxx.aop.LogAction)")
+@SneakyThrows
+public Object logAction(ProceedingJoinPoint joinPoint) {
+    if (joinPoint instanceof MethodInvocationProceedingJoinPoint methodInvocationJoinPoint) {
+        var signature = methodInvocationJoinPoint.getSignature();
+        if (signature instanceof MethodSignature methodSignature) {
+            var method = methodSignature.getMethod();
+            var logAction = method.getAnnotation(LogAction.class); // 终于搞到手了
+        }
+    }
+    // 其他内容省略
+}
+```

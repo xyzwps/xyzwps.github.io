@@ -11,7 +11,7 @@ type Props = MdxLayoutProps;
 // 现在，`frontmatter`、`url` 和其他 Markdown 布局属性
 // 可以通过 TypeScript 类型安全地访问
 const { frontmatter, url, headings, breadcrumbs } = Astro.props;
-const { parent, translateFrom } = frontmatter;
+const { parent, translateFrom, date } = frontmatter;
 
 const PROSE_CONFIG = [
   "prose-code:before:content-[''] prose-code:after:content-['']",
@@ -40,6 +40,7 @@ const PROSE_CONFIG = [
           class={`prose prose-slate ${PROSE_CONFIG}  bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow`}
         >
           <h1>{frontmatter.title}</h1>
+          {date && <div class="text-sm text-gray-400">{date.substring(0, 10)}</div>}
           {
             translateFrom && (
               <div class="border-2 p-4 rounded-lg">
