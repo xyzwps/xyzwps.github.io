@@ -1,0 +1,91 @@
+---
+layout: ./_BlogLayout.astro
+title: Java 中如何检查一个日期是否合法？
+date: 2025-06-26
+---
+
+## 背景
+
+最近要写校验身份证号的代码。这个东西用 AI 都能帮我自动生成了。
+但是 AI 生成的代码里没有检查出生日期部分的代码。如果不检查，仅对校验和做检查，
+那么形如下面的“身份证号”就会通过检查：
+
+```
+123456789012345677
+123456202502305672
+```
+
+这肯定是不行的。我得自己补一个出生日期检查。
+
+## 检查日期
+
+检查日期的代码当然也是 AI 来写。核心逻辑如下：
+
+```java
+private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+public static boolean checkDate(String date) {
+    try {
+        LocalDate.parse(date, DF);
+        return true;
+    } catch (Exception e) {
+        return false;
+    }
+}
+```
+
+这段代码写完后，我们发现对于 `20250230` 这样的日期，居然检查不出来！
+
+于是我在 jshell 里试验了一下：
+
+```
+jshell> import java.time.format.DateTimeFormatter
+
+jshell> var df = DateTimeFormatter.ofPattern("yyyyMMdd")
+df ==> Value(YearOfEra,4,19,EXCEEDS_PAD)Value(MonthOfYear,2)Value(DayOfMonth,2)
+
+jshell> df.parse("20250230")
+$3 ==> {},ISO resolved to 2025-02-28
+
+jshell> df.parse("20250231")
+$4 ==> {},ISO resolved to 2025-02-28
+
+jshell> df.parse("20250232")
+|  异常错误 java.time.format.DateTimeParseException：Text '20250232' could not be parsed: Invalid value for DayOfMonth (valid values 1 - 28/31): 32
+|        at DateTimeFormatter.createError (DateTimeFormatter.java:2079)
+|        at DateTimeFormatter.parse (DateTimeFormatter.java:1940)
+|        at (#5:1)
+|  原因: java.time.DateTimeException： Invalid value for DayOfMonth (valid values 1 - 28/31): 32
+```
+
+可以看到，Java 解析日期偷了懒，没有判断闰年，甚至没有按大月小月做区分，
+只是简单粗暴的设定了一个 31 日的上限，在 31 之内，它会“智能”调整日期到合适的值。
+比如，把 `20250231` 调成了 `20250228`。
+
+这就是前大语言模型时代的“人工”智能？
+
+这套日期时间 API 是 Java 8 引入的，我测试使用的是 Java 21。显然，这特么是个 feature！！
+
+## 如何改进？
+
+最朴素的想法，就是自己写一个：
+
+1. 解析出年月日
+2. 对大月、小月、2月分别做处理
+3. 对闰年的2月份专门做处理
+
+可是这么一搞的话，代码就长了。写这么一大段代码肯定耽误下班。我们得换个写法。
+
+下面就是新写法，不解释了，一看就懂：
+
+```java
+private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+public static boolean checkDate(String date) {
+    try {
+        return LocalDate.parse(date, DF).format(DF).equals(date);
+    } catch (Exception e) {
+        return false;
+    }
+}
+```
