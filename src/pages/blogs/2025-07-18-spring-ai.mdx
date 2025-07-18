@@ -1,0 +1,93 @@
+---
+layout: ./_BlogLayout.astro
+title: 记一个在使用 Spring AI 过程中遇到的问题
+date: 2025-07-18
+---
+
+嗯，事情是这样的：
+
+## 背景
+
+我们有一处代码使用了 Spring AI，过程是用 Spring AI 的 `ChatClient`
+调用我司内部通过 vllm 部署的模型，然后处理返回结果。这段代码已上线，并且正常运行。
+我在把它搬到新项目之后，发现接口总是返回 400。
+
+有点麻。
+
+## 尝试找问题
+
+首先，要看看是不是我代码写错了，于是开始了快速的找不同。盯了一圈没发现问题。
+
+然后，我把同样的请求用 Bruno 直接调接口发送试了一下，发现结果正常。也就是说，代码在新项目里不行，在别的地方行。
+
+本着我遇到的问题在别人肯定已经遇到过了的伟大主题思想，我去网上搜了一下，还真发现了有人在 Spring AI 的 Github
+上提的一个类似的问题: [issues/3438](https://github.com/spring-projects/spring-ai/issues/3438)，
+不过这个问题并没有被解决。所以，我只好委屈下自己亲自去调查了！
+
+打开多年没碰过的有线鲨鱼（wireshark），开启监听。然后分别在 Bruno 和 Spring AI 上各调了一次这个接口后，
+关闭有线鲨鱼的监听，去过滤器里找到对应的 HTTP 请求记录。逐行对比两个请求的区别后，发现 Spring AI
+发起的请求有尝试把 HTTP 1.1 升级为 HTTP 2 的相关请求头，如下图所示。于是猜测是不是和这哦相关。
+
+![相关截图](/assets/img/blogs/h2c.jpg)
+
+> 从图中可以看到，Spring RestClient 使用了 Java HttpClient API 作为后端。
+
+我把 `Upgrade: h2c` 头加到 Bruno 的请求头里之后，问题就复现了，现在请求稳定返回 400，错误内容如下：
+
+```
+Invalid HTTP request received.
+```
+
+既然知道了问题来源，就可以去尝试修正问题了。
+
+## 修正问题
+
+首先肯定是不太容易去碰 vllm 部署的 AI 服务，那我就勉为其难在自己的代码里指定必须用 HTTP 1.1 吧：
+
+```java
+@Bean
+public ChatClient myChatClient(RestClient.Builder defaultRestClientBuilder,
+                               WebClient.Builder defaultWebClientBuilder) {
+
+    var httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1) // 这指定用 HTTP 1.1
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
+
+    var restClientBuilder = defaultRestClientBuilder.clone() // 复制一份
+            .requestFactory(new JdkClientHttpRequestFactory(httpClient));
+
+    var webClientBuilder = defaultWebClientBuilder.clone() // 复制一份
+            .clientConnector(new JdkClientHttpConnector(httpClient));
+
+    OpenAiChatProperties conf = getAiConfig();
+    var api = OpenAiApi.builder()
+            .apiKey(conf.getApiKey())
+            .baseUrl(conf.getBaseUrl())
+            .restClientBuilder(restClientBuilder)
+            .webClientBuilder(webClientBuilder) // 流式输出用这个
+            .build();
+    // 后面 ChatClient 的构造过程省略
+}
+```
+
+至此，问题解决。
+
+## 后续
+
+虽然问题找到了，但是这里还有很多问题没有解释：
+
+1. 新项目使用的是 Spring Boot 3.5.3，老项目使用的是 Spring Boot 3.5.0。两个项目都是使用的 Spring AI 1.0.0，JDK 均为 21。
+   这里到底发生了什么变更导致同样的代码在新项目中无法正常工作？
+2. 从响应头可以看到，内部模型使用的服务器似乎是 uvicorn，不清楚是 uvicorn 不太支持 h2c，还是模型使用的 uvicorn
+   版本不支持 h2c，还是别的原因。
+3. JDK 自己的 HttpClient 什么情况下回尝试对 HTTP 1.1 的协议进行升级？
+
+因为没有权限去部署模型的服务器上做进一步调查，所以作罢。（好吧，主要是想早点下班，问题解决了就别难为自己了）
+
+## 吐槽
+
+这个过程中，我尝试了 Openai 官方提供的 Java SDK，嗯……这里得到的经验就是，如果你不使用 Kotlin
+的话，就不要使用这个 SDK，因为用 Java 调用 Kotlin 的方法，太只因吧啰嗦了。
+
+Spring Boot 中配置想对 Rest Client 做配置太麻烦了，包了一层又一层，自动配置代码也是散落得到处都是……
