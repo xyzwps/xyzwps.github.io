@@ -8,7 +8,7 @@ date: 2025-07-18
 
 ## 背景
 
-前几天在使用 Spring AI 时，被 `RestClient` 折腾的不轻。在翻 Spring 文档时，发现有一个
+前几天在使用 Spring AI 时，[被 `RestClient` 折腾的不轻](/blogs/2025-07-18-spring-ai)。在翻 Spring 文档时，发现有一个
 [HTTP Interface](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-http-interface)
 的用法。
 
@@ -149,7 +149,7 @@ public class RestApisRegistrar implements ImportBeanDefinitionRegistrar, Resourc
         scanner.addIncludeFilter(filter);
 
         // 3. 获取一个包作为 base package
-        var basePackage = "com.zhxt.scs.scscp";
+        var basePackage = "com.example.demo.apis";
 
         // 4. 扫描得到 bean definitions
         var candidates = scanner.findCandidateComponents(basePackage);
