@@ -16,6 +16,4 @@ git checkout -b deploy
 
 git push -f git@github.com:xyzwps/xyzwps.github.io.git deploy
 
-cd ..
-
-rm -rf dist
+du -h -d 0
