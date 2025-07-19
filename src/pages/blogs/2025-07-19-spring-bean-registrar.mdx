@@ -1,0 +1,224 @@
+---
+layout: ./_BlogLayout.astro
+title: Spring 如和按注解扫描接口，并把它注册为 Bean？
+date: 2025-07-18
+---
+
+嗯，事情是这样的：
+
+## 背景
+
+前几天在使用 Spring AI 时，被 `RestClient` 折腾的不轻。在翻 Spring 文档时，发现有一个
+[HTTP Interface](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-http-interface)
+的用法。
+
+首先，定义一个接口:
+
+```java
+public interface RepositoryService {
+
+	@GetExchange("/repos/{owner}/{repo}")
+	Repository getRepository(@PathVariable String owner, @PathVariable String repo);
+
+	// more HTTP exchange methods...
+
+}
+```
+
+然后把接口创建成一个可以调用的 HTTP 接口类：
+
+```java
+var restClient = RestClient.builder().baseUrl("https://api.github.com/").build();
+var adapter = RestClientAdapter.create(restClient);
+var factory = HttpServiceProxyFactory.builderFor(adapter).build();
+
+var service = factory.createClient(RepositoryService.class);
+```
+
+> 除了 `RestClient` 之外，还有基于 `WebClient` 和 `RestTemplate` 的用法。这里不做列举。
+
+创建这个类之后，就可以像调用本地方法一样调用这个接口了：
+
+```java
+var repository = service.getRepository("spring-projects", "spring-boot");
+```
+
+看到项目里使用的 dtflyx forest 依赖的 okhttp 模块一直报安全隐患，于是想着干脆用这东西把
+forest 替换掉得了。
+
+说干就干。
+
+## 施工
+
+思路上很简单，步骤大体如下：
+
+1. 创建一个注解
+2. 扫描注上这个注解的接口
+3. 通过这个接口创建一个代理类
+
+### 创建注解
+
+这一步最简单：
+
+```java
+@Documented
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RestApis {
+    String baseUrl() default "";
+}
+
+```
+
+注意，我们预期注解被注到接口上，所以没法直接对接口进行实例化，需要通过上面的 `HttpServiceProxyFactory`
+来创建接口的代理类。所以我们需要一个创建代理类的工厂类。
+
+### 创建工厂类
+
+我们使用 Spring 中的 `FactoryBean` 来创建工厂类。下面的代码还挺简单的：
+
+```java
+@Data
+public class RestApisFactoryBean implements FactoryBean<Object> {
+
+    public static final HttpClient HTTP_1_1_CLIENT = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
+            .connectTimeout(Duration.ofSeconds(5))
+            .build();
+
+    public static final JdkClientHttpRequestFactory JDK_CLIENT_HTTP_REQUEST_FACTORY =
+            new JdkClientHttpRequestFactory(HTTP_1_1_CLIENT);
+
+    private Class<?> objectType;
+
+    private Environment environment;
+
+    @Override
+    public Object getObject() throws Exception {
+        var anno = objectType.getAnnotation(RestApis.class);
+        if (anno == null) {
+            throw new RuntimeException("Unexpected type " + objectType.getCanonicalName());
+        }
+        log.info("Creating RestApis: {}", objectType.getCanonicalName());
+
+        var baseUrl = anno.baseUrl();
+
+        var rcb = RestClient.builder().requestFactory(JDK_CLIENT_HTTP_REQUEST_FACTORY);
+        {
+            if (StringUtils.hasText(baseUrl)) {
+                if (baseUrl.startsWith("${") && baseUrl.endsWith("}")) {
+                    var configBaseUrl = environment.getProperty(baseUrl.substring(2, baseUrl.length() - 1));
+                    if (configBaseUrl == null) {
+                        throw new IllegalStateException("Cannot find property for " + baseUrl);
+                    }
+                    rcb = rcb.baseUrl(configBaseUrl);
+                } else {
+                    rcb = rcb.baseUrl(baseUrl);
+                }
+            }
+        }
+        var restClient = rcb.build();
+        var adapter = RestClientAdapter.create(restClient);
+        var factory = HttpServiceProxyFactory.builderFor(adapter).build();
+        return factory.createClient(objectType);
+    }
+}
+```
+
+### 创建类注册器
+
+有了注解和工厂类，我们需要扫描注解接口，然后通过上面的工厂类创建接口实例，再把实例注册到
+Spring 容器中。代码如下：
+
+```java
+@Slf4j
+@Setter
+public class RestApisRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+
+    private Environment environment;
+    private ResourceLoader resourceLoader;
+
+    @Override
+    public void registerBeanDefinitions(@NonNull AnnotationMetadata meta, @NonNull BeanDefinitionRegistry registry) {
+        // 1. 创建扫描器
+        var scanner = getScanner();
+        scanner.setResourceLoader(this.resourceLoader);
+
+        // 2. 为扫描器添加过滤器，按注解过滤
+        var filter = new AnnotationTypeFilter(RestApis.class);
+        scanner.addIncludeFilter(filter);
+
+        // 3. 获取一个包作为 base package
+        var basePackage = "com.zhxt.scs.scscp";
+
+        // 4. 扫描得到 bean definitions
+        var candidates = scanner.findCandidateComponents(basePackage);
+
+        // 5. 注册 bean
+        candidates.forEach(bd -> this.registerBean(bd, registry));
+    }
+
+    private void registerBean(BeanDefinition candidate, BeanDefinitionRegistry registry) {
+        var beanClassName = candidate.getBeanClassName();
+        if (beanClassName == null) {
+            throw new RuntimeException("IMPOSSIBLE!!!");
+        }
+
+        var builder = BeanDefinitionBuilder.genericBeanDefinition(RestApisFactoryBean.class);
+        builder.addPropertyValue("objectType", beanClassName); // 注意看，这里的两个属性都是定义在
+        builder.addPropertyValue("environment", environment);  // RestApisFactoryBean 中的
+        builder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
+        builder.setScope(BeanDefinition.SCOPE_SINGLETON);
+
+        var beanDefinition = builder.getBeanDefinition();
+        beanDefinition.setPrimary(true);
+
+        registry.registerBeanDefinition(beanClassName, beanDefinition);
+    }
+
+    protected ClassPathScanningCandidateComponentProvider getScanner() {
+        return new ClassPathScanningCandidateComponentProvider(false, this.environment) {
+            @Override
+            protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+                boolean isCandidate = false;
+                if (beanDefinition.getMetadata().isIndependent()) {
+                    if (!beanDefinition.getMetadata().isAnnotation()) {
+                        isCandidate = true;
+                    }
+                }
+                return isCandidate;
+            }
+        };
+    }
+}
+```
+
+### 启用注册器
+
+我们注意到 `RestApisRegistrar` 是一个在 Spring 语境下“普通”的类，我们要启用它。
+
+做法是在启动类上添加 `@Import` 注解，并传入 `RestApisRegistrar` 类：
+
+```java
+@SpringBootApplication
+@Import(RestApisRegistrar.class)
+public class App {
+    // ...
+}
+```
+
+### 使用注解
+
+现在，我们在一个接口上注上 `@RestApi`，然后启动应用，观察 `/actuator/beans`
+输出就可以看到结果了。
+
+## 后续
+
+后续当然是坚决删除 forest 啦。
+
+## 有没有别的方法呢？
+
+其实是有的。
+
+上面的方法是使用 Spring API 的运行时生成 bean 定义的方法。我们还可以把注解改成编译时注解，
+然后在编译时生成带有 bean 定义的 `@Configuration` 类源码的方式来搞。
