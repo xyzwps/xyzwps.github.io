@@ -3,35 +3,35 @@
 ---
 
 <div class="flex justify-center">
-  <div
-    class={[
-      'border-solid border-indigo-600 border rounded',
-      'has-[:focus]:ring-indigo-400 has-[:focus]:ring-2',
-      'w-full max-w-[420px]',
-      'p-3 flex',
-    ].join(' ')}
-  >
-    <input class="flex-1 focus:outline-none focus:border-6 ml-2 bg-transparent" placeholder="搜索" id="search-input" />
-    <span class="ml-2 cursor-pointer" id="search-icon">🔍</span>
-  </div>
+  <label class="input input-primary">
+    <input class="grow" placeholder="搜索" id="search-input" />
+    <span class="btn btn-square btn-ghost btn-sm" style="margin-right: -8px;" id="search-icon">🔍</span>
+  </label>
 </div>
 <script>
-  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchInput = document.getElementById(
+    "search-input"
+  ) as HTMLInputElement;
   const search = () => {
-    const value = (searchInput.value || '').trim();
+    const value = (searchInput.value || "").trim();
     if (value) {
-      const qs = encodeURI(value.split(' ').filter(it => it).join('+'));
+      const qs = encodeURI(
+        value
+          .split(" ")
+          .filter((it) => it)
+          .join("+")
+      );
       location.href = `https://cn.bing.com/search?q=${qs}`;
     }
   };
-  searchInput.addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') {
+  searchInput.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") {
       search();
     }
   });
 
-  const searchIcon = document.getElementById('search-icon');
-  searchIcon.addEventListener('click', () => {
+  const searchIcon = document.getElementById("search-icon");
+  searchIcon.addEventListener("click", () => {
     search();
   });
 </script>

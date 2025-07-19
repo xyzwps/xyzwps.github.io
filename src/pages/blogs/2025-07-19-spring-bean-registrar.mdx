@@ -1,6 +1,6 @@
 ---
 layout: ./_BlogLayout.astro
-title: Spring 如和按注解扫描接口，并把它注册为 Bean？
+title: Spring 如何按注解扫描接口，并把它注册为 Bean？
 date: 2025-07-18
 ---
 
@@ -220,5 +220,5 @@ public class App {
 
 其实是有的。
 
-上面的方法是使用 Spring API 的运行时生成 bean 定义的方法。我们还可以把注解改成编译时注解，
+上面的方法是使用 Spring API 的运行时生成 bean 定义的方法。我们还可以把运行时注解改成编译时注解，
 然后在编译时生成带有 bean 定义的 `@Configuration` 类源码的方式来搞。
