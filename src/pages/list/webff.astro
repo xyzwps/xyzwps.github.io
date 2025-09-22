@@ -29,6 +29,7 @@ type FramkworkAspects = Component & {
   dataFetching: Component[];
   hooks: Component[];
   diagrams: Component[];
+  animation: Component[];
 };
 
 const COMMON_STYLES: FComponent[] = [
@@ -210,6 +211,16 @@ const COMMON_DATA_FETCHING: FComponent[] = [
   },
 ];
 
+const COMMON_ANIMATION: FComponent[] = [
+  {
+    name: "Barba.js",
+    url: "https://barba.js.org/",
+    react: true,
+    vue: true,
+    solid: true,
+  },
+];
+
 const REACT: FramkworkAspects = {
   name: "React",
   url: "https://react.dev/",
@@ -233,6 +244,7 @@ const REACT: FramkworkAspects = {
     { name: "FlowGram.AI", url: "https://flowgram.ai/" },
     { name: "React Flow", url: "https://reactflow.dev/" },
   ],
+  animation: [{ name: "React Bits", url: "https://www.reactbits.dev/" }],
 };
 
 const VUE: FramkworkAspects = {
@@ -256,6 +268,7 @@ const VUE: FramkworkAspects = {
   ],
   dataFetching: [],
   diagrams: [{ name: "Vue Flow", url: "https://vueflow.dev/" }],
+  animation: [{ name: "Vue Bits", url: "https://vue-bits.dev/" }],
 };
 const SOLID: FramkworkAspects = {
   name: "Solid",
@@ -271,6 +284,7 @@ const SOLID: FramkworkAspects = {
   dataFetching: [],
   hooks: [],
   diagrams: [],
+  animation: [],
 };
 ---
 
@@ -352,6 +366,13 @@ const SOLID: FramkworkAspects = {
             react={REACT.diagrams}
             vue={VUE.diagrams}
             solid={SOLID.diagrams}
+          />
+          <Row
+            title="动画"
+            common={COMMON_ANIMATION}
+            react={REACT.animation}
+            vue={VUE.animation}
+            solid={SOLID.animation}
           />
         </tbody>
       </table>

@@ -1,0 +1,101 @@
+---
+layout: ./_BlogLayout.astro
+title: 把 Spring Boot 应用 jar 包的体积降低到原来的 1%!
+date: 2025-09-24
+---
+
+## 是这样的
+
+我司有个 Spring Boot 应用的部署方式是这样的：
+
+1. 应用打包成 jar 包，fat jar
+2. 把 jar 包 scp 到应用服务器上
+3. 应用服务器上执行 `java -jar app.jar` 启动应用
+
+因为应用依赖很多，打出来的 jar 包体积巨大，非常的 fat，有 243MB 之多。
+公司的网又比较慢，scp 这样的庞然大雾，非常耗时，每次上线光上传 jar
+包就要 2 分半，非常折磨人。
+
+## 分析问题
+
+大体看了下，应用本身比较简单，加上依赖之后能有这么大体积真是匪夷所思。
+
+首先，我把打出来的 jar 包 unzip 一下，在 `BOOT-INF/lib` 目录下有 237 个 jar 包:
+
+```bash
+% ls BOOT-INF/lib | wc -l
+237
+```
+
+然后看看依赖的最大的 jar 包有哪些：
+
+```bash
+% ls -lhS BOOT-INF/lib | head -n 5
+total 493192
+-rw-r--r--@ 1 xyzwps  staff   102M Dec  1  2023 opencv-4.8.1-0.jar
+-rw-r--r--@ 1 xyzwps  staff    13M May 16  2020 Happy-Captcha-1.0.1.jar
+-rw-r--r--@ 1 xyzwps  staff   8.6M Jun 16 12:10 byte-buddy-1.17.6.jar
+-rw-r--r--@ 1 xyzwps  staff   8.5M Jun  3 17:31 bcprov-jdk18on-1.81.jar
+```
+
+可以看到 opencv 这个 jar 包占用了最大的体积，占了一小半。要是能把它去掉，应用的体积可以减小一小半左右。
+
+## 解决问题
+
+处理这个问题的思路是这样的：
+
+> 应用的依赖不会经常升级，所以可以考虑提前把这些巨型一来提前放到应用服务器的 `CLASSPATH`
+> 下，日后升级只要升级变动的部分即可。
+
+最开始我的想法是在 pom.xml 中直接把依赖排除掉。操作了一下，发现有点复杂。于是，我去 Spring Boot
+官网看看有关打包的文档，看看有没有什么好的做法。
+
+很幸运，在 [Efficient Deployments](https://docs.spring.io/spring-boot/reference/packaging/efficient.html)
+这一章，第一节就是关于如何解包 fat jar 包的，执行以下命令就可以解包了：
+
+```bash
+% java -Djarmode=tools -jar my-app.jar extract
+```
+
+执行完以上命令后，可以得到这样的目录结构：
+
+```
+my-app
+├── lib
+│   ├── Happy-Captcha-1.0.1.jar
+│   ├── ...
+│   └── xxl-job-core-3.1.0.jar
+└── my-app.jar
+```
+
+即把 `my-app.jar` 这个 fat jar 解包成 `my-app/my-app.jar` 这个 thin jar 包 + `my-app/lib` 这个目录下的所有的依赖 jar 包。
+
+现在做法就很明了了
+
+## 新部署方案
+
+部署的时候只要这样就可以了：
+
+1. 应用打包成 jar 包，fat jar
+2. 解包 fat jar
+3. `rsync` 把 `my-app/lib` 目录下所有的依赖 jar 包同步到应用服务器上 `$WORKDIR/app/lib` 目录下
+   > 只有第一次的时候需要全量同步，以后只需要同步变动的依赖 jar 包即可。多数情况下，依赖的 jar 包保持稳定，完全没有数据传输。
+   >
+   > 下面是我使用的 `rsync` 命令：
+   >
+   > ```bash
+   > # 按文件大小和 checksum 是否改变来判断是否需要更新，而非按时间戳
+   > rsync -r --ignore-times --checksum --itemize-changes --progress --delete my-app/lib/ $USER@$HOST:$WORKDIR/app/lib
+   > ```
+4. `scp` 把 `my-app/my-app.jar` 这个 thin jar 包同步到应用服务器上 `$WORKDIR/app` 目录下
+5. 应用服务器上执行 `java -jar app.jar` 启动应用
+
+## 结果
+
+解包后的 `my-app/my-app.jar` 体积为 2.4MB，体积减小到了原来的 1%!!! 现在部署体验就欻欻快了。
+
+## 另
+
+解包之后后的目录结构非常适合打 docker 镜像。合理地利用 docker 镜像 layer 缓存，可以极大地打 docker 镜像的时间。
+
+Quarkus 这样的框架打包一早就不是 fat jar……
