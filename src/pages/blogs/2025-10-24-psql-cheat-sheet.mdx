@@ -1,0 +1,90 @@
+---
+layout: ./_BlogLayout.astro
+title: PostgreSQL Cheat Sheet
+date: 2025-10-24
+---
+
+## 背景
+
+最近被迫要操作 PostgreSQL 数据库，发现自己对 PostgreSQL 还是比较陌生的。所以，我就想写一个 PostgreSQL 的 Cheat Sheet，方便自己以后查询。
+
+## 常用命令
+
+### 连接 PG
+
+```bash
+$ psql
+```
+
+其他参数请参考 `psql --help`。
+
+### 退出 PG
+
+```bash
+$ \q
+```
+
+### 数据库操作
+
+#### 查看数据库列表
+
+```bash
+postgres=# \l
+```
+
+
+#### 查看数据库磁盘占用
+
+```sql
+SELECT datname AS database_name,
+       pg_size_pretty(pg_database_size(datname)) AS size
+  FROM pg_database
+ ORDER BY pg_database_size(datname) DESC;
+```
+
+#### 连接数据库
+
+```bash
+postgres=# \c dify
+```
+
+#### 查看数据库中所有表
+
+```bash
+dify=# \dt
+```
+
+#### 查看数据库中所有 schema
+
+```bash
+dify=# \dn
+```
+
+#### 查看数据库中表占用磁盘的大小
+
+```sql
+SELECT quote_ident(schemaname) || '.' || quote_ident(tablename) AS full_table_name,
+       pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename))) AS total_size
+  FROM pg_tables
+ WHERE schemaname = 'public'
+ ORDER BY pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(tablename)) DESC limit 10
+```
+
+#### 估算表的大小+行数
+
+```sql
+SELECT relname AS table_name,
+       n_live_tup AS live_rows_estimate,
+       pg_size_pretty(pg_relation_size(relid)) AS table_size
+  FROM pg_stat_user_tables
+ WHERE schemaname = 'public'
+ ORDER BY pg_relation_size(relid) DESC limit 10
+```
+
+不准呢。TODO:
+
+#### 查看表定义
+
+```bash
+dify=# \d+ public.workflow_node_executions
+```
