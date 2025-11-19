@@ -1,0 +1,83 @@
+---
+layout: ./_BlogLayout.astro
+title: 使用 pyauto-gui 自动操作微信
+date: 2025-11-19
+---
+
+最近（3周前了😂）做一个 Demo，要能用程序自动发微信给指定好友。找了一圈现有方案，作者要么删库跑路，要么支持的微信版本太旧，无法满足要求。
+思来想去，决定用程序直接模拟 ui 操作的方式来实现。最后选了 pyauto-gui 库。
+
+## 需求分析
+
+给一个好友发消息，操作流程是这样的：
+
+1. 在搜索框里输入好友昵称
+2. 点击搜索结果中的好友
+3. 在好友聊天框里输入消息
+4. 点击发送按钮
+
+这个流程里仅有几个关键操作：
+
+1. 定位页面上的元素：模拟视觉观察屏幕
+2. 点击：用于点击按钮、输入框聚焦
+3. 输入文本
+
+下面介绍下如何用 pyauto-gui 实现这些操作。
+
+## 找到页面上的元素
+
+首先，你需要把要找到的元素进行截图。比如，你要找到搜索框，就把搜索框截图下来。我们把这个截图叫做 `wx-search-box.png` 好了。
+
+![搜索框截图](./assets/wx-search-box.png)
+
+然后在代码里，你可以用 `locateCenterOnScreen` 函数来找到这个元素的位置（注意处理 `pyautogui.ImageNotFoundException` 异常）。比如：
+
+```python
+import pyautogui
+
+_CONFIDENCE = 0.8
+cx, cy = pyautogui.locateCenterOnScreen('wx-search-box.png', confidence=_CONFIDENCE)
+```
+
+这里置信度 `_CONFIDENCE` 是一个浮点数，范围是 `[0, 1]`。默认值是 `0.8`。
+如果你的截图和实际元素的相似度低于这个值，就会抛出 `pyautogui.ImageNotFoundException` 异常。
+自行按需调整置信度即可，反正它不是越低越好，更不是越高越好。
+
+## 点击元素
+
+只要像下面这样就可以了：
+
+```python
+pyautogui.click(cx, cy)
+```
+
+## 输入文本
+
+输入文本比较坑。模拟输入中文非常麻烦，我们用 `ctrl + v` 来输入。
+
+```python
+import pyperclip 
+
+pyperclip.copy(some_text)
+pyautogui.hotkey('ctrl', 'v')
+```
+
+就是这样了。下面是一个
+
+## 微信发送消息的完整流程
+
+1. 定位搜索框
+2. 点击搜索框
+3. 输入好友昵称
+4. 点击搜索结果中的好友（把搜索框的点击位置往下挪 100 像素即可）
+6. 定位聊天框发送按钮
+6. 点击聊天框（发送按钮左上方的一片区域）
+7. 输入消息
+8. 点击发送按钮
+
+就是这样了。
+
+## 注意事项
+
+- pyauto-gui 库使用时会需要别的依赖，请自行参考官方文档。
+- 即使使用这种非侵入式自动化，依然可能触发微信的反黑产机制。使用时请谨慎。
