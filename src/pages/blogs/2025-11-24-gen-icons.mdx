@@ -1,0 +1,76 @@
+---
+layout: ./_BlogLayout.astro
+title: 为 Tauri 应用生成图标
+date: 2025-11-24
+---
+
+## 背景
+
+最近在使用 Tauri 手搓简单桌面应用，需要自定义应用图标。咱也不会设计，就用千问帮忙生成了一张 1024x1024 的 PNG 图标。
+下面的工作，就是把这张 PNG 图标转换成各种平台需要的图标格式和尺寸了。
+
+为此，依靠 AI，我编写了以下脚本：
+
+## PNG 转图标脚本
+
+`gen-icons.sh` 内容如下：
+
+```bash
+#!/bin/bash
+
+PNG=$1
+
+mkdir -p target
+rm -f target/*
+
+convert $PNG -resize 32x32   target/32x32.png
+convert $PNG -resize 128x128 target/128x128.png
+convert $PNG -resize 256x256 target/128x128@2x.png
+convert $PNG -resize 512x512 target/icon.png
+convert $PNG -resize 30x30   target/Square30x30Logo.png
+convert $PNG -resize 44x44   target/Square44x44Logo.png
+convert $PNG -resize 71x71   target/Square71x71Logo.png
+convert $PNG -resize 89x89   target/Square89x89Logo.png
+convert $PNG -resize 107x107 target/Square107x107Logo.png
+convert $PNG -resize 142x142 target/Square142x142Logo.png
+convert $PNG -resize 150x150 target/Square150x150Logo.png
+convert $PNG -resize 284x284 target/Square284x284Logo.png
+convert $PNG -resize 310x310 target/Square310x310Logo.png
+convert $PNG -resize 50x50   target/StoreLogo.png
+
+# 1. 先做成一张“无半透明”的 PNG
+magick $PNG -alpha set -background none -resize 256x256^ -extent 256x256 -channel A -threshold 50% +channel 256_noalpha.png
+# 2. 再由这张“无半透明”的 PNG 生成 ICO
+magick 256_noalpha.png target/icon.ico
+
+rm 256_noalpha.png
+
+# 1. 建临时目录
+mkdir -p o2.iconset
+
+# 2. 一次性导出 10 个带 Alpha 的 png（macOS 官方尺寸）
+for sz in 16 32 64 128 256 512; do
+    # 1× 图标
+    sips -z $sz $sz $PNG --out o2.iconset/icon_${sz}x${sz}.png
+    # 2× 视网膜版本
+    sips -z $((sz*2)) $((sz*2)) $PNG --out o2.iconset/icon_${sz}x${sz}@2x.png
+done
+
+# 3. 打包成 icns
+iconutil -c icns o2.iconset -o target/icon.icns
+
+# 4. 清理
+rm -rf o2.iconset
+```
+
+## 使用
+
+```bash
+./gen-icons.sh path/to/your/icon.png
+```
+
+## 注意事项
+
+生成 .icns 文件使用了 `iconutil` 命令，这个命令仅在 macOS 上可用。
+
+如果你需要在其他操作系统上生成 .icns 文件，请使用其他命令行工具。具体请资讯 AI。
