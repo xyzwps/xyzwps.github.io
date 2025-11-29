@@ -1,0 +1,140 @@
+---
+import "../styles/mdx.css";
+import type { MdxLayoutProps } from "./MdxLayoutProps";
+import Toc from "./_MdxLayoutToc.astro";
+import CommonHeader from "../components/CommonHeader.astro";
+import AnalyticsBaidu from "../components/AnalyticsBaidu.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+
+interface ColorTheme {
+  background: string;
+  border: string;
+  borderColor: string;
+  textColor: string;
+  accentColor: string;
+}
+
+interface Props extends MdxLayoutProps {
+  breadcrumbItems: Array<{ href: string; name: string }>;
+  colorTheme: ColorTheme;
+}
+
+const { frontmatter, url, headings, breadcrumbItems, colorTheme, ...rest } = Astro.props;
+const { parent, translateFrom, date } = frontmatter;
+
+const PROSE_CONFIG = [
+  "prose-code:before:content-[''] prose-code:after:content-['']",
+  "prose-img:p-4 prose-img:shadow",
+].join(" ");
+---
+
+<html lang="zh-CN">
+  <head>
+    <link rel="canonical" href={url} />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{frontmatter.title}</title>
+    <AnalyticsBaidu />
+    <link
+      href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class={`pb-6 ${colorTheme.background}`}>
+    <CommonHeader />
+    <Breadcrumbs items={breadcrumbItems} />
+    <div class="container mx-auto p-4 min-h-screen">
+      <div class="grid grid-cols-4 gap-4">
+        <div
+          class={`prose prose-slate ${PROSE_CONFIG} bg-white max-w-none col-span-3 max-lg:col-span-4 ${colorTheme.border} rounded-lg p-6 shadow text-gray-900`}
+        >
+          <h1 class="text-gray-900">{frontmatter.title}</h1>
+          {date && <div class={`text-sm ${colorTheme.textColor}`}>{date.substring(0, 10)}</div>}
+          {
+            translateFrom && (
+              <div class={`border-2 ${colorTheme.borderColor} p-4 rounded-lg ${colorTheme.background}`}>
+                <strong class={colorTheme.accentColor}>提示</strong>：本文翻译自{" "}
+                <strong>
+                  <a href={translateFrom.url} target="_blank" class={`${colorTheme.accentColor} hover:${colorTheme.accentColor.replace('600', '700')}`}>
+                    {translateFrom.title}
+                  </a>
+                </strong>
+                。本文不保证翻译质量，并可能有删改。若你自觉英语尚可，强烈建议尝试看一下原文。
+              </div>
+            )
+          }
+          <slot />
+        </div>
+        <div
+          class={`max-lg:hidden ${colorTheme.border} rounded-lg p-6 bg-white shadow`}
+        >
+          <div class="sticky top-4">
+            {
+              parent && (
+                <div class={`${colorTheme.accentColor} font-bold`}>
+                  <a href={parent.path}>{parent.name}</a>
+                </div>
+              )
+            }
+            {
+              headings.length > 0 && (
+                <>
+                  <h1 class={`mt-4 ${colorTheme.accentColor} font-bold`}>本文目录</h1>
+                  <Toc headings={headings} />
+                </>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style lang="scss" is:global>
+  * {
+    line-height: 1.8;
+  }
+
+  h2, h3, h4, h5, h6 {
+    color: #1f2937;
+  }
+
+  blockquote {
+    color: #4b5563;
+    border-left-color: #6366f1;
+  }
+
+  table {
+    border: 1px solid #ced4da;
+    border-collapse: collapse;
+
+    tr {
+      border-top: 1px solid #ced4da;
+      td,
+      th {
+        border-left: 1px solid #ced4da;
+        padding: 8px 16px;
+      }
+    }
+  }
+
+  img {
+    width: 100%;
+    border: 1px solid #eef;
+    border-radius: 4px;
+  }
+
+  .math {
+    max-width: 100%;
+    overflow-y: auto;
+  }
+  .katex {
+    font-size: 1rem;
+  }
+
+  .astro-code {
+    padding: 16px;
+    border-radius: 6px;
+  }
+</style>
