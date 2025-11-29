@@ -7,6 +7,7 @@ const list = [
   { title: "Emoji", href: "/list/emoji" },
   { title: "JSON", href: "/app/json-prettier" },
   { title: "文章", href: "/blogs" },
+  { title: "乱弹", href: "/ramblings" },
   { title: "列表", href: "/list" },
 ];
 ---
@@ -18,26 +19,37 @@ const list = [
     <title>xyzwps pages</title>
     <AnalyticsBaidu />
   </head>
-  <body style="background: linear-gradient(90deg, #faf5ff, #f9fafb, #f5f2ff)">
-    <div
-      class="mx-auto bg-transparent flex flex-col border-x-gray-500 px-4 min-h-screen text-base"
-    >
-      <div class="h-24"></div>
-      <div
-        class="text-center text-5xl text-indigo-700 my-8 font-bold select-none"
-      >
-        xyzwps
-      </div>
-      <SearchInput />
-      <div class="text-center m-8 text-sm text-gray-500 text-light">
-        {
-          list.map((it, i) => (
-            <>
-              {i > 0 ? <>&emsp;|&emsp;</> : ""}
-              <a href={it.href}>{it.title}</a>
-            </>
-          ))
-        }
+  <body style="background: linear-gradient(135deg, #faf5ff 0%, #f9fafb 50%, #f5f2ff 100%)">
+    <div class="min-h-screen flex flex-col px-4">
+      <div class="w-full flex flex-col items-center flex-1">
+        <!-- Header -->
+        <div class="text-center pt-24 mb-8">
+          <div class="inline-block">
+            <h1 class="text-6xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent select-none tracking-tight">
+              xyzwps
+            </h1>
+            <div class="h-1 w-24 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mx-auto mt-4 opacity-60"></div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="w-full max-w-2xl mb-12">
+          <SearchInput />
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="flex justify-center gap-6 text-sm flex-1 items-start">
+          {
+            list.map((it, i) => (
+              <a
+                href={it.href}
+                class="px-4 py-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-white/40 backdrop-blur-sm border border-transparent hover:border-indigo-200/50 transition-all duration-200"
+              >
+                {it.title}
+              </a>
+            ))
+          }
+        </div>
       </div>
     </div>
   </body>

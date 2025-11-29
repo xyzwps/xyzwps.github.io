@@ -24,3 +24,7 @@ pnpm-debug.log*
 public/gen
 demo
 *.log
+
+# Claude files
+scripts/claude*
+!CLAUDE.md

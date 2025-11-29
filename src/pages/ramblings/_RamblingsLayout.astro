@@ -29,22 +29,22 @@ const PROSE_CONFIG = [
       rel="stylesheet"
     />
   </head>
-  <body class="bg-indigo-50 pb-6">
+  <body class="pb-6 bg-gradient-to-br from-rose-50 via-pink-50 to-rose-50">
     <CommonHeader />
-    <Breadcrumbs items={[{ href: "/blogs", name: "文章列表" }]} />
+    <Breadcrumbs items={[{ href: "/ramblings", name: "乱弹" }]} />
     <div class="container mx-auto p-4 min-h-screen">
       <div class="grid grid-cols-4 gap-4">
         <div
-          class={`prose prose-slate ${PROSE_CONFIG} bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900`}
+          class={`prose prose-slate ${PROSE_CONFIG} bg-white max-w-none col-span-3 max-lg:col-span-4 border-2 border-rose-200 rounded-lg p-6 shadow-lg text-gray-900`}
         >
           <h1 class="text-gray-900">{frontmatter.title}</h1>
-          {date && <div class="text-sm text-gray-500">{date.substring(0, 10)}</div>}
+          {date && <div class="text-sm text-rose-400">{date.substring(0, 10)}</div>}
           {
             translateFrom && (
-              <div class="border-2 border-indigo-200 p-4 rounded-lg bg-indigo-50">
-                <strong class="text-indigo-700">提示</strong>：本文翻译自{" "}
+              <div class="border-2 border-rose-200 p-4 rounded-lg bg-rose-50">
+                <strong class="text-rose-600">提示</strong>：本文翻译自{" "}
                 <strong>
-                  <a href={translateFrom.url} target="_blank" class="text-indigo-600 hover:text-indigo-700">
+                  <a href={translateFrom.url} target="_blank" class="text-rose-600 hover:text-rose-700">
                     {translateFrom.title}
                   </a>
                 </strong>
@@ -55,12 +55,12 @@ const PROSE_CONFIG = [
           <slot />
         </div>
         <div
-          class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"
+          class="max-lg:hidden border-2 border-rose-200 rounded-lg p-6 bg-white shadow-lg"
         >
           <div class="sticky top-4">
             {
               parent && (
-                <div class="text-indigo-700 font-bold">
+                <div class="text-rose-600 font-bold">
                   <a href={parent.path}>{parent.name}</a>
                 </div>
               )
@@ -68,7 +68,7 @@ const PROSE_CONFIG = [
             {
               headings.length > 0 && (
                 <>
-                  <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1>
+                  <h1 class="mt-4 text-rose-600 font-bold">本文目录</h1>
                   <Toc headings={headings} />
                 </>
               )
@@ -90,8 +90,8 @@ const PROSE_CONFIG = [
   }
 
   blockquote {
-    color: #4b5563;
-    border-left-color: #6366f1;
+    color: #6b7280;
+    border-left-color: #9ca3af;
   }
 
   table {
