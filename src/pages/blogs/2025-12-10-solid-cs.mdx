@@ -1,0 +1,603 @@
+---
+layout: ./_BlogLayout.astro
+title: Solid.js 从入门到放弃
+date: 2025-12-10
+---
+
+事情是这样的。
+
+因为本人写了很多年 React，写 Solid 的时候虽然感觉很熟悉，但是非常别扭。
+这里记录下在不同场景下使用 Solid.js 的一些代码片段。
+
+## 简单组件
+
+```tsx
+function SimpleComponent() {
+  return (
+    <div>
+      <a href="https://vitejs.dev" target="_blank">
+        <img src={viteLogo} class="logo" alt="Vite logo" />
+      </a>
+      <a href="https://solidjs.com" target="_blank">
+        <img src={solidLogo} class="logo solid" alt="Solid logo" />
+      </a>
+    </div>
+  );
+}
+
+// 使用
+<SimpleComponent />
+```
+
+## 组件内部状态
+
+```tsx
+function Counter() {
+  const [count, setCount] = createSignal(0);
+
+  return (
+    <button onClick={() => setCount((count) => count + 1)}>
+      count is: {count()}
+    </button>
+  );
+}
+```
+
+## 组件属性
+
+### 普通属性
+
+```tsx
+// 注意: 不要对 props 进行解构
+function Image(props: { src: string; alt: string; class?: string }) {
+  return (
+    <img
+      src={props.src}
+      class={["logo", props.class || ""].join(" ")}
+      alt={props.alt}
+    />
+  );
+}
+```
+
+### Children
+
+为防止意外，使用 `children` 函数包裹 `props.children`:
+
+```tsx
+function Card(props: { children: JSX.Element }) {
+  const safeChildren = children(() => props.children);
+  return <div style={{ border: "1px solid red" }}>{safeChildren()}</div>;
+}
+
+// 使用 children
+<Card>
+  <Counter />
+  <p>Edit <code>src/App.tsx</code> and save to test HMR</p>
+</Card>
+```
+
+### 组件属性
+
+```tsx
+type CardProps = {
+  children: JSX.Element;
+  title?: JSX.Element;
+};
+
+function Card(props: CardProps) {
+  const safeChildren = children(() => props.children);
+  const safeTitle = children(() => props.title);
+  return (
+    <div style={{ border: "1px solid red" }}>
+      <Show when={safeTitle()}>{safeTitle()}</Show>
+      {safeChildren()}
+    </div>
+  );
+}
+
+```
+
+### 事件
+
+```tsx
+type InputProps = {
+  placeholder?: string;
+  value?: string;
+  onInput?: (value: string) => void;
+};
+
+function Input(props: InputProps) {
+  return (
+    <input
+      type="text"
+      placeholder={props.placeholder}
+      value={props.value}
+      onInput={(e) => props.onInput?.(e.currentTarget.value)}
+    />
+  );
+}
+
+// 使用
+function InputDemo() {
+  const [text, setText] = createSignal("");
+  return (
+    <div>
+      <Input placeholder="Type here" value={text()} onInput={setText} />
+      {text()}
+    </div>
+  );
+}
+```
+
+### 解构属性
+
+Solid 中解构属性会导致组件失去响应性。正确的做法是使用使用 `splitProps` 函数来拆分属性：
+
+```tsx
+import { splitProps } from "solid-js";
+
+function ParentComponent(props) {
+  // Splitting props into two groups: 'name' and 'age'
+  const [greetingProps, personalInfoProps, restProps] = splitProps(
+    props,
+    ["name"],
+    ["age"]
+  );
+
+  // Using greetingProps and personalInfoProps in the current component
+  return (
+    <div>
+      <Greeting {...greetingProps} />
+      <PersonalInfo {...personalInfoProps} />
+      {/* restProps can be passed down or used as needed */}
+    </div>
+  );
+}
+```
+
+## 生命周期
+
+### onMount
+
+可以简单理解为，这个函数发生于元素被挂在到页面上之后：
+
+```tsx
+import { onMount } from "solid-js"
+
+function MyComponent() {
+  let ref: HTMLButtonElement
+
+  // when the component is mounted, the button will be disabled
+  onMount(() => {
+    ref.disabled = true
+  })
+  return <button ref={ref}>Focus me!</button>
+}
+```
+
+### onCleanup
+
+可以简单理解为，这个函数发生于元素被卸载时前。不写例子了。
+
+### createEffect
+
+它有两个执行时机：
+
+1. 组价初始化渲染后；
+2. 它依赖的 reactive 值发生变化时运行。
+
+下面的例子中，组件渲染后执行一次，每次点击按钮也都会执行一次。
+
+```tsx
+import { createEffect, createSignal } from "solid-js";
+
+export default function EffectDemo() {
+  const [count, setCount] = createSignal(0);
+
+  createEffect(() => {
+    console.log("effect count", count());
+  });
+
+  return (
+    <div>
+      <button onClick={() => setCount((c) => c + 1)}>+ 1</button>
+    </div>
+  );
+}
+```
+
+下面是一个永动机（直接 stack overflow 了）：
+
+```tsx
+export default function EffectDemo() {
+  const [count, setCount] = createSignal(0);
+  const [value, setValue] = createSignal(0);
+
+  createEffect(() => {
+    console.log("effect count", count());
+    setValue(v => v + 1)
+  });
+
+  createEffect(() => {
+    console.log("effect value", value());
+    setCount(c => c + 1)
+  });
+
+  return (
+    <div>
+      <button onClick={() => setCount((c) => c + 1)}>+ 1</button>
+    </div>
+  );
+}
+```
+
+## 状态管理
+
+### Signal
+
+Signal 用于跟踪一个值。它最神奇的地方在于，可以把它用在组件外面：
+
+```tsx
+import { createSignal } from "solid-js";
+
+const [count, setCount] = createSignal(0);
+
+export default function SignalDemo() {
+  return (
+    <div>
+      <button onClick={() => setCount((c) => c + 1)}>+ 1</button>
+      <button onClick={() => setCount((c) => c + 100)}>+ 100</button>
+      <p>Count: {count()}</p>
+    </div>
+  );
+}
+```
+
+### Store
+
+#### 创建和访问 Store
+
+`createStore` 追踪一个有层级的对象。下例中，`store` 是一个代理对象，reactive 对象，不需要像 signal 中那样使用 `()`:
+
+```tsx
+import { createStore } from "solid-js/store"
+
+const App = () => {
+  const [mySignal, setMySignal] = createSignal("This is a signal.")
+  const [store, setStore] = createStore({
+    userCount: 3,
+    users: [
+      { id: 0, username: "felix909", location: "England", loggedIn: false },
+      { id: 1, username: "tracy634", location: "Canada", loggedIn: true },
+      { id: 2, username: "johny123", location: "India", loggedIn: true },
+    ],
+  })
+  return (
+    <div>
+      <h1>Hello, {store.users[0].username}</h1> {/* Accessing a store value */}
+      <span>{mySignal()}</span> {/* Accessing a signal */}
+    </div>
+  )
+}
+```
+
+#### 修改 Store
+
+修改 store 的方式是使用返回的 `setStore(key, newValue)` 函数来拆分属性：
+
+```tsx
+setStore("users", (currentUsers) => [
+  ...currentUsers,
+  {
+    id: 3,
+    username: "michael584",
+    location: "Nigeria",
+    loggedIn: false,
+  },
+])
+```
+
+#### 获取非响应式的 Store 值 - unwrap
+
+```tsx
+import { createStore, unwrap } from "solid-js/store"
+
+const [data, setData] = createStore({
+  animals: ["cat", "dog", "bird", "gorilla"],
+})
+
+const rawData = unwrap(data)
+```
+
+#### Store 杂项
+
+Store 也可以放在组件外。
+
+## 控制流程
+
+### 条件显示 - Show
+
+```tsx
+import { Show } from "solid-js"
+
+<>
+  <Show when={data.loading}>
+    <div>Loading...</div>
+  </Show>
+  <Show when={!data.loading} fallback={<div>Loading...</div>}>
+    <h1>Hi, I am {data().name}.</h1>
+  </Show>
+<>
+```
+
+### 条件显示 - Switch & Match
+
+```tsx
+import { Switch, Match } from "solid-js"
+
+<Switch fallback={<p>Fallback content</p>}>
+  <Match when={condition1}>
+    <p>Outcome 1</p>
+  </Match>
+  <Match when={condition2}>
+    <p>Outcome 2</p>
+  </Match>
+</Switch>
+```
+
+### 动态渲染 - Dynamic
+
+```tsx
+import { createSignal, For } from "solid-js"
+import { Dynamic } from "solid-js/web"
+
+const RedDiv = () => <div style="color: red">Red</div>
+const GreenDiv = () => <div style="color: green">Green</div>
+const BlueDiv = () => <div style="color: blue">Blue</div>
+
+const options = {
+  red: RedDiv,
+  green: GreenDiv,
+  blue: BlueDiv,
+}
+
+function App() {
+  const [selected, setSelected] = createSignal("red")
+
+  return (
+    <>
+      <select
+        value={selected()}
+        onInput={(e) => setSelected(e.currentTarget.value)}
+      >
+        <For each={Object.keys(options)}>
+          {(color) => <option value={color}>{color}</option>}
+        </For>
+      </select>
+      <Dynamic component={options[selected()]} />
+    </>
+  )
+}
+```
+
+等价的写法是这样的：
+
+```tsx
+function App() {
+  const [selected, setSelected] = createSignal("red")
+
+  return (
+    <>
+      <select
+        value={selected()}
+        onInput={(e) => setSelected(e.currentTarget.value)}
+      >
+        <For each={Object.keys(options)}>
+          {(color) => <option value={color}>{color}</option>}
+        </For>
+      </select>
+      <Switch fallback={<BlueDiv />}>
+        <Match when={selected() === "red"}>
+          <RedDiv />
+        </Match>
+        <Match when={selected() === "green"}>
+          <GreenDiv />
+        </Match>
+      </Switch>
+    </>
+  )
+}
+```
+
+### 渲染列表 - For
+
+`For` 适用于列表的顺序和长度变化频繁的场景。这种场景下，列表变化会导致 `For` 重新渲染整个列表：
+
+```tsx
+import { For } from "solid-js"
+
+<For each={data()}>
+  {(item, index) =>
+    // rendering logic for each element
+  }
+</For>
+```
+
+### 渲染列表 - Index
+
+`Index` 适用于列表的顺序和长度稳定，但是内容变化频繁的场景：
+
+```tsx
+import { Index } from "solid-js"
+
+<Index each={data()}>
+  {(item, index) =>
+    // rendering logic for each element
+  }
+</Index>
+```
+
+## 杂项
+
+### 错误处理
+
+`Solid` 提供了 `ErrorBoundary` 组件，用于处理组件中的错误：
+
+```tsx
+import { ErrorBoundary } from "solid-js";
+import { Header, ErrorProne } from "./components";
+
+function App() {
+  return (
+    <div>
+      <Header />
+      <ErrorBoundary
+        fallback={(error, reset) => (
+          <div>
+            <p>Something went wrong: {error.message}</p>
+            <button onClick={reset}>Try Again</button>
+          </div>
+        )}
+      >
+        <ErrorProne />
+      </ErrorBoundary>
+    </div>
+  );
+}
+```
+
+### JSX 作为值
+
+```tsx
+function Component() {
+  const myElement = <p>My Element</p>
+
+  return <div>{myElement}</div>
+}
+```
+
+### 操作 DOM - refs
+
+```tsx
+function Component() {
+  let myElement!: HTMLParagraphElement;
+  return (
+    <div><p ref={myElement}>My Element</p></div>
+  )
+}
+```
+
+这里赋值发生于组件创建时，早于元素被加到 DOM 中的时间。虽然如此，但是你必须在组件创建后才可以访问 `myElement`。
+如果你希望在组件创建时就访问 DOM 元素，可以使用回调风格的 ref:
+
+```tsx
+<p ref={(el) => {
+    myElement = el; // 这个函数体就是你可以动手脚的地方
+  }}>
+  My Element
+</p>
+```
+
+### 父组件引用子组件元素 DOM 的方法 - Forwarding refs
+
+```tsx
+// Parent component
+import { Canvas } from "./Canvas.jsx"
+
+function ParentComponent() {
+  let canvasRef
+
+  const animateCanvas = () => {
+    // Manipulate the canvas using canvasRef...
+  }
+
+  return (
+    <div>
+      <Canvas ref={canvasRef} />
+      <button onClick={animateCanvas}>Animate Canvas</button>
+    </div>
+  )
+}
+
+// Child component
+function Canvas(props) {
+  return (
+    <div className="canvas-container">
+      <canvas ref={props.ref} /> {/* Assign the ref to the canvas element */}
+    </div>
+  )
+}
+```
+
+### 原生事件
+
+使用 `on:__` 语法来绑定原生事件：
+
+```tsx
+<div on:scroll={handleScroll}>... very long text ...</div>
+```
+
+### 响应式对象派生 - Derived
+
+可以使用函数对响应式对象进行派生：
+
+```tsx
+export default function DerivedDemo() {
+  const [count, setCount] = createSignal(0);
+
+  // 因为 count 是响应式的，所以 idOdd 也是响应式的
+  const idOdd = () => count() % 2 === 1;
+
+  createEffect(() => {
+    console.log("derived: count is odd", idOdd());
+  });
+
+  return (
+    <div>
+      <h2>Derived Demo</h2>
+      <button onClick={() => setCount((c) => (c >= 5 ? 5 : c + 1))}>哈</button>
+    </div>
+  );
+}
+```
+
+### memo
+
+可以直接把 meno 是可以返回数据版的 effect。使用 `createMemo` 来创建 memo。
+
+### 函数式组件的执行
+
+下面有一个例子：
+
+```tsx
+function FunctionDemo() {
+  const [count, setCount] = createSignal(0);
+  console.log("render");
+  return (
+    <div>
+      <h2>Function Demo</h2>
+      <button onClick={() => setCount((c) => c + 1)}>+ 1</button>
+      <p>Count: {count()}</p>
+    </div>
+  );
+}
+```
+
+这个例子中，只有组件渲染时才会打印 `render`，后续点击按钮不会触发组件函数的重新执行。这是因为后续的组件变化是由 Solid 的响应式系统来追踪的。
+这和 React 完全不同。下面的 React 版本，每次点击按钮都会打印 `render`:
+
+```tsx
+// React 版本
+function FunctionDemo() {
+  const [count, setCount] = useState(0);
+  console.log("render");
+  return (
+    <div>
+      <h2>Function Demo</h2>
+      <button onClick={() => setCount(c => c + 1)}>+ 1</button>
+      <p>Count: {count}</p>
+    </div>
+  );
+}
+```
