@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/list/dataformat"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>数据格式</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="bg-indigo-50 pb-6"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/list" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 集合 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow  bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow"> <h1>数据格式</h1>    <h2 id="文本格式">文本格式</h2>
+<h3 id="json"><a href="https://www.json.org/json-en.html">JSON</a></h3>
+<p>伟哉！无需多言!</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="json"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#E06C75">  &quot;region&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;璃月港&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  &quot;characters&quot;</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;name&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;重云&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;summary&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;方士重云以璃月为中心，四处进行驱邪活动。作为驱邪世家继承人，他自幼便有过人的绝技。然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;stars&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">4</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;element&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;冰&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;weapon&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;双手剑&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;tags&quot;</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">&quot;方士&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;驱邪&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;纯阳之体&quot;</span><span style="color:#ABB2BF">]</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;name&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;刻晴&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;summary&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;stars&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">5</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;element&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;雷&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;weapon&quot;</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&quot;单手剑&quot;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      &quot;tags&quot;</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">&quot;璃月七星&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;玉衡星&quot;</span><span style="color:#ABB2BF">]</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">  ]</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h3 id="json5"><a href="https://json5.org/">JSON5</a></h3>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="js"><code><span class="line"><span style="color:#ABB2BF">{</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  // 璃月港角色信息</span></span>
+<span class="line"><span style="color:#E06C75">  region</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;璃月港&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">  characters</span><span style="color:#ABB2BF">: [</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;重云&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      summary</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;方士重云以璃月为中心，四处进行驱邪活动。作为驱邪世家继承人，他自幼便有过人的绝技。然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      stars</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">4</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      element</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;冰&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      weapon</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;双手剑&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      tags</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">&#39;方士&#39;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&#39;驱邪&#39;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&#39;纯阳之体&#39;</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">    {</span></span>
+<span class="line"><span style="color:#E06C75">      name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;刻晴&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      summary</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      stars</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">5</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      element</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;雷&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      weapon</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">&#39;单手剑&#39;</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E06C75">      tags</span><span style="color:#ABB2BF">: [</span><span style="color:#98C379">&#39;璃月七星&#39;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&#39;玉衡星&#39;</span><span style="color:#ABB2BF">],</span></span>
+<span class="line"><span style="color:#ABB2BF">    },</span></span>
+<span class="line"><span style="color:#ABB2BF">  ],</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h3 id="xml"><a href="https://www.w3.org/XML/">XML</a></h3>
+<p>曾经的王者!</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">root</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">  &lt;!-- 璃月港角色信息 --&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;</span><span style="color:#E06C75">region</span><span style="color:#ABB2BF">&gt;璃月港&lt;/</span><span style="color:#E06C75">region</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;</span><span style="color:#E06C75">characters</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E06C75">character</span><span style="color:#D19A66"> name</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;重云&quot;</span><span style="color:#D19A66"> stars</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;4&quot;</span><span style="color:#D19A66"> element</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;冰&quot;</span><span style="color:#D19A66"> weapon</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;双手剑&quot;</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;</span><span style="color:#E06C75">summary</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">        方士重云以璃月为中心，四处进行驱邪活动。</span></span>
+<span class="line"><span style="color:#ABB2BF">        作为驱邪世家继承人，他自幼便有过人的绝技。</span></span>
+<span class="line"><span style="color:#ABB2BF">        然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;/</span><span style="color:#E06C75">summary</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;</span><span style="color:#E06C75">tags</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">        &lt;</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;方士&lt;/</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">        &lt;</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;驱邪&lt;/</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">        &lt;</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;纯阳之体&lt;/</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;/</span><span style="color:#E06C75">tags</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;/</span><span style="color:#E06C75">character</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E06C75">character</span><span style="color:#D19A66"> name</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;刻晴&quot;</span><span style="color:#D19A66"> stars</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;5&quot;</span><span style="color:#D19A66"> element</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;雷&quot;</span><span style="color:#D19A66"> weapon</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;单手剑&quot;</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;</span><span style="color:#E06C75">summary</span><span style="color:#ABB2BF">&gt;璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。&lt;/</span><span style="color:#E06C75">summary</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;</span><span style="color:#E06C75">tags</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">        &lt;</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;璃月七星&lt;/</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">        &lt;</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;玉衡星&lt;/</span><span style="color:#E06C75">tag</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">      &lt;/</span><span style="color:#E06C75">tags</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;/</span><span style="color:#E06C75">character</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">  &lt;/</span><span style="color:#E06C75">characters</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/</span><span style="color:#E06C75">root</span><span style="color:#ABB2BF">&gt;</span></span></code></pre>
+<h2 id="配置文件格式">配置文件格式</h2>
+<h3 id="toml"><a href="https://toml.io/cn/">TOML</a></h3>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="toml"><code><span class="line"><span style="color:#7F848E;font-style:italic"># 璃月港角色列表</span></span>
+<span class="line"><span style="color:#E06C75">region</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;璃月港&quot;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">[[</span><span style="color:#61AFEF">characters</span><span style="color:#ABB2BF">]]</span></span>
+<span class="line"><span style="color:#E06C75">name</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;重云&quot;</span></span>
+<span class="line"><span style="color:#E06C75">summary</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&#39;&#39;&#39;</span></span>
+<span class="line"><span style="color:#98C379">方士重云以璃月为中心，四处进行驱邪活动。</span></span>
+<span class="line"><span style="color:#98C379">作为驱邪世家继承人，他自幼便有过人的绝技。</span></span>
+<span class="line"><span style="color:#98C379">然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。</span></span>
+<span class="line"><span style="color:#98C379">&#39;&#39;&#39;</span></span>
+<span class="line"><span style="color:#E06C75">stars</span><span style="color:#ABB2BF"> = </span><span style="color:#D19A66">4</span></span>
+<span class="line"><span style="color:#E06C75">element</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;冰&quot;</span></span>
+<span class="line"><span style="color:#E06C75">weapon</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;双手剑&quot;</span></span>
+<span class="line"><span style="color:#E06C75">tags</span><span style="color:#ABB2BF"> = [</span><span style="color:#98C379">&quot;方士&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;驱邪&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;纯阳之体&quot;</span><span style="color:#ABB2BF">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">[[</span><span style="color:#61AFEF">characters</span><span style="color:#ABB2BF">]]</span></span>
+<span class="line"><span style="color:#E06C75">name</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;刻晴&quot;</span></span>
+<span class="line"><span style="color:#E06C75">summary</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。&quot;</span></span>
+<span class="line"><span style="color:#E06C75">stars</span><span style="color:#ABB2BF"> = </span><span style="color:#D19A66">5</span></span>
+<span class="line"><span style="color:#E06C75">element</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;雷&quot;</span></span>
+<span class="line"><span style="color:#E06C75">weapon</span><span style="color:#ABB2BF"> = </span><span style="color:#98C379">&quot;单手剑&quot;</span></span>
+<span class="line"><span style="color:#E06C75">tags</span><span style="color:#ABB2BF"> = [</span><span style="color:#98C379">&quot;璃月七星&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;玉衡星&quot;</span><span style="color:#ABB2BF">]</span></span></code></pre>
+<h3 id="yaml"><a href="https://yaml.org/">YAML</a></h3>
+<p>虽说是一个数据序列化标记语言，但是大家似乎更喜欢用它来做配置文件。</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#7F848E;font-style:italic"># 璃月港角色信息</span></span>
+<span class="line"><span style="color:#E06C75">region</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">璃月港</span></span>
+<span class="line"><span style="color:#E06C75">characters</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#ABB2BF">  - </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">重云</span></span>
+<span class="line"><span style="color:#E06C75">    summary</span><span style="color:#ABB2BF">: </span><span style="color:#C678DD">|</span></span>
+<span class="line"><span style="color:#98C379">      方士重云以璃月为中心，四处进行驱邪活动。</span></span>
+<span class="line"><span style="color:#98C379">      作为驱邪世家继承人，他自幼便有过人的绝技。</span></span>
+<span class="line"><span style="color:#98C379">      然而，这种绝技并非学自师门，而是与生俱来的异能——「纯阳之体」。</span></span>
+<span class="line"><span style="color:#E06C75">    stars</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">4</span></span>
+<span class="line"><span style="color:#E06C75">    element</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">冰</span></span>
+<span class="line"><span style="color:#E06C75">    weapon</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">双手剑</span></span>
+<span class="line"><span style="color:#E06C75">    tags</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#98C379">方士</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#98C379">驱邪</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#98C379">纯阳之体</span></span>
+<span class="line"><span style="color:#ABB2BF">  - </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">刻晴</span></span>
+<span class="line"><span style="color:#E06C75">    summary</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">璃月七星中的「玉衡」星。做事干练，雷厉风行，并努力构建璃月的人治之世。</span></span>
+<span class="line"><span style="color:#E06C75">    stars</span><span style="color:#ABB2BF">: </span><span style="color:#D19A66">5</span></span>
+<span class="line"><span style="color:#E06C75">    element</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">雷</span></span>
+<span class="line"><span style="color:#E06C75">    weapon</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">单手剑</span></span>
+<span class="line"><span style="color:#E06C75">    tags</span><span style="color:#ABB2BF">:</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#98C379">璃月七星</span></span>
+<span class="line"><span style="color:#ABB2BF">      - </span><span style="color:#98C379">玉衡星</span></span></code></pre>
+<h2 id="二进制格式">二进制格式</h2>
+<p>在决定使用哪种二进制数据格式之前，要根据自己的需求、场景、偏好等做出合适的选择。这里就不举例子了。</p>
+<h3 id="avro"><a href="https://avro.apache.org/">Avro</a></h3>
+<p>Apache Avro™ 是先进的数据序列化格式，也是流数据管道的首选。
+它提供了出色的模式演进，并为 JVM（Java、Kotlin、Scala……）、Python、C/C++/C#、PHP、Ruby、Rust、JavaScript
+甚至 Perl 提供了实现。</p>
+<p>Avro 是一种数据和 schema 相关的序列化方案。</p>
+<h3 id="messagepack"><a href="https://msgpack.org/">MessagePack</a></h3>
+<p>一种类似 JSON 的二进制序列化格式。从下图中可以看到，这是一种与 schema 无关的数据序列化方案。</p>
+<p><img src="https://msgpack.org/images/intro.png" alt="msgpack"/></p>
+<h3 id="protobuf"><a href="https://protobuf.dev/">Protobuf</a></h3>
+<p>Protobuf 是用于序列化结构化数据的，语言中立、平台中立的可扩展机制。</p>
+<p>Protobuf 是一种数据和 schema 相关的序列化方案。</p>
+<p>Protobuf 不支持 <code>null</code> 值。</p>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-600 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#文本格式">文本格式</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#json">JSON</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#json5">JSON5</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#xml">XML</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#配置文件格式">配置文件格式</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#toml">TOML</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#yaml">YAML</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#二进制格式">二进制格式</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#avro">Avro</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#messagepack">MessagePack</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#protobuf">Protobuf</a> </li> </ol>  </div> </div> </div> </div> </body></html>

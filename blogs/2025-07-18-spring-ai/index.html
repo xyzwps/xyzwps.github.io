@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-07-18-spring-ai"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>记一个在使用 Spring AI 过程中遇到的问题</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">记一个在使用 Spring AI 过程中遇到的问题</h1> <div class="text-sm text-gray-500">2025-07-18</div>   <p>嗯，事情是这样的：</p>
+<h2 id="背景">背景</h2>
+<p>我们有一处代码使用了 Spring AI，过程是用 Spring AI 的 <code>ChatClient</code>
+调用我司内部通过 vllm 部署的模型，然后处理返回结果。这段代码已上线，并且正常运行。
+我在把它搬到新项目之后，发现接口总是返回 400。</p>
+<p>有点麻。</p>
+<h2 id="尝试找问题">尝试找问题</h2>
+<p>首先，要看看是不是我代码写错了，于是开始了快速的找不同。盯了一圈没发现问题。</p>
+<p>然后，我把同样的请求用 Bruno 直接调接口发送试了一下，发现结果正常。也就是说，代码在新项目里不行，在别的地方行。</p>
+<p>本着我遇到的问题在别人肯定已经遇到过了的伟大主题思想，我去网上搜了一下，还真发现了有人在 Spring AI 的 Github
+上提的一个类似的问题: <a href="https://github.com/spring-projects/spring-ai/issues/3438">issues/3438</a>，
+不过这个问题并没有被解决。所以，我只好委屈下自己亲自去调查了！</p>
+<p>打开多年没碰过的有线鲨鱼（wireshark），开启监听。然后分别在 Bruno 和 Spring AI 上各调了一次这个接口后，
+关闭有线鲨鱼的监听，去过滤器里找到对应的 HTTP 请求记录。逐行对比两个请求的区别后，发现 Spring AI
+发起的请求有尝试把 HTTP 1.1 升级为 HTTP 2 的相关请求头，如下图所示。于是猜测是不是和这哦相关。</p>
+<p><img src="/assets/img/blogs/h2c.jpg" alt="相关截图"/></p>
+<blockquote>
+<p>从图中可以看到，Spring RestClient 使用了 Java HttpClient API 作为后端。</p>
+</blockquote>
+<p>我把 <code>Upgrade: h2c</code> 头加到 Bruno 的请求头里之后，问题就复现了，现在请求稳定返回 400，错误内容如下：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>Invalid HTTP request received.</span></span></code></pre>
+<p>既然知道了问题来源，就可以去尝试修正问题了。</p>
+<h2 id="修正问题">修正问题</h2>
+<p>首先肯定是不太容易去碰 vllm 部署的 AI 服务，那我就勉为其难在自己的代码里指定必须用 HTTP 1.1 吧：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Bean</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#E5C07B"> ChatClient</span><span style="color:#61AFEF"> myChatClient</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">RestClient</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">Builder</span><span style="color:#E06C75"> defaultRestClientBuilder</span><span style="color:#ABB2BF">,</span></span>
+<span class="line"><span style="color:#E5C07B">                               WebClient</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">Builder</span><span style="color:#E06C75"> defaultWebClientBuilder) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    var</span><span style="color:#E06C75"> httpClient </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> HttpClient</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">newBuilder</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">version</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">HttpClient</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">Version</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">HTTP_1_1</span><span style="color:#ABB2BF">)</span><span style="color:#7F848E;font-style:italic"> // 这指定用 HTTP 1.1</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">connectTimeout</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">Duration</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">ofSeconds</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">5</span><span style="color:#ABB2BF">))</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">build</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    var</span><span style="color:#E06C75"> restClientBuilder </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> defaultRestClientBuilder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">clone</span><span style="color:#ABB2BF">()</span><span style="color:#7F848E;font-style:italic"> // 复制一份</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">requestFactory</span><span style="color:#ABB2BF">(</span><span style="color:#C678DD">new</span><span style="color:#61AFEF"> JdkClientHttpRequestFactory</span><span style="color:#ABB2BF">(httpClient));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    var</span><span style="color:#E06C75"> webClientBuilder </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> defaultWebClientBuilder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">clone</span><span style="color:#ABB2BF">()</span><span style="color:#7F848E;font-style:italic"> // 复制一份</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">clientConnector</span><span style="color:#ABB2BF">(</span><span style="color:#C678DD">new</span><span style="color:#61AFEF"> JdkClientHttpConnector</span><span style="color:#ABB2BF">(httpClient));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">    OpenAiChatProperties</span><span style="color:#E06C75"> conf </span><span style="color:#56B6C2">=</span><span style="color:#61AFEF"> getAiConfig</span><span style="color:#E06C75">()</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">    var</span><span style="color:#E06C75"> api </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> OpenAiApi</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">builder</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">apiKey</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">conf</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getApiKey</span><span style="color:#ABB2BF">())</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">baseUrl</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">conf</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getBaseUrl</span><span style="color:#ABB2BF">())</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">restClientBuilder</span><span style="color:#ABB2BF">(restClientBuilder)</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">webClientBuilder</span><span style="color:#ABB2BF">(webClientBuilder)</span><span style="color:#7F848E;font-style:italic"> // 流式输出用这个</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">build</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 后面 ChatClient 的构造过程省略</span></span>
+<span class="line"><span style="color:#E06C75">}</span></span></code></pre>
+<p>至此，问题解决。</p>
+<h2 id="后续">后续</h2>
+<p>虽然问题找到了，但是这里还有很多问题没有解释：</p>
+<ol>
+<li>新项目使用的是 Spring Boot 3.5.3，老项目使用的是 Spring Boot 3.5.0。两个项目都是使用的 Spring AI 1.0.0，JDK 均为 21。
+这里到底发生了什么变更导致同样的代码在新项目中无法正常工作？</li>
+<li>从响应头可以看到，内部模型使用的服务器似乎是 uvicorn，不清楚是 uvicorn 不太支持 h2c，还是模型使用的 uvicorn
+版本不支持 h2c，还是别的原因。</li>
+<li>JDK 自己的 HttpClient 什么情况下回尝试对 HTTP 1.1 的协议进行升级？</li>
+</ol>
+<p>因为没有权限去部署模型的服务器上做进一步调查，所以作罢。（好吧，主要是想早点下班，问题解决了就别难为自己了）</p>
+<h2 id="吐槽">吐槽</h2>
+<p>这个过程中，我尝试了 Openai 官方提供的 Java SDK，嗯……这里得到的经验就是，如果你不使用 Kotlin
+的话，就不要使用这个 SDK，因为用 Java 调用 Kotlin 的方法，太只因吧啰嗦了。</p>
+<p>Spring Boot 中配置想对 Rest Client 做配置太麻烦了，包了一层又一层，自动配置代码也是散落得到处都是……</p>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#背景">背景</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#尝试找问题">尝试找问题</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#修正问题">修正问题</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#后续">后续</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#吐槽">吐槽</a> </li> </ol>  </div> </div> </div> </div> </body></html>

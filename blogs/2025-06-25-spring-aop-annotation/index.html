@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-06-25-spring-aop-annotation"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spring AOP @annotation</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">Spring AOP @annotation</h1> <div class="text-sm text-gray-500">2025-06-25</div>   <p>事情是这样的。</p>
+<h2 id="背景">背景</h2>
+<p>今天我为 Controller 中的 HTTP handler 写了两个切面，如下：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Aspect</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Component</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Order</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">AspectOrders</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">REQUIRED_PERMS_ASPECT_ORDER</span><span style="color:#E06C75">) </span><span style="color:#7F848E;font-style:italic">// 1002</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> RequiredPermsAspect</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Before</span><span style="color:#E06C75">(</span><span style="color:#98C379">&quot;@annotation(requiredPerms)&quot;</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">SneakyThrows</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> checkPermission</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">RequiredPerms</span><span style="color:#E06C75;font-style:italic"> requiredPerms</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        // 忽略具体实现</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Aspect</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Component</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Order</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">AspectOrders</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">LOG_ACTION_ASPECT_ORDER</span><span style="color:#E06C75">) </span><span style="color:#7F848E;font-style:italic">// 1001</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> LogActionAspect</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Around</span><span style="color:#E06C75">(</span><span style="color:#98C379">&quot;@annotation(logAction)&quot;</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">SneakyThrows</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#E5C07B"> Object</span><span style="color:#61AFEF"> logAction</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">ProceedingJoinPoint</span><span style="color:#E06C75;font-style:italic"> joinPoint</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">LogAction</span><span style="color:#E06C75;font-style:italic"> anno</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        // 省略具体实现</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>如果一个 handler 方法上如果同时注解有 <code>@RequiredPerms</code> 和 <code>@LogAction</code>，那么按照预期，
+<code>@LogAction</code> 的切面会先执行，然后 <code>@RequiredPerms</code> 的切面才会执行。</p>
+<p>可是！实际运行时，<code>checkPermission</code> 确实执行了，<code>logAction</code> 却未执行！见了鬼了。怎么办呢？</p>
+<h2 id="解决-logaction-的执行问题">解决 <code>logAction</code> 的执行问题</h2>
+<p>我看反复看了代码，没看出来任何问题。</p>
+<p>本着我遇到的问题别人也会遇到的原则，我开始尝试找原因。
+先是问了各种强悍的人工智能助手，然后用搜索引擎去淘别人的经验，最后还查看了
+Spring 官方文档和 AspectJ 的相关文档。
+一无所获，半个下午就这么过去了。一看时间 6 点多了，先下班吧。</p>
+<p>回到家有空之后，我又重新对比了两段代码，猜测和 <code>logAction</code> 方法的参数名有关。
+于是，我把代码改成了下面这样，结果就正常了：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#7F848E;font-style:italic">//                       +-------------------------------------------+</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">//                       ↓                                           |</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Around</span><span style="color:#E06C75">(</span><span style="color:#98C379">&quot;@annotation(logAction)&quot;</span><span style="color:#E06C75">) </span><span style="color:#7F848E;font-style:italic">//                                 |</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">SneakyThrows</span><span style="color:#7F848E;font-style:italic">                     //                                 ↓</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#E5C07B"> Object</span><span style="color:#61AFEF"> logAction</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">ProceedingJoinPoint</span><span style="color:#E06C75"> joinPoint</span><span style="color:#ABB2BF">,</span><span style="color:#E5C07B"> LogAction</span><span style="color:#E06C75"> logAction) {</span></span></code></pre>
+<p>就是把参数名改成和 <code>@annotation</code> 的参数一样。</p>
+<p>就这。</p>
+<h2 id="这个东西该怎么理解">这个东西该怎么理解？</h2>
+<p>其实在 Spring 框架的文档中是记载有这种用法的，下面是官方文档中提供的一个例子：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Before</span><span style="color:#E06C75">(</span><span style="color:#98C379">&quot;com.xyz.Pointcuts.publicMethod() &amp;&amp; @annotation(auditable)&quot;</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> audit</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">Auditable</span><span style="color:#E06C75"> auditable) {</span></span>
+<span class="line"><span style="color:#E5C07B">	AuditCode</span><span style="color:#E06C75"> code </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> auditable</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">value</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">	// ...</span></span>
+<span class="line"><span style="color:#E06C75">}</span></span></code></pre>
+<p>但是文档中对 <code>@annotation</code> 参数的用法没有详细说明，只是举例子。既然这东西是 AspectJ
+声明切面的语法，那么 AspectJ 官方文档中总该有对此的详细说明吧？可是 AspectJ
+这老（牌的）东西官方文档居然一团糟，没有找到相关说明。既然如此，那社区里应该有人对
+<code>@annotation</code> 的用法有很深的了解，并输出文章了吧？很遗憾，也没有。
+社区里的文章对此描述也很含糊，好像这是理所当然一样。</p>
+<p>搞不清楚就先别费神了。就酱吧先，改天再调查。</p>
+<h2 id="其他写法">其他写法</h2>
+<p>Spring 官方文档中，有 <code>@annotation</code> 参数是注解全限定名的用法。
+不过对于这种用法，我们就得自己手动写代码来解析注解了。比如：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Around</span><span style="color:#E06C75">(</span><span style="color:#98C379">&quot;@annotation(com.xxx.aop.LogAction)&quot;</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">SneakyThrows</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#E5C07B"> Object</span><span style="color:#61AFEF"> logAction</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">ProceedingJoinPoint</span><span style="color:#E06C75"> joinPoint) {</span></span>
+<span class="line"><span style="color:#C678DD">    if</span><span style="color:#E06C75"> (joinPoint </span><span style="color:#C678DD">instanceof</span><span style="color:#E5C07B"> MethodInvocationProceedingJoinPoint</span><span style="color:#E06C75"> methodInvocationJoinPoint) {</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> signature </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> methodInvocationJoinPoint</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getSignature</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#E06C75"> (signature </span><span style="color:#C678DD">instanceof</span><span style="color:#E5C07B"> MethodSignature</span><span style="color:#E06C75"> methodSignature) {</span></span>
+<span class="line"><span style="color:#C678DD">            var</span><span style="color:#E06C75"> method </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> methodSignature</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMethod</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">            var</span><span style="color:#E06C75"> logAction </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> method</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getAnnotation</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">LogAction</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">class</span><span style="color:#ABB2BF">);</span><span style="color:#7F848E;font-style:italic"> // 终于搞到手了</span></span>
+<span class="line"><span style="color:#E06C75">        }</span></span>
+<span class="line"><span style="color:#E06C75">    }</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // 其他内容省略</span></span>
+<span class="line"><span style="color:#E06C75">}</span></span></code></pre>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#背景">背景</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#解决-logaction-的执行问题">解决 logAction 的执行问题</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#这个东西该怎么理解">这个东西该怎么理解？</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#其他写法">其他写法</a> </li> </ol>  </div> </div> </div> </div> </body></html>

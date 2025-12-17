@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-06-12-streaming-rendering"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>流式渲染</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">流式渲染</h1> <div class="text-sm text-gray-500">2025-06-12</div>   <h2 id="背景">背景</h2>
+<p>事情是这样的：我有一个需求，是使用 AI 为客户制定旅行计划。</p>
+<p>这个功能的输入是用户的一段话。比如：</p>
+<blockquote>
+<p>我有7天时间，想从山东德州去北京旅行。请帮我安排一个出行计划</p>
+</blockquote>
+<p>输出是一个有漂亮格式的列表。就像下面这样：</p>
+<style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="r0EpB" component-url="/_astro/ExamplePlan.BCd0N7R9.js" component-export="default" renderer-url="/_astro/client.Fq_1qYMf.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;ExamplePlan&quot;,&quot;value&quot;:true}"></astro-island>
+<p>传统的方式是，输出一个 JSON，然后把整个 JSON 用组件渲染出来。
+如果 AI 思考过程较长，用户可能要对着屏幕上的旋转菊花相当长的时间，体验不够好。
+最好能做成流式的，一边输出，一边渲染。</p>
+<p>如果我们用流式输出的话，在把所有 token 输出给前端之前，前端用得到的 token join 出来的 JSON
+是不闭合的，或者说不合法的。前端解析这种缺屁股的不合法 JSON 十分麻烦。</p>
+<p>这时需要一种输出一部分就可以解析的数据格式。我们把目光投降了 YAML。</p>
+<h2 id="yaml">YAML</h2>
+<p>如果流式输出 YAML 的话，也会存在无法解析的问题。
+但是大部分情况下，输出的 YAML 是可以解析的。不会出现 JSON 那种不接受全部 token 就完全无法解析的情况。
+前端接受到 token 之后，把它们 join 成 YAML 字符串，并对此字符串进行解析。</p>
+<ul>
+<li>如果解析成功，就立刻渲染</li>
+<li>如果解析失败，就等待下一个 token，来了之后再尝试解析。等待的这段时间内，我们渲染之前成功解析的部分</li>
+</ul>
+<p>这样就好了。我们开干。</p>
+<h2 id="流式渲染旅行计划">流式渲染旅行计划</h2>
+<p>具体过程已经说清楚了，点击下面的按钮观看演示效果吧：</p>
+<astro-island uid="Z2fhQ7u" component-url="/_astro/StreamingPlan.BbG7mKzB.js" component-export="default" renderer-url="/_astro/client.Fq_1qYMf.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;StreamingPlan&quot;,&quot;value&quot;:true}"></astro-island>
+<p>可以看到，演示效果还不错。</p>
+<h2 id="存在的问题">存在的问题</h2>
+<p>不过，这种方案依然存在一些难搞的问题：</p>
+<ol>
+<li>现在的大模型都针对输出 JSON 的场景做过优化，但是没有对输出 YAML 的场景做优化。
+输出 YAML 时，可能会出现格式错误。
+输出有嵌套层级的 YAML 和带有数组的 YAML 时，出现格式错误的概率会更高。</li>
+<li>YAML 标准复杂，解析 YAML 需要引入一个体积较大的库。
+如果你在微信小程序这种限制应用包体大小的环境中工作，要慎重考虑项目体积的问题。
+<blockquote>
+<p>上面的示例中，解析 YAML 的库是我手搓的，对于本示例来说，够用了 😂</p>
+</blockquote>
+</li>
+<li>YAML 输出一半时，有可能出现这种情况：能够解析成功，但是格式不符合要求。比如:
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#ABB2BF">- </span><span style="color:#98C379">name</span></span></code></pre>
+会被解析成一个字符串数组。新 token 加入后，yaml 可能变成这样:
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="yaml"><code><span class="line"><span style="color:#ABB2BF">- </span><span style="color:#E06C75">name</span><span style="color:#ABB2BF">: </span><span style="color:#98C379">刻晴</span></span></code></pre>
+这次又变成了对象数组。对于这种情况，要想办法处理。</li>
+</ol>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#背景">背景</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#yaml">YAML</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#流式渲染旅行计划">流式渲染旅行计划</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#存在的问题">存在的问题</a> </li> </ol>  </div> </div> </div> </div> </body></html>

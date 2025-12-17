@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-11-24-gen-icons"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>为 Tauri 应用生成图标</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">为 Tauri 应用生成图标</h1> <div class="text-sm text-gray-500">2025-11-24</div>   <h2 id="背景">背景</h2>
+<p>最近在使用 Tauri 手搓简单桌面应用，需要自定义应用图标。咱也不会设计，就用千问帮忙生成了一张 1024x1024 的 PNG 图标。
+下面的工作，就是把这张 PNG 图标转换成各种平台需要的图标格式和尺寸了。</p>
+<p>为此，依靠 AI，我编写了以下脚本：</p>
+<h2 id="png-转图标脚本">PNG 转图标脚本</h2>
+<p><code>gen-icons.sh</code> 内容如下：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#7F848E;font-style:italic">#!/bin/bash</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E06C75">PNG</span><span style="color:#56B6C2">=</span><span style="color:#E06C75;font-style:italic">$1</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">mkdir</span><span style="color:#D19A66"> -p</span><span style="color:#98C379"> target</span></span>
+<span class="line"><span style="color:#61AFEF">rm</span><span style="color:#D19A66"> -f</span><span style="color:#98C379"> target/</span><span style="color:#E5C07B">*</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 32x32</span><span style="color:#98C379">   target/32x32.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 128x128</span><span style="color:#98C379"> target/128x128.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 256x256</span><span style="color:#98C379"> target/128x128@2x.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 512x512</span><span style="color:#98C379"> target/icon.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 30x30</span><span style="color:#98C379">   target/Square30x30Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 44x44</span><span style="color:#98C379">   target/Square44x44Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 71x71</span><span style="color:#98C379">   target/Square71x71Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 89x89</span><span style="color:#98C379">   target/Square89x89Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 107x107</span><span style="color:#98C379"> target/Square107x107Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 142x142</span><span style="color:#98C379"> target/Square142x142Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 150x150</span><span style="color:#98C379"> target/Square150x150Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 284x284</span><span style="color:#98C379"> target/Square284x284Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 310x310</span><span style="color:#98C379"> target/Square310x310Logo.png</span></span>
+<span class="line"><span style="color:#61AFEF">convert</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 50x50</span><span style="color:#98C379">   target/StoreLogo.png</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 1. 先做成一张“无半透明”的 PNG</span></span>
+<span class="line"><span style="color:#61AFEF">magick</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> -alpha</span><span style="color:#98C379"> set</span><span style="color:#D19A66"> -background</span><span style="color:#98C379"> none</span><span style="color:#D19A66"> -resize</span><span style="color:#98C379"> 256x256^</span><span style="color:#D19A66"> -extent</span><span style="color:#98C379"> 256x256</span><span style="color:#D19A66"> -channel</span><span style="color:#98C379"> A</span><span style="color:#D19A66"> -threshold</span><span style="color:#98C379"> 50%</span><span style="color:#98C379"> +channel</span><span style="color:#98C379"> 256_noalpha.png</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 2. 再由这张“无半透明”的 PNG 生成 ICO</span></span>
+<span class="line"><span style="color:#61AFEF">magick</span><span style="color:#98C379"> 256_noalpha.png</span><span style="color:#98C379"> target/icon.ico</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#61AFEF">rm</span><span style="color:#98C379"> 256_noalpha.png</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 1. 建临时目录</span></span>
+<span class="line"><span style="color:#61AFEF">mkdir</span><span style="color:#D19A66"> -p</span><span style="color:#98C379"> o2.iconset</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 2. 一次性导出 10 个带 Alpha 的 png（macOS 官方尺寸）</span></span>
+<span class="line"><span style="color:#C678DD">for</span><span style="color:#E06C75"> sz</span><span style="color:#C678DD"> in</span><span style="color:#98C379"> 16</span><span style="color:#98C379"> 32</span><span style="color:#98C379"> 64</span><span style="color:#98C379"> 128</span><span style="color:#98C379"> 256</span><span style="color:#98C379"> 512</span><span style="color:#ABB2BF">; </span><span style="color:#C678DD">do</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    # 1× 图标</span></span>
+<span class="line"><span style="color:#61AFEF">    sips</span><span style="color:#D19A66"> -z</span><span style="color:#E06C75"> $sz</span><span style="color:#E06C75"> $sz</span><span style="color:#E06C75"> $PNG</span><span style="color:#D19A66"> --out</span><span style="color:#98C379"> o2.iconset/icon_</span><span style="color:#ABB2BF">${</span><span style="color:#E06C75">sz</span><span style="color:#ABB2BF">}</span><span style="color:#98C379">x</span><span style="color:#ABB2BF">${</span><span style="color:#E06C75">sz</span><span style="color:#ABB2BF">}</span><span style="color:#98C379">.png</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    # 2× 视网膜版本</span></span>
+<span class="line"><span style="color:#61AFEF">    sips</span><span style="color:#D19A66"> -z</span><span style="color:#ABB2BF"> $((</span><span style="color:#61AFEF">sz*2</span><span style="color:#ABB2BF">)) $((</span><span style="color:#61AFEF">sz*2</span><span style="color:#ABB2BF">)) </span><span style="color:#E06C75">$PNG</span><span style="color:#D19A66"> --out</span><span style="color:#98C379"> o2.iconset/icon_</span><span style="color:#ABB2BF">${</span><span style="color:#E06C75">sz</span><span style="color:#ABB2BF">}</span><span style="color:#98C379">x</span><span style="color:#ABB2BF">${</span><span style="color:#E06C75">sz</span><span style="color:#ABB2BF">}</span><span style="color:#98C379">@2x.png</span></span>
+<span class="line"><span style="color:#C678DD">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 3. 打包成 icns</span></span>
+<span class="line"><span style="color:#61AFEF">iconutil</span><span style="color:#D19A66"> -c</span><span style="color:#98C379"> icns</span><span style="color:#98C379"> o2.iconset</span><span style="color:#D19A66"> -o</span><span style="color:#98C379"> target/icon.icns</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic"># 4. 清理</span></span>
+<span class="line"><span style="color:#61AFEF">rm</span><span style="color:#D19A66"> -rf</span><span style="color:#98C379"> o2.iconset</span></span></code></pre>
+<h2 id="使用">使用</h2>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">./gen-icons.sh</span><span style="color:#98C379"> path/to/your/icon.png</span></span></code></pre>
+<h2 id="注意事项">注意事项</h2>
+<p>生成 .icns 文件使用了 <code>iconutil</code> 命令，这个命令仅在 macOS 上可用。</p>
+<p>如果你需要在其他操作系统上生成 .icns 文件，请使用其他命令行工具。具体请资讯 AI。</p>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#背景">背景</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#png-转图标脚本">PNG 转图标脚本</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#使用">使用</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#注意事项">注意事项</a> </li> </ol>  </div> </div> </div> </div> </body></html>

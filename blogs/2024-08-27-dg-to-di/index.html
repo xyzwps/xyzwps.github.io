@@ -1,0 +1,138 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2024-08-27-dg-to-di"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>从有向图到依赖注入</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">从有向图到依赖注入</h1> <div class="text-sm text-gray-500">2024-08-27</div>   <p>本文在讨论<strong>依赖注入</strong>（<em>dependency inject</em>，<strong>DI</strong>）时，只关心实现。</p>
+<h2 id="依赖">依赖</h2>
+<p>举个例子：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> a </span><span style="color:#56B6C2">=</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> A</span><span style="color:#E06C75">()</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> b </span><span style="color:#56B6C2">=</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> B</span><span style="color:#E06C75">(a)</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> c </span><span style="color:#56B6C2">=</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> C</span><span style="color:#E06C75">(b)</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E5C07B">c</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setA</span><span style="color:#ABB2BF">(a);</span></span></code></pre>
+<p>此例中，</p>
+<ul>
+<li>对象 <code>a</code> 不<strong>依赖</strong>其他对象；</li>
+<li>对象 <code>b</code> 在初始化时，需要从构造器中传入一个 <code>A</code> 类型对象，这里传入的是 <code>a</code>，我们就说 <code>b</code> <strong>依赖</strong> <code>a</code>；</li>
+<li>对象 <code>c</code> 在初始化时，需要从构造器传入一个 <code>B</code> 类型对象，这里传入的是 <code>b</code>，还需要通过 set 方法传入一个 <code>A</code> 类型对象，这里传入的是 <code>a</code>，我们就说 <code>c</code> <strong>依赖</strong> <code>a</code> 和 <code>b</code>。</li>
+</ul>
+<p>我们可以用<strong>有向图</strong>来表达这种依赖关系：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>   ╭--&gt; b</span></span>
+<span class="line"><span>c ╴┤    ↓</span></span>
+<span class="line"><span>   ╰--&gt; a</span></span></code></pre>
+<p>我们甚至可以用 xml 来表示这个依赖关系：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="xml"><code><span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">bean</span><span style="color:#D19A66"> id</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;a&quot;</span><span style="color:#D19A66"> class</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;A&quot;</span><span style="color:#ABB2BF">/&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">bean</span><span style="color:#D19A66"> id</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;b&quot;</span><span style="color:#D19A66"> class</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;B&quot;</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E06C75">constructor-arg</span><span style="color:#D19A66"> ref</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;a&quot;</span><span style="color:#ABB2BF">/&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/</span><span style="color:#E06C75">bean</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;</span><span style="color:#E06C75">bean</span><span style="color:#D19A66"> id</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;c&quot;</span><span style="color:#D19A66"> class</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;C&quot;</span><span style="color:#ABB2BF">&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E06C75">constructor-arg</span><span style="color:#D19A66"> ref</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;b&quot;</span><span style="color:#ABB2BF">/&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E06C75">property</span><span style="color:#D19A66"> name</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;a&quot;</span><span style="color:#D19A66"> ref</span><span style="color:#ABB2BF">=</span><span style="color:#98C379">&quot;a&quot;</span><span style="color:#ABB2BF">/&gt;</span></span>
+<span class="line"><span style="color:#ABB2BF">&lt;/</span><span style="color:#E06C75">bean</span><span style="color:#ABB2BF">&gt;</span></span></code></pre>
+<p>Spring 框架当年就是用这种 xml 文件来表达对象之间的依赖关系的。现在大家更喜欢用 java 代码来配置 bean：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Bean</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#E5C07B"> A</span><span style="color:#61AFEF"> a</span><span style="color:#E06C75">() { </span><span style="color:#C678DD">return</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> A</span><span style="color:#E06C75">()</span><span style="color:#ABB2BF">;</span><span style="color:#E06C75"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Bean</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#E5C07B"> B</span><span style="color:#61AFEF"> b</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">A</span><span style="color:#E06C75"> a) { </span><span style="color:#C678DD">return</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> B</span><span style="color:#E06C75">(a)</span><span style="color:#ABB2BF">;</span><span style="color:#E06C75"> }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Bean</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#E5C07B"> C</span><span style="color:#61AFEF"> c</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">A</span><span style="color:#E06C75"> a</span><span style="color:#ABB2BF">,</span><span style="color:#E5C07B"> B</span><span style="color:#E06C75"> b) {</span></span>
+<span class="line"><span style="color:#C678DD">    var</span><span style="color:#E06C75"> c </span><span style="color:#56B6C2">=</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> C</span><span style="color:#E06C75">(b)</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E5C07B">    c</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setA</span><span style="color:#ABB2BF">(a);</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#E06C75"> c</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">}</span></span></code></pre>
+<p>无论是哪种方式并没有本质区别：这些形式都是描述对象之间依赖关系的元数据。整个依赖关系构成一个有向图，每个对象都是有向图的一个顶点，
+每个依赖关系都是有向图的一条边。</p>
+<p>我们可以写一个工具解析这些元数据，来自动初始化这些类实例，而我们需要做的就是编写这些元数据。
+这个工具我们暂且把它叫做</p>
+<h2 id="beanfactory"><code>BeanFactory</code></h2>
+<p>它长这样：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">interface</span><span style="color:#E5C07B"> BeanFactory</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt;</span><span style="color:#E5C07B"> T</span><span style="color:#61AFEF"> getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">String</span><span style="color:#E06C75;font-style:italic"> id</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>因为元数据是有向图，所以初始化对象的过程就是对有向图的遍历。它的一个实现可以是这样的：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">class</span><span style="color:#E5C07B"> VerySimpleBeanFactory</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> BeanFactory</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Cache</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#ABB2BF"> &lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt;</span><span style="color:#E5C07B"> T</span><span style="color:#61AFEF"> getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">String</span><span style="color:#E06C75;font-style:italic"> id</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> beanMetaInfo</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> allMetaInfo</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getById</span><span style="color:#ABB2BF">(id);</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (beanMetaInfo </span><span style="color:#56B6C2">==</span><span style="color:#D19A66"> null</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">            throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> IllegalStateException</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> dependencies</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> allMetaInfo</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getDependenciesMetaInfo</span><span style="color:#ABB2BF">(beanMetaInfo).</span><span style="color:#61AFEF">stream</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">map</span><span style="color:#ABB2BF">(it </span><span style="color:#C678DD">-&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">it</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">id</span><span style="color:#ABB2BF">))</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">toList</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">        return</span><span style="color:#E5C07B"> beanMetaInfo</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createInstance</span><span style="color:#ABB2BF">(dependencies);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h2 id="循环依赖">循环依赖</h2>
+<p><code>VerySimpleBeanFactory</code> 的 <code>getBean</code> 方法是递归的。所以在这段代码中，一旦出现循环依赖，就会 stack overflow······</p>
+<p>对于循环依赖问题，我们可以对 <code>allMetaInfo</code> 中的元数据进行<strong>拓扑排序</strong>来确定是否有循环依赖，如果发现循环依赖，就抛出异常，并打印循环依赖信息（有向图中的环）。
+我们也可以通过深度优先遍历的方式来判断是否有环：把已经访问过的顶点做标记，在访问“新”定点时，判断它是否已经被访问过，如果是的话，就说明有循环依赖。</p>
+<p>循环依赖并不是不可解的。比如，对于 set 注入方式产生的依赖，可以先把构造器注入产生的依赖关系构建好之后，再集中处理 set 依赖。
+对于构造器注入产生的依赖关系，则没有好的办法处理。</p>
+<h2 id="按类型注入">按类型注入</h2>
+<p>在 spring 框架中，有两种自动装配方式。一种是按名称，一种是按类型。上面 <code>BeanFactory</code> 的 <code>getBean</code> 就是按名称装配的 api，
+我们已经为其提供了一个实现。要提供按类型注入功能，只需要把 <code>BeanFactory</code> 改一下即可：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">interface</span><span style="color:#E5C07B"> BeanFactory</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt;</span><span style="color:#E5C07B"> T</span><span style="color:#61AFEF"> getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">String</span><span style="color:#E06C75;font-style:italic"> id</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">    &lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt;</span><span style="color:#E5C07B"> T</span><span style="color:#61AFEF"> getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">Class</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt; </span><span style="color:#E06C75;font-style:italic">type</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>我们可以脑补一个实现：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">class</span><span style="color:#E5C07B"> VerySimpleBeanFactory</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> BeanFactory</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Cache</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#ABB2BF"> &lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt;</span><span style="color:#E5C07B"> T</span><span style="color:#61AFEF"> getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">Class</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">T</span><span style="color:#ABB2BF">&gt; </span><span style="color:#E06C75;font-style:italic">type</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> beanMetaInfo</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> allMetaInfo</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getByType</span><span style="color:#ABB2BF">(type)</span></span>
+<span class="line"><span style="color:#ABB2BF">                                      .</span><span style="color:#61AFEF">findTheBestMatch</span><span style="color:#ABB2BF">(someRules);</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (beanMetaInfo </span><span style="color:#56B6C2">==</span><span style="color:#D19A66"> null</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">            throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> IllegalStateException</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> dependencies</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> allMetaInfo</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getDependenciesMetaInfo</span><span style="color:#ABB2BF">(beanMetaInfo).</span><span style="color:#61AFEF">stream</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">map</span><span style="color:#ABB2BF">(it </span><span style="color:#C678DD">-&gt;</span><span style="color:#C678DD"> switch</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">it</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">injectType</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">                case</span><span style="color:#ABB2BF"> BY_NAME </span><span style="color:#C678DD">-&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">it</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">id</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">                case</span><span style="color:#ABB2BF"> BY_TYPE </span><span style="color:#C678DD">-&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">it</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">type</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">            })</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">toList</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">        return</span><span style="color:#E5C07B"> beanMetaInfo</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createInstance</span><span style="color:#ABB2BF">(dependencies);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>到此为止，我们基本上可以</p>
+<h2 id="手搓一个简陋的-di-库">手搓一个简陋的 DI 库</h2>
+<p>了。整个 DI 库的逻辑实际上就两个步骤：</p>
+<ol>
+<li>收集依赖关系元数据</li>
+<li>实现 <code>BeanFactory</code> 接口</li>
+</ol>
+<p>收集依赖关系元数据，在 Java 中一般有几种方式：</p>
+<ol>
+<li>在运行时收集
+<ol>
+<li>手动编写元数据文件。早期 spring 框架就是这么干的，美其名曰“非入侵”。</li>
+<li>在运行时扫描类文件来获取元数据。现在 spring 框架是这么做的</li>
+</ol>
+</li>
+<li>在编译时收集。通过 Java 的 annotation processing API 从源代码来获取元数据</li>
+</ol>
+<p>对应的 <code>BeanFactory</code> 实现也大致分为两个流派：</p>
+<ol>
+<li>运行时依赖注入：运行时通过反射、代理等方式创建对象</li>
+<li>编译时依赖注入：直接生成创建对象的代码······</li>
+</ol>
+<p>显而易见，运行时 DI 会在启动时消耗一些时间来扫描元数据。</p>
+<h2 id="一些-di-库">一些 DI 库</h2>
+<p>编译时依赖注入的库，我尝试过的有俩：</p>
+<ul>
+<li><a href="https://github.com/google/dagger">Google Dagger</a>：其注解语义需要适应一下。</li>
+<li><a href="https://avaje.io/inject/">Avaje DI</a>：它使用的注解基本保持了 Jakarta EE 注解的语义，没有学习门槛。</li>
+</ul>
+<p>Google 还搞了个<a href="https://github.com/google/guice">guice</a>库，是为运行时依赖注入框架。</p>
+<p>对于 web 框架，Spring Boot 和 Quarkus 选择了运行时注入，Micronaut 则是编译时注入。</p>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#依赖">依赖</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#beanfactory">BeanFactory</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#循环依赖">循环依赖</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#按类型注入">按类型注入</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#手搓一个简陋的-di-库">手搓一个简陋的 DI 库</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#一些-di-库">一些 DI 库</a> </li> </ol>  </div> </div> </div> </div> </body></html>

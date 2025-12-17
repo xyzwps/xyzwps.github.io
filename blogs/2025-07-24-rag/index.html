@@ -1,0 +1,105 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-07-24-rag"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>记录最近一次做简单 RAG 流程的感受</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">记录最近一次做简单 RAG 流程的感受</h1> <div class="text-sm text-gray-500">2025-07-24</div>   <p>嗯，事情是这样的。前段时间做了一个简单的 RAG 流程。今天看到有人在知乎回复我的吐槽，这才想起来，我都快把这里的细节都忘掉了。赶紧记录下，待查。</p>
+<h2 id="需求">需求</h2>
+<p>我们的需求比较简单，就是</p>
+<blockquote>
+<p>根据场景描述，找出与这个场景匹配的法律条款、行业标准规范条文等。要求：</p>
+<ol>
+<li>要准</li>
+<li>能搞到条款原文</li>
+</ol>
+</blockquote>
+<h2 id="思路">思路</h2>
+<p>大体的思路是这样的:</p>
+<ol>
+<li>把条款原文拆分后放到数据库中待查</li>
+<li>根据场景描述构建查询</li>
+<li>按构建好的查询，从数据库中找条款原文。这一步只能找到相关性最高的前 n 条。</li>
+<li>把找到的原文和查询结果，发给大语言模型，让模型找出匹配度最高的条款。</li>
+</ol>
+<p>这是一个典型的 RAG 流程。</p>
+<p>思路大体确定之后，就开始施工了。</p>
+<h2 id="施工">施工</h2>
+<h3 id="文件处理">文件处理</h3>
+<p>我们的数据是一堆文件，主要有 pdf、docx、html 几种，大部分是 pdf。这些文件质量不一，
+尤其是一些行业文件，因为没有官方来源，发布较早，而且还是扫描件，都特么包浆了，非常糊。
+有的文档有奇怪的水印，还是图片水印；有的文字类 pdf 中文复制下来一堆乱码……
+这些文件处理起来非常麻烦。社区里有很多工具可以处理这些文件。</p>
+<p>试了 docling，这个东西在我的笔记本上跑得非常慢，中文支持配置复杂。期间找了其他基于
+AI 的 pdf 转文本工具，都不好用。还参考了一些开源 Agent 项目自带的 pdf 转文本工具的代码，
+效果都一言难尽。</p>
+<p>我还试了 kimi 的 pdf 转文本工具，速度很快，效果也不错；但是 kimi 的 api
+有文档数量限制，而且也不是对所有文档都有很好的效果。</p>
+<p>考虑到我们的文档数量有限，未来不会频繁增加新文档，我还试了 wps。Wps 转 pdf
+的工具效果居然相当好，所有 pdf 成功被转成 docx 文件。看来，专业的事情还是得专业的人做。</p>
+<p>之后就是把 docx 转成 markdown 文件了。一个 pandoc 命令就搞定。</p>
+<p>此时，已经有比较容易处理的文本了。这些文本有一些麻烦的问题，比如：章节编号非常奇怪；
+页眉页脚和正文混在一起；不正确的换行导致段落错误；不可打印符号到处都是；奇怪的书签；
+嵌套的表格……这些问题先用脚本配合正则表达式逐步替换，实在无法用脚本处理的就人工去修改格式了，
+人工处理也费劲，但是价值不大的文档部分，直接丢掉了。</p>
+<p>至此，我们就得到了一些有良好格式的、我们需要的条款文档。</p>
+<p>这个用工具把 pdf 转成粗文本，然后人工细调的办法，在我们的场景里是可以接受的，
+但是不适合开放场景。</p>
+<h3 id="文件切割">文件切割</h3>
+<p>因为大语言模型上下文长度有限，不可能把整个文档都塞进模型，所以我们需要把文档进行切割。</p>
+<p>最开始使用 langchain 自带的文本分割器，分割方法是 1000 字切成一块，相邻两块之间有一部分重复。
+实践下来，这种分隔方式确实有效果，在匹配精度上比较容易达到 80% 左右。但是往上提升匹配度，非常难。</p>
+<p>因为条款文本都是一条一条的，所以尝试了按段落切割的方式。再试之后，匹配准确度已经摸到 90% 的门槛了。</p>
+<p>一般来说，条款文件比较精炼，有些标题中提到的名词、场景等，会在正文里略去。我又在每个条款前，
+加上了二级标题。这时再进行测试，匹配准确度可以稳定在 90% 以上了。</p>
+<h3 id="数据入库">数据入库</h3>
+<p>文件分割后，要存入数据库，用数据库提供的算法进行匹配。</p>
+<p>大体而言，有两种选择：支持传统全文搜索的数据库和向量数据库。一般而言，在
+RAG 场景中，都是使用向量数据库做语义搜索，而非使用全文搜索引擎做关键词搜索。</p>
+<p>使用向量数据库的方式是，首先把文本用向量模型转成高维向量（即嵌入，embedding），然后把向量存进数据库。
+查询的时候，把问题或者要查询的文本也转成向量，然后使用向量模型进行相似度计算，返回最相似的向量。
+这里有一个嵌入模型选择的问题。这里选择不多，本着用新不用旧的原则，当时选择的千问 text embedding
+v3，得到 1024 维向量。</p>
+<p>得到向量后，需要把它们存入数据库。向量数据库的选择非常多，但是我司没有精力去运维向量数据库，找了一圈后，重点试了以下数据库：</p>
+<ul>
+<li>MySQL 9.0 引入了向量数据类型，但是只支持存储，只有特定版本支持向量计算。不考虑。</li>
+<li>我司内部有一个跑在 docker 上的 PostgreSQL 实例，但是没人有精力维护它，也不考虑。</li>
+<li>Redis 的向量计算在社区版本不支持，也不考虑。</li>
+<li>Milvus 是一个开源的向量数据库，可以使用 lite 版本直接把它嵌入到项目里。我在把它的数据库文件打包到项目后，
+在别的机器上运行总是有各种奇怪的问题。挣扎了一段时间后作罢。</li>
+<li>Chroma 是一个基于 sqlite 的向量数据库，它支持向量计算和全文搜索。</li>
+</ul>
+<p>我最后选择了 chroma，直接把数据文件放到代码仓库里。可以看到，因为我们数据量较小，人员少，所以性能不是我们考虑的重点，
+用起来是否给我们添麻烦（运维难度）才是考虑的重点。</p>
+<h3 id="构建查询">构建查询</h3>
+<p>切割好的文本被向量化再存入数据库后，需要把它们查出来，这时需要构造查询。使用向量数据库进行查询的关键在于，如何构造用于查询的文本。</p>
+<p>最开始我直接用 prompt 本身作为查询文本，把它向量化后，拿到数据库上进行匹配。这样的做法不是很理想。</p>
+<p>在知乎上偶然看到了一个方法：HyDE（Hypothetical Document Embeddings，假设文档嵌入）。
+这个方法的思路很直观：大语言模型已经有了相关知识，我们要利用它。
+首先，让 LLM 根据自己已有的知识，生成要找的条款。这一步骤，LLM
+会生成一个一眼真，但是大概率不存在的条款内容，这是假设文档。
+然后，拿着这个假设文档用语义搜索找真实条款。
+实践下来，这个方法可以大幅提升检索准确度，是从最开始的匹配准确度略微超过 50%，到 80%，再到最后的 90%+。</p>
+<p>我还在其他文章中看到了有结合向量检索和 bm25 进行关键词检索的方法。实践下来，感觉似乎有一丢丢提升，
+但是提升幅度并不明显。最后，我们线上的查询中，我把按关键词的全文搜索也放了进去，有一点总比没有强。</p>
+<p>这一步骤，我们取按语义匹配出来的前 10 条内容（和一些按关键词全文搜索出来的内容），扔给大模型，
+让大模型做最后的筛选。</p>
+<h3 id="ai-生成">AI 生成</h3>
+<p>找到相似的条款之后，直接它们贴到 prompt 中，让大模型按照提示生成选出最匹配的条款即可。</p>
+<p>这个步骤最简单，但也有一点值得说道，就是让大模型生成一些辅助内容，可以提升输出的准确度。
+比如，在我们的场景里，要求大语言模型在输出最匹配的条款时，给条款打分，并说出理由，
+比直接输出最匹配的条款的更准确。</p>
+<h2 id="总结">总结</h2>
+<p>可以看到，整个 RAG 过程中，最麻烦的是 R！不对，是 R 之前的数据准备！
+尤其是文档处理，非常麻烦。
+因为我们场景特殊，用人工手动处理文档细节这种办法才是可以接受的。
+如果是做开放场景下的通用工具，还是得尝试用工具来处理文档。</p>
+<p>即使是麻烦，也已经过去了，就这样吧。</p>
+<h2 id="没了">没了</h2>
+<p>真没了。</p>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#需求">需求</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#思路">思路</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#施工">施工</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#文件处理">文件处理</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#文件切割">文件切割</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#数据入库">数据入库</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#构建查询">构建查询</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#ai-生成">AI 生成</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#总结">总结</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#没了">没了</a> </li> </ol>  </div> </div> </div> </div> </body></html>

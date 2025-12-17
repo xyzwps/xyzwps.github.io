@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-09-24-minijar"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>把 Spring Boot 应用 jar 包的体积降低到原来的 1%!</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">把 Spring Boot 应用 jar 包的体积降低到原来的 1%!</h1> <div class="text-sm text-gray-500">2025-09-24</div>   <h2 id="是这样的">是这样的</h2>
+<p>我司有个 Spring Boot 应用的部署方式是这样的：</p>
+<ol>
+<li>应用打包成 jar 包，fat jar</li>
+<li>把 jar 包 scp 到应用服务器上</li>
+<li>应用服务器上执行 <code>java -jar app.jar</code> 启动应用</li>
+</ol>
+<p>因为应用依赖很多，打出来的 jar 包体积巨大，非常的 fat，有 243MB 之多。
+公司的网又比较慢，scp 这样的庞然大雾，非常耗时，每次上线光上传 jar
+包就要 2 分半，非常折磨人。</p>
+<h2 id="分析问题">分析问题</h2>
+<p>大体看了下，应用本身比较简单，加上依赖之后能有这么大体积真是匪夷所思。</p>
+<p>首先，我把打出来的 jar 包 unzip 一下，在 <code>BOOT-INF/lib</code> 目录下有 237 个 jar 包:</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">%</span><span style="color:#98C379"> ls</span><span style="color:#98C379"> BOOT-INF/lib</span><span style="color:#ABB2BF"> | </span><span style="color:#61AFEF">wc</span><span style="color:#D19A66"> -l</span></span>
+<span class="line"><span style="color:#61AFEF">237</span></span></code></pre>
+<p>然后看看依赖的最大的 jar 包有哪些：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">%</span><span style="color:#98C379"> ls</span><span style="color:#D19A66"> -lhS</span><span style="color:#98C379"> BOOT-INF/lib</span><span style="color:#ABB2BF"> | </span><span style="color:#61AFEF">head</span><span style="color:#D19A66"> -n</span><span style="color:#D19A66"> 5</span></span>
+<span class="line"><span style="color:#61AFEF">total</span><span style="color:#D19A66"> 493192</span></span>
+<span class="line"><span style="color:#61AFEF">-rw-r--r--@</span><span style="color:#D19A66"> 1</span><span style="color:#98C379"> xyzwps</span><span style="color:#98C379">  staff</span><span style="color:#98C379">   102M</span><span style="color:#98C379"> Dec</span><span style="color:#D19A66">  1</span><span style="color:#D19A66">  2023</span><span style="color:#98C379"> opencv-4.8.1-0.jar</span></span>
+<span class="line"><span style="color:#61AFEF">-rw-r--r--@</span><span style="color:#D19A66"> 1</span><span style="color:#98C379"> xyzwps</span><span style="color:#98C379">  staff</span><span style="color:#98C379">    13M</span><span style="color:#98C379"> May</span><span style="color:#D19A66"> 16</span><span style="color:#D19A66">  2020</span><span style="color:#98C379"> Happy-Captcha-1.0.1.jar</span></span>
+<span class="line"><span style="color:#61AFEF">-rw-r--r--@</span><span style="color:#D19A66"> 1</span><span style="color:#98C379"> xyzwps</span><span style="color:#98C379">  staff</span><span style="color:#98C379">   8.6M</span><span style="color:#98C379"> Jun</span><span style="color:#D19A66"> 16</span><span style="color:#98C379"> 12:10</span><span style="color:#98C379"> byte-buddy-1.17.6.jar</span></span>
+<span class="line"><span style="color:#61AFEF">-rw-r--r--@</span><span style="color:#D19A66"> 1</span><span style="color:#98C379"> xyzwps</span><span style="color:#98C379">  staff</span><span style="color:#98C379">   8.5M</span><span style="color:#98C379"> Jun</span><span style="color:#D19A66">  3</span><span style="color:#98C379"> 17:31</span><span style="color:#98C379"> bcprov-jdk18on-1.81.jar</span></span></code></pre>
+<p>可以看到 opencv 这个 jar 包占用了最大的体积，占了一小半。要是能把它去掉，应用的体积可以减小一小半左右。</p>
+<h2 id="解决问题">解决问题</h2>
+<p>处理这个问题的思路是这样的：</p>
+<blockquote>
+<p>应用的依赖不会经常升级，所以可以考虑提前把这些巨型一来提前放到应用服务器的 <code>CLASSPATH</code>
+下，日后升级只要升级变动的部分即可。</p>
+</blockquote>
+<p>最开始我的想法是在 pom.xml 中直接把依赖排除掉。操作了一下，发现有点复杂。于是，我去 Spring Boot
+官网看看有关打包的文档，看看有没有什么好的做法。</p>
+<p>很幸运，在 <a href="https://docs.spring.io/spring-boot/reference/packaging/efficient.html">Efficient Deployments</a>
+这一章，第一节就是关于如何解包 fat jar 包的，执行以下命令就可以解包了：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#61AFEF">%</span><span style="color:#98C379"> java</span><span style="color:#D19A66"> -Djarmode=tools</span><span style="color:#D19A66"> -jar</span><span style="color:#98C379"> my-app.jar</span><span style="color:#98C379"> extract</span></span></code></pre>
+<p>执行完以上命令后，可以得到这样的目录结构：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="plaintext"><code><span class="line"><span>my-app</span></span>
+<span class="line"><span>├── lib</span></span>
+<span class="line"><span>│   ├── Happy-Captcha-1.0.1.jar</span></span>
+<span class="line"><span>│   ├── ...</span></span>
+<span class="line"><span>│   └── xxl-job-core-3.1.0.jar</span></span>
+<span class="line"><span>└── my-app.jar</span></span></code></pre>
+<p>即把 <code>my-app.jar</code> 这个 fat jar 解包成 <code>my-app/my-app.jar</code> 这个 thin jar 包 + <code>my-app/lib</code> 这个目录下的所有的依赖 jar 包。</p>
+<p>现在做法就很明了了</p>
+<h2 id="新部署方案">新部署方案</h2>
+<p>部署的时候只要这样就可以了：</p>
+<ol>
+<li>应用打包成 jar 包，fat jar</li>
+<li>解包 fat jar</li>
+<li><code>rsync</code> 把 <code>my-app/lib</code> 目录下所有的依赖 jar 包同步到应用服务器上 <code>$WORKDIR/app/lib</code> 目录下
+<blockquote>
+<p>只有第一次的时候需要全量同步，以后只需要同步变动的依赖 jar 包即可。多数情况下，依赖的 jar 包保持稳定，完全没有数据传输。</p>
+<p>下面是我使用的 <code>rsync</code> 命令：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#7F848E;font-style:italic"># 按文件大小和 checksum 是否改变来判断是否需要更新，而非按时间戳</span></span>
+<span class="line"><span style="color:#61AFEF">rsync</span><span style="color:#D19A66"> -r</span><span style="color:#D19A66"> --ignore-times</span><span style="color:#D19A66"> --checksum</span><span style="color:#D19A66"> --itemize-changes</span><span style="color:#D19A66"> --progress</span><span style="color:#D19A66"> --delete</span><span style="color:#98C379"> my-app/lib/</span><span style="color:#E06C75"> $USER</span><span style="color:#98C379">@</span><span style="color:#E06C75">$HOST</span><span style="color:#98C379">:</span><span style="color:#E06C75">$WORKDIR</span><span style="color:#98C379">/app/lib</span></span></code></pre>
+</blockquote>
+</li>
+<li><code>scp</code> 把 <code>my-app/my-app.jar</code> 这个 thin jar 包同步到应用服务器上 <code>$WORKDIR/app</code> 目录下</li>
+<li>应用服务器上执行 <code>java -jar app.jar</code> 启动应用</li>
+</ol>
+<h2 id="结果">结果</h2>
+<p>解包后的 <code>my-app/my-app.jar</code> 体积为 2.4MB，体积减小到了原来的 1%!!! 现在部署体验就欻欻快了。</p>
+<h2 id="另">另</h2>
+<p>解包之后后的目录结构非常适合打 docker 镜像。合理地利用 docker 镜像 layer 缓存，可以极大地打 docker 镜像的时间。</p>
+<p>Quarkus 这样的框架打包一早就不是 fat jar……</p>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#是这样的">是这样的</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#分析问题">分析问题</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#解决问题">解决问题</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#新部署方案">新部署方案</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#结果">结果</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#另">另</a> </li> </ol>  </div> </div> </div> </div> </body></html>

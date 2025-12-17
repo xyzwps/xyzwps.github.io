@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-11-19-pyauto-gui"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>使用 pyauto-gui 自动操作微信</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">使用 pyauto-gui 自动操作微信</h1> <div class="text-sm text-gray-500">2025-11-19</div>   <p>最近（3周前了😂）做一个 Demo，要能用程序自动发微信给指定好友。找了一圈现有方案，作者要么删库跑路，要么支持的微信版本太旧，无法满足要求。
+思来想去，决定用程序直接模拟 ui 操作的方式来实现。最后选了 pyauto-gui 库。</p>
+<h2 id="需求分析">需求分析</h2>
+<p>给一个好友发消息，操作流程是这样的：</p>
+<ol>
+<li>在搜索框里输入好友昵称</li>
+<li>点击搜索结果中的好友</li>
+<li>在好友聊天框里输入消息</li>
+<li>点击发送按钮</li>
+</ol>
+<p>这个流程里仅有几个关键操作：</p>
+<ol>
+<li>定位页面上的元素：模拟视觉观察屏幕</li>
+<li>点击：用于点击按钮、输入框聚焦</li>
+<li>输入文本</li>
+</ol>
+<p>下面介绍下如何用 pyauto-gui 实现这些操作。</p>
+<h2 id="找到页面上的元素">找到页面上的元素</h2>
+<p>首先，你需要把要找到的元素进行截图。比如，你要找到搜索框，就把搜索框截图下来。我们把这个截图叫做 <code>wx-search-box.png</code> 好了。</p>
+<p><img src="/assets/img/blogs/wx-search-box.png" alt="搜索框截图"/></p>
+<p>然后在代码里，你可以用 <code>locateCenterOnScreen</code> 函数来找到这个元素的位置（注意处理 <code>pyautogui.ImageNotFoundException</code> 异常）。比如：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="python"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> pyautogui</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D19A66">_CONFIDENCE</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> 0.8</span></span>
+<span class="line"><span style="color:#ABB2BF">cx, cy </span><span style="color:#56B6C2">=</span><span style="color:#ABB2BF"> pyautogui.</span><span style="color:#61AFEF">locateCenterOnScreen</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&#39;wx-search-box.png&#39;</span><span style="color:#ABB2BF">, </span><span style="color:#E06C75;font-style:italic">confidence</span><span style="color:#56B6C2">=</span><span style="color:#D19A66">_CONFIDENCE</span><span style="color:#ABB2BF">)</span></span></code></pre>
+<p>这里置信度 <code>_CONFIDENCE</code> 是一个浮点数，范围是 <code>[0, 1]</code>。默认值是 <code>0.8</code>。
+如果你的截图和实际元素的相似度低于这个值，就会抛出 <code>pyautogui.ImageNotFoundException</code> 异常。
+自行按需调整置信度即可，反正它不是越低越好，更不是越高越好。</p>
+<h2 id="点击元素">点击元素</h2>
+<p>只要像下面这样就可以了：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="python"><code><span class="line"><span style="color:#ABB2BF">pyautogui.</span><span style="color:#61AFEF">click</span><span style="color:#ABB2BF">(cx, cy)</span></span></code></pre>
+<h2 id="输入文本">输入文本</h2>
+<p>输入文本比较坑。模拟输入中文非常麻烦，我们用 <code>ctrl + v</code> 来输入。</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="python"><code><span class="line"><span style="color:#C678DD">import</span><span style="color:#ABB2BF"> pyperclip </span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">pyperclip.</span><span style="color:#61AFEF">copy</span><span style="color:#ABB2BF">(some_text)</span></span>
+<span class="line"><span style="color:#ABB2BF">pyautogui.</span><span style="color:#61AFEF">hotkey</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&#39;ctrl&#39;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&#39;v&#39;</span><span style="color:#ABB2BF">)</span></span></code></pre>
+<p>就是这样了。下面是一个</p>
+<h2 id="微信发送消息的完整流程">微信发送消息的完整流程</h2>
+<ol>
+<li>定位搜索框</li>
+<li>点击搜索框</li>
+<li>输入好友昵称</li>
+<li>点击搜索结果中的好友（把搜索框的点击位置往下挪 100 像素即可）</li>
+<li>定位聊天框发送按钮</li>
+<li>点击聊天框（发送按钮左上方的一片区域）</li>
+<li>输入消息</li>
+<li>点击发送按钮</li>
+</ol>
+<p>就是这样了。</p>
+<h2 id="注意事项">注意事项</h2>
+<ul>
+<li>pyauto-gui 库使用时会需要别的依赖，请自行参考官方文档。</li>
+<li>即使使用这种非侵入式自动化，依然可能触发微信的反黑产机制。使用时请谨慎。</li>
+</ul>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#需求分析">需求分析</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#找到页面上的元素">找到页面上的元素</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#点击元素">点击元素</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#输入文本">输入文本</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#微信发送消息的完整流程">微信发送消息的完整流程</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#注意事项">注意事项</a> </li> </ol>  </div> </div> </div> </div> </body></html>

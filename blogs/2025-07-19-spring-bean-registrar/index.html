@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="zh-CN"> <head><link rel="canonical" href="/blogs/2025-07-19-spring-bean-registrar"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Spring 如何按注解扫描接口，并把它注册为 Bean？</title><script>
+  var _hmt = _hmt || [];
+  (function () {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?e5cd13f29c2fc3a6a3ca36ad30480374";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script><link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.4/katex.min.css" rel="stylesheet"><link rel="stylesheet" href="/_astro/2024-08-27-dg-to-di.DzoS-3go.css">
+<style>*{line-height:1.8}h2,h3,h4,h5,h6{color:#1f2937}blockquote{color:#4b5563;border-left-color:#6366f1}table{border:1px solid #ced4da;border-collapse:collapse}table tr{border-top:1px solid #ced4da}table tr td,table tr th{border-left:1px solid #ced4da;padding:8px 16px}img{width:100%;border:1px solid #eef;border-radius:4px}.math{max-width:100%;overflow-y:auto}.katex{font-size:1rem}.astro-code{padding:16px;border-radius:6px}
+</style></head> <body class="pb-6 bg-indigo-50"> <div class="container mx-auto px-4 py-2 flex"> <a href="/" class="rounded-full bg-white py-2 px-6 select-none"><span class="font-bold">@xyzwps</span></a> </div> <div class="container mx-auto pt-4 px-4 sm:px-6 lg:px-8"> <nav class="flex" aria-label="Breadcrumb"> <ol class="inline-flex items-center space-x-1 md:space-x-3"> <li class="inline-flex items-center"> <a href="/" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200"> <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path> </svg>
+主页
+</a> </li> <li> <div class="flex items-center"> <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path> </svg> <a href="/blogs" class="ml-1 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors duration-200 md:ml-2"> 文章列表 </a> </div> </li> </ol> </nav> </div> <div class="container mx-auto p-4 min-h-screen"> <div class="grid grid-cols-4 gap-4"> <div class="prose prose-slate prose-code:before:content-[''] prose-code:after:content-[''] prose-img:p-4 prose-img:shadow bg-white max-w-none col-span-3 max-lg:col-span-4 border border-indigo-50 rounded-lg p-6 shadow text-gray-900"> <h1 class="text-gray-900">Spring 如何按注解扫描接口，并把它注册为 Bean？</h1> <div class="text-sm text-gray-500">2025-07-18</div>   <p>嗯，事情是这样的：</p>
+<h2 id="背景">背景</h2>
+<p>前几天在使用 Spring AI 时，<a href="/blogs/2025-07-18-spring-ai">被 <code>RestClient</code> 折腾的不轻</a>。在翻 Spring 文档时，发现有一个
+<a href="https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-http-interface">HTTP Interface</a>
+的用法。</p>
+<p>首先，定义一个接口:</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> interface</span><span style="color:#E5C07B"> RepositoryService</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">	@</span><span style="color:#E5C07B">GetExchange</span><span style="color:#E06C75">(</span><span style="color:#98C379">&quot;/repos/{owner}/{repo}&quot;</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#E5C07B">	Repository</span><span style="color:#61AFEF"> getRepository</span><span style="color:#ABB2BF">(@</span><span style="color:#E5C07B">PathVariable</span><span style="color:#E5C07B"> String</span><span style="color:#E06C75;font-style:italic"> owner</span><span style="color:#ABB2BF">, @</span><span style="color:#E5C07B">PathVariable</span><span style="color:#E5C07B"> String</span><span style="color:#E06C75;font-style:italic"> repo</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">	// more HTTP exchange methods...</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<p>然后把接口创建成一个可以调用的 HTTP 接口类：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> restClient </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> RestClient</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">builder</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">baseUrl</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;https://api.github.com/&quot;</span><span style="color:#ABB2BF">).</span><span style="color:#61AFEF">build</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> adapter </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> RestClientAdapter</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">create</span><span style="color:#ABB2BF">(restClient);</span></span>
+<span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> factory </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> HttpServiceProxyFactory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">builderFor</span><span style="color:#ABB2BF">(adapter).</span><span style="color:#61AFEF">build</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> service </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> factory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createClient</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">RepositoryService</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">class</span><span style="color:#ABB2BF">);</span></span></code></pre>
+<blockquote>
+<p>除了 <code>RestClient</code> 之外，还有基于 <code>WebClient</code> 和 <code>RestTemplate</code> 的用法。这里不做列举。</p>
+</blockquote>
+<p>创建这个类之后，就可以像调用本地方法一样调用这个接口了：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#C678DD">var</span><span style="color:#E06C75"> repository </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> service</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getRepository</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;spring-projects&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#98C379">&quot;spring-boot&quot;</span><span style="color:#ABB2BF">);</span></span></code></pre>
+<p>看到项目里使用的 dtflyx forest 依赖的 okhttp 模块一直报安全隐患，于是想着干脆用这东西把
+forest 替换掉得了。</p>
+<p>说干就干。</p>
+<h2 id="施工">施工</h2>
+<p>思路上很简单，步骤大体如下：</p>
+<ol>
+<li>创建一个注解</li>
+<li>扫描注上这个注解的接口</li>
+<li>通过这个接口创建一个代理类</li>
+</ol>
+<h3 id="创建注解">创建注解</h3>
+<p>这一步最简单：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Documented</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Target</span><span style="color:#E06C75">({</span><span style="color:#E5C07B">ElementType</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">TYPE</span><span style="color:#E06C75">})</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Retention</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">RetentionPolicy</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">RUNTIME</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#ABB2BF"> @</span><span style="color:#C678DD">interface</span><span style="color:#E5C07B"> RestApis</span><span style="color:#E06C75"> {</span></span>
+<span class="line"><span style="color:#E5C07B">    String</span><span style="color:#61AFEF"> baseUrl</span><span style="color:#E06C75">() </span><span style="color:#C678DD">default</span><span style="color:#98C379"> &quot;&quot;</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">}</span></span>
+<span class="line"></span></code></pre>
+<p>注意，我们预期注解被注到接口上，所以没法直接对接口进行实例化，需要通过上面的 <code>HttpServiceProxyFactory</code>
+来创建接口的代理类。所以我们需要一个创建代理类的工厂类。</p>
+<h3 id="创建工厂类">创建工厂类</h3>
+<p>我们使用 Spring 中的 <code>FactoryBean</code> 来创建工厂类。下面的代码还挺简单的：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Data</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> RestApisFactoryBean</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> FactoryBean</span><span style="color:#ABB2BF">&lt;</span><span style="color:#E5C07B">Object</span><span style="color:#ABB2BF">&gt;</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> static</span><span style="color:#C678DD"> final</span><span style="color:#E5C07B"> HttpClient</span><span style="color:#E06C75"> HTTP_1_1_CLIENT </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> HttpClient</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">newBuilder</span><span style="color:#ABB2BF">()</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">version</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">HttpClient</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">Version</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">HTTP_1_1</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">connectTimeout</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">Duration</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">ofSeconds</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">5</span><span style="color:#ABB2BF">))</span></span>
+<span class="line"><span style="color:#ABB2BF">            .</span><span style="color:#61AFEF">build</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> static</span><span style="color:#C678DD"> final</span><span style="color:#E5C07B"> JdkClientHttpRequestFactory</span><span style="color:#E06C75"> JDK_CLIENT_HTTP_REQUEST_FACTORY </span><span style="color:#56B6C2">=</span></span>
+<span class="line"><span style="color:#C678DD">            new</span><span style="color:#61AFEF"> JdkClientHttpRequestFactory</span><span style="color:#E06C75">(HTTP_1_1_CLIENT)</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    private</span><span style="color:#E5C07B"> Class</span><span style="color:#ABB2BF">&lt;</span><span style="color:#C678DD">?</span><span style="color:#ABB2BF">&gt;</span><span style="color:#E06C75"> objectType</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    private</span><span style="color:#E5C07B"> Environment</span><span style="color:#E06C75"> environment</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#E5C07B"> Object</span><span style="color:#61AFEF"> getObject</span><span style="color:#ABB2BF">()</span><span style="color:#C678DD"> throws</span><span style="color:#E5C07B"> Exception</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> anno</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> objectType</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getAnnotation</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">RestApis</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">class</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (anno </span><span style="color:#56B6C2">==</span><span style="color:#D19A66"> null</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">            throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> RuntimeException</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Unexpected type &quot;</span><span style="color:#56B6C2"> +</span><span style="color:#E5C07B"> objectType</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getCanonicalName</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#E5C07B">        log</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">info</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Creating RestApis: {}&quot;</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">objectType</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getCanonicalName</span><span style="color:#ABB2BF">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> baseUrl</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> anno</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">baseUrl</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> rcb</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> RestClient</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">builder</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">requestFactory</span><span style="color:#ABB2BF">(JDK_CLIENT_HTTP_REQUEST_FACTORY);</span></span>
+<span class="line"><span style="color:#ABB2BF">        {</span></span>
+<span class="line"><span style="color:#C678DD">            if</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">StringUtils</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">hasText</span><span style="color:#ABB2BF">(baseUrl)) {</span></span>
+<span class="line"><span style="color:#C678DD">                if</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">baseUrl</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">startsWith</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;${&quot;</span><span style="color:#ABB2BF">) </span><span style="color:#56B6C2">&amp;&amp;</span><span style="color:#E5C07B"> baseUrl</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">endsWith</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;}&quot;</span><span style="color:#ABB2BF">)) {</span></span>
+<span class="line"><span style="color:#C678DD">                    var</span><span style="color:#E06C75"> configBaseUrl</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> environment</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getProperty</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">baseUrl</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">substring</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">2</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">baseUrl</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">length</span><span style="color:#ABB2BF">() </span><span style="color:#56B6C2">-</span><span style="color:#D19A66"> 1</span><span style="color:#ABB2BF">));</span></span>
+<span class="line"><span style="color:#C678DD">                    if</span><span style="color:#ABB2BF"> (configBaseUrl </span><span style="color:#56B6C2">==</span><span style="color:#D19A66"> null</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">                        throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> IllegalStateException</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;Cannot find property for &quot;</span><span style="color:#56B6C2"> +</span><span style="color:#ABB2BF"> baseUrl);</span></span>
+<span class="line"><span style="color:#ABB2BF">                    }</span></span>
+<span class="line"><span style="color:#ABB2BF">                    rcb </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> rcb</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">baseUrl</span><span style="color:#ABB2BF">(configBaseUrl);</span></span>
+<span class="line"><span style="color:#ABB2BF">                } </span><span style="color:#C678DD">else</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#ABB2BF">                    rcb </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> rcb</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">baseUrl</span><span style="color:#ABB2BF">(baseUrl);</span></span>
+<span class="line"><span style="color:#ABB2BF">                }</span></span>
+<span class="line"><span style="color:#ABB2BF">            }</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> restClient</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> rcb</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">build</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> adapter</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> RestClientAdapter</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">create</span><span style="color:#ABB2BF">(restClient);</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> factory</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> HttpServiceProxyFactory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">builderFor</span><span style="color:#ABB2BF">(adapter).</span><span style="color:#61AFEF">build</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">        return</span><span style="color:#E5C07B"> factory</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">createClient</span><span style="color:#ABB2BF">(objectType);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h3 id="创建类注册器">创建类注册器</h3>
+<p>有了注解和工厂类，我们需要扫描注解接口，然后通过上面的工厂类创建接口实例，再把实例注册到
+Spring 容器中。代码如下：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Slf4j</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Setter</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> RestApisRegistrar</span><span style="color:#C678DD"> implements</span><span style="color:#E5C07B"> ImportBeanDefinitionRegistrar</span><span style="color:#ABB2BF">,</span><span style="color:#E5C07B"> ResourceLoaderAware</span><span style="color:#ABB2BF">,</span><span style="color:#E5C07B"> EnvironmentAware</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    private</span><span style="color:#E5C07B"> Environment</span><span style="color:#E06C75"> environment</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">    private</span><span style="color:#E5C07B"> ResourceLoader</span><span style="color:#E06C75"> resourceLoader</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">    @</span><span style="color:#E5C07B">Override</span></span>
+<span class="line"><span style="color:#C678DD">    public</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> registerBeanDefinitions</span><span style="color:#ABB2BF">(@</span><span style="color:#E5C07B">NonNull</span><span style="color:#E5C07B"> AnnotationMetadata</span><span style="color:#E06C75;font-style:italic"> meta</span><span style="color:#ABB2BF">, @</span><span style="color:#E5C07B">NonNull</span><span style="color:#E5C07B"> BeanDefinitionRegistry</span><span style="color:#E06C75;font-style:italic"> registry</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        // 1. 创建扫描器</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> scanner</span><span style="color:#56B6C2"> =</span><span style="color:#61AFEF"> getScanner</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#E5C07B">        scanner</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setResourceLoader</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">resourceLoader</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        // 2. 为扫描器添加过滤器，按注解过滤</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> filter</span><span style="color:#56B6C2"> =</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> AnnotationTypeFilter</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">RestApis</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">class</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E5C07B">        scanner</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">addIncludeFilter</span><span style="color:#ABB2BF">(filter);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        // 3. 获取一个包作为 base package</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> basePackage</span><span style="color:#56B6C2"> =</span><span style="color:#98C379"> &quot;com.example.demo.apis&quot;</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        // 4. 扫描得到 bean definitions</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> candidates</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> scanner</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">findCandidateComponents</span><span style="color:#ABB2BF">(basePackage);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">        // 5. 注册 bean</span></span>
+<span class="line"><span style="color:#E5C07B">        candidates</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">forEach</span><span style="color:#ABB2BF">(bd </span><span style="color:#C678DD">-&gt;</span><span style="color:#E5C07B"> this</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">registerBean</span><span style="color:#ABB2BF">(bd, registry));</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    private</span><span style="color:#C678DD"> void</span><span style="color:#61AFEF"> registerBean</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">BeanDefinition</span><span style="color:#E06C75;font-style:italic"> candidate</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">BeanDefinitionRegistry</span><span style="color:#E06C75;font-style:italic"> registry</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> beanClassName</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> candidate</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getBeanClassName</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#C678DD">        if</span><span style="color:#ABB2BF"> (beanClassName </span><span style="color:#56B6C2">==</span><span style="color:#D19A66"> null</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#C678DD">            throw</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> RuntimeException</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;IMPOSSIBLE!!!&quot;</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#ABB2BF">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> builder</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> BeanDefinitionBuilder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">genericBeanDefinition</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">RestApisFactoryBean</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">class</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E5C07B">        builder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">addPropertyValue</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;objectType&quot;</span><span style="color:#ABB2BF">, beanClassName); </span><span style="color:#7F848E;font-style:italic">// 注意看，这里的两个属性都是定义在</span></span>
+<span class="line"><span style="color:#E5C07B">        builder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">addPropertyValue</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">&quot;environment&quot;</span><span style="color:#ABB2BF">, environment);  </span><span style="color:#7F848E;font-style:italic">// RestApisFactoryBean 中的</span></span>
+<span class="line"><span style="color:#E5C07B">        builder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setAutowireMode</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">AbstractBeanDefinition</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">AUTOWIRE_BY_TYPE</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"><span style="color:#E5C07B">        builder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setScope</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">BeanDefinition</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">SCOPE_SINGLETON</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">        var</span><span style="color:#E06C75"> beanDefinition</span><span style="color:#56B6C2"> =</span><span style="color:#E5C07B"> builder</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getBeanDefinition</span><span style="color:#ABB2BF">();</span></span>
+<span class="line"><span style="color:#E5C07B">        beanDefinition</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">setPrimary</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">true</span><span style="color:#ABB2BF">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E5C07B">        registry</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">registerBeanDefinition</span><span style="color:#ABB2BF">(beanClassName, beanDefinition);</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C678DD">    protected</span><span style="color:#E5C07B"> ClassPathScanningCandidateComponentProvider</span><span style="color:#61AFEF"> getScanner</span><span style="color:#ABB2BF">()</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">        return</span><span style="color:#C678DD"> new</span><span style="color:#61AFEF"> ClassPathScanningCandidateComponentProvider</span><span style="color:#ABB2BF">(</span><span style="color:#D19A66">false</span><span style="color:#ABB2BF">, </span><span style="color:#E5C07B">this</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">environment</span><span style="color:#ABB2BF">) {</span></span>
+<span class="line"><span style="color:#ABB2BF">            @</span><span style="color:#E5C07B">Override</span></span>
+<span class="line"><span style="color:#C678DD">            protected</span><span style="color:#C678DD"> boolean</span><span style="color:#61AFEF"> isCandidateComponent</span><span style="color:#ABB2BF">(</span><span style="color:#E5C07B">AnnotatedBeanDefinition</span><span style="color:#E06C75;font-style:italic"> beanDefinition</span><span style="color:#ABB2BF">)</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">                boolean</span><span style="color:#E06C75"> isCandidate</span><span style="color:#56B6C2"> =</span><span style="color:#D19A66"> false</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#C678DD">                if</span><span style="color:#ABB2BF"> (</span><span style="color:#E5C07B">beanDefinition</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMetadata</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">isIndependent</span><span style="color:#ABB2BF">()) {</span></span>
+<span class="line"><span style="color:#C678DD">                    if</span><span style="color:#ABB2BF"> (</span><span style="color:#56B6C2">!</span><span style="color:#E5C07B">beanDefinition</span><span style="color:#ABB2BF">.</span><span style="color:#61AFEF">getMetadata</span><span style="color:#ABB2BF">().</span><span style="color:#61AFEF">isAnnotation</span><span style="color:#ABB2BF">()) {</span></span>
+<span class="line"><span style="color:#ABB2BF">                        isCandidate </span><span style="color:#56B6C2">=</span><span style="color:#D19A66"> true</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#ABB2BF">                    }</span></span>
+<span class="line"><span style="color:#ABB2BF">                }</span></span>
+<span class="line"><span style="color:#C678DD">                return</span><span style="color:#ABB2BF"> isCandidate;</span></span>
+<span class="line"><span style="color:#ABB2BF">            }</span></span>
+<span class="line"><span style="color:#ABB2BF">        };</span></span>
+<span class="line"><span style="color:#ABB2BF">    }</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h3 id="启用注册器">启用注册器</h3>
+<p>我们注意到 <code>RestApisRegistrar</code> 是一个在 Spring 语境下“普通”的类，我们要启用它。</p>
+<p>做法是在启动类上添加 <code>@Import</code> 注解，并传入 <code>RestApisRegistrar</code> 类：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf;overflow-x:auto" tabindex="0" data-language="java"><code><span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">SpringBootApplication</span></span>
+<span class="line"><span style="color:#ABB2BF">@</span><span style="color:#E5C07B">Import</span><span style="color:#E06C75">(</span><span style="color:#E5C07B">RestApisRegistrar</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">class</span><span style="color:#E06C75">)</span></span>
+<span class="line"><span style="color:#C678DD">public</span><span style="color:#C678DD"> class</span><span style="color:#E5C07B"> App</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#7F848E;font-style:italic">    // ...</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h3 id="使用注解">使用注解</h3>
+<p>现在，我们在一个接口上注上 <code>@RestApi</code>，然后启动应用，观察 <code>/actuator/beans</code>
+输出就可以看到结果了。</p>
+<h2 id="后续">后续</h2>
+<p>后续当然是坚决删除 forest 啦。</p>
+<h2 id="有没有别的方法呢">有没有别的方法呢？</h2>
+<p>其实是有的。</p>
+<p>上面的方法是使用 Spring API 的运行时生成 bean 定义的方法。我们还可以把运行时注解改成编译时注解，
+然后在编译时生成带有 bean 定义的 <code>@Configuration</code> 类源码的方式来搞。</p>  </div> <div class="max-lg:hidden border border-indigo-50 rounded-lg p-6 bg-white shadow"> <div class="sticky top-4">   <h1 class="mt-4 text-indigo-700 font-bold">本文目录</h1> <ol class="ml-3 mt-4 list-disc pl-4 text-indigo-700"> <li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#背景">背景</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#施工">施工</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#创建注解">创建注解</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#创建工厂类">创建工厂类</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#创建类注册器">创建类注册器</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#启用注册器">启用注册器</a> </li><li class="ml-4 text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#使用注解">使用注解</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#后续">后续</a> </li><li class="font-bold text-sm"> <a class="cursor-pointer text-indigo-700 hover:text-indigo-900 hover:bg-indigo-100" href="#有没有别的方法呢">有没有别的方法呢？</a> </li> </ol>  </div> </div> </div> </div> </body></html>
