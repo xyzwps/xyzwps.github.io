@@ -1,0 +1,45 @@
+
+
+## 场景
+
+## 对于不断增大的单日志文件场景 - logrotate
+
+比如：
+
+- pino.js 产生的日志文件
+- n9e 的日志文件
+
+使用 linux 自带的 logrotate。比如，你有一个 n9e 服务，产生的日志文件位于
+`/var/log/n9e.log`。那么你就可以配置在 `/etc/logrotate.d` 下增加一个名为
+`n9e` 的配置文件。比如这样：
+
+```
+/var/log/n9e.log {
+	daily
+	rotate 2
+	compress
+	delaycompress
+	missingok
+	notifempty
+	create 644 root root
+}
+```
+
+表示每天搞一次这个日志文件，保留两份。
+
+执行 `logrotate -vf /etc/logrotate.d/n9e` 来立刻观察运行结果。
+
+## 对于产生了大量碎片化日志文件的场景 - cron
+
+使用 ZLMediaKit 截图频繁的话，会产生大量 ffmpeg 日志文件，有数百万个之多。
+加入删除命令是这样：
+
+```sh
+find /opt/apps/ZLMediaKit/ffmpeg/ -type f -delete
+```
+
+那么，可以 `crontab -e` 把这个命令加入到计划任务中，由系统定时运行。
+
+## 系统日志
+
+TODO: 

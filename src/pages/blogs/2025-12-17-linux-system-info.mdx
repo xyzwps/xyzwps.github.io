@@ -1,0 +1,207 @@
+---
+layout: ./_BlogLayout.astro
+title: Linux 系统信息查看命令大全
+date: 2025-12-17
+---
+
+## 操作系统信息
+
+### 查看发行版信息
+```bash
+cat /etc/os-release          # 详细的发行版信息
+lsb_release -a               # LSB 标准发行版信息
+hostnamectl                  # 主机名和操作系统
+```
+
+### 查看内核版本
+```bash
+uname -a                     # 所有系统信息
+uname -r                     # 内核版本号
+uname -m                     # 硬件架构（x86_64, arm64 等）
+```
+
+### 查看系统启动时间
+```bash
+uptime                       # 系统运行时间
+last reboot                  # 最后一次重启时间
+who -b                       # 系统最后启动的日期/时间
+```
+
+---
+
+## 硬件信息
+
+### CPU 信息
+```bash
+lscpu                        # 详细 CPU 信息
+cat /proc/cpuinfo            # CPU 详细参数
+nproc                        # 逻辑 CPU 核心数
+grep -c ^processor /proc/cpuinfo  # CPU 核心数
+```
+
+### 内存信息
+```bash
+free -h                      # 内存使用情况（可读格式）
+free -m                      # 内存使用情况（MB）
+cat /proc/meminfo            # 详细内存信息
+```
+
+### 磁盘信息
+```bash
+lsblk                        # 块设备列表
+fdisk -l                     # 磁盘分区表（需要 sudo）
+parted -l                    # 所有磁盘和分区（需要 sudo）
+df -h                        # 文件系统磁盘使用情况
+du -sh *                     # 当前目录各文件大小
+```
+
+### 显卡信息
+```bash
+lspci | grep -i vga          # 显卡信息
+nvidia-smi                   # NVIDIA GPU 信息（如果安装驱动）
+glxinfo | grep "OpenGL"      # OpenGL 信息
+```
+
+### 其他硬件信息
+```bash
+lsusb                        # USB 设备列表
+dmidecode                    # 主板、BIOS 等信息（需要 sudo）
+hwinfo                       # 完整硬件信息（需要安装）
+inxi -F                      # 详细硬件信息摘要（需要安装）
+```
+
+---
+
+## 网络信息
+
+### 网络接口配置
+```bash
+ip addr                      # 所有网络接口和 IP 地址
+ip link show                 # 网络接口状态
+ifconfig                     # 网络接口信息（已过时但仍可用）
+hostname -I                  # 本机 IP 地址
+```
+
+### 路由信息
+```bash
+ip route                     # 路由表
+route -n                     # 数值形式的路由表
+```
+
+### DNS 配置
+```bash
+cat /etc/resolv.conf         # DNS 服务器
+systemctl status systemd-resolved  # DNS 解析服务状态
+resolvectl status            # DNS 详细状态
+```
+
+### 网络连接状态
+```bash
+ss -tulpn                    # 监听的端口和进程
+netstat -tulpn               # 网络连接统计（需要安装）
+ss -an                       # 所有网络连接
+netstat -i                   # 网络接口统计
+```
+
+### 网络性能测试
+```bash
+ping google.com              # 测试网络连接
+traceroute google.com        # 追踪路由路径
+mtr google.com               # 实时网络诊断
+iperf3 -s                    # 启动性能测试服务器
+```
+
+---
+
+## 进程和性能
+
+### 系统负载
+```bash
+uptime                       # 系统平均负载
+w                            # 当前登录用户和系统负载
+```
+
+### 进程信息
+```bash
+ps aux                       # 所有进程列表
+ps aux --sort=-%mem         # 按内存占用排序
+ps aux --sort=-%cpu         # 按 CPU 占用排序
+top -b -n 1                 # 实时监控信息（非交互）
+```
+
+### 服务状态
+```bash
+systemctl status             # 系统状态
+systemctl list-units --type=service  # 所有服务列表
+systemctl is-active <service>        # 检查服务状态
+```
+
+---
+
+## 用户和权限
+
+### 用户信息
+```bash
+whoami                       # 当前用户名
+id                           # 当前用户 ID 和组信息
+w                            # 登录用户列表
+who                          # 登录用户信息
+```
+
+### 用户和组
+```bash
+cat /etc/passwd              # 用户账户信息
+cat /etc/group               # 用户组信息
+groups                       # 当前用户所属组
+```
+
+### 权限信息
+```bash
+sudo -l                      # 当前用户 sudo 权限
+sudo -ll                     # 详细 sudo 权限
+```
+
+---
+
+## 其他常用信息
+
+### 系统日志
+```bash
+dmesg                        # 内核日志信息
+journalctl -xe               # 系统日志（systemd）
+tail -f /var/log/syslog      # 实时系统日志
+```
+
+### 环境变量
+```bash
+env                          # 所有环境变量
+echo $PATH                   # PATH 环境变量
+```
+
+### 文件系统
+```bash
+mount                        # 已挂载的文件系统
+fstab                        # 文件系统挂载配置
+cat /proc/filesystems        # 支持的文件系统类型
+```
+
+### 时间和时区
+```bash
+date                         # 当前日期和时间
+timedatectl                  # 时间和时区信息
+cat /etc/timezone            # 当前时区
+```
+
+---
+
+## 快速诊断命令
+
+一键获取完整系统信息：
+
+```bash
+# 简洁版本
+echo "=== 系统 ===" && uname -a && echo -e "\n=== CPU ===" && nproc && echo -e "\n=== 内存 ===" && free -h && echo -e "\n=== 磁盘 ===" && df -h
+
+# 详细版本（需要 sudo）
+sudo dmidecode -q && uname -a && lscpu && free -h && lsblk && ip addr
+```
