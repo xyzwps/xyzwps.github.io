@@ -1,0 +1,2390 @@
+---
+layout: ./_BlogLayout.astro
+title: Rust 从入门到放弃（AI Generated）
+date: 2025-12-25
+---
+
+{/* 为 TypeScript 开发者准备的 */}Rust 语法速查手册。
+
+## 1. 基本数据类型
+
+### 整数、浮点数、布尔值、字符
+
+```rust
+// 整数类型：i8, i16, i32, i64, i128, isize（有符号）
+// u8, u16, u32, u64, u128, usize（无符号）
+let x: i32 = 42;
+let y: u64 = 100;
+let z = 50; // 默认 i32
+
+// 浮点数：f32, f64
+let pi: f64 = 3.14;
+let e: f32 = 2.71;
+
+// 布尔值
+let is_active: bool = true;
+let flag = false;
+
+// 字符（单个 Unicode 字符，注意是单引号）
+let ch: char = 'A';
+let emoji: char = '😀';
+```
+
+### 字符串（String vs &str）
+
+```rust
+// &str：字符串切片，不可变，固定大小，栈分配
+// 类似 TS 中的 string 字面量
+let s1: &str = "Hello"; // 字符串字面量
+let s2 = "World";        // 推断为 &str
+
+// String：可变的、堆分配的字符串，拥有所有权
+// 类似 TS 的 String 对象
+let mut s3: String = String::from("Hello");
+s3.push_str(" World");
+
+// 字符串插值（类似 TS 的模板字符串）
+let name = "Rust";
+let message = format!("Hello, {}", name);
+
+// &str 和 String 的转换
+let s4: String = "text".to_string();
+let s5: &str = &s4;      // String 可以转为 &str（自动）
+let s6: &str = s4.as_str(); // 显式转换
+
+// 字符串字面量中的转义
+let path = "C:\\Users\\name";
+let raw = r#"C:\Users\name"#; // 原始字符串（不转义）
+```
+
+### 数组和切片
+
+```rust
+// 数组：固定大小，栈分配
+let arr: [i32; 3] = [1, 2, 3];
+let arr2 = [1, 2, 3];           // 推断为 [i32; 3]
+let arr3 = [0; 5];              // [0, 0, 0, 0, 0]
+
+// 访问元素
+let first = arr[0];
+let last = arr[arr.len() - 1];
+
+// 切片（Slice）：指向数组或 String 的一部分，不拥有所有权
+// 类似 TS 的数组引用概念
+let slice: &[i32] = &arr[1..3]; // [2, 3]
+let full_slice: &[i32] = &arr[..];    // 整个数组
+let partial: &[i32] = &arr[1..];      // 从索引 1 开始到末尾
+let partial2: &[i32] = &arr[..2];     // 从开始到索引 2（不含）
+
+// 字符串切片
+let s = "Hello World";
+let hello: &str = &s[0..5];  // "Hello"
+let world: &str = &s[6..];   // "World"
+
+// Vec：动态数组，堆分配（类似 TS 的数组）
+let mut vec: Vec<i32> = vec![1, 2, 3];
+vec.push(4);
+vec.pop();
+let len = vec.len();
+```
+
+## 2. 自定义数据类型
+
+### Struct
+
+#### 命名字段
+
+```rust
+// 定义 struct（类似 TS 的 interface 或 class 属性）
+struct Person {
+    name: String,
+    age: u32,
+    email: String,
+}
+
+// 创建实例
+let p1 = Person {
+    name: "Alice".to_string(),
+    age: 30,
+    email: "alice@example.com".to_string(),
+};
+
+// 访问字段
+println!("{}", p1.name);
+
+// 如果变量名和字段名相同，可以简写
+let name = "Bob".to_string();
+let age = 25;
+let email = "bob@example.com".to_string();
+let p2 = Person { name, age, email };
+
+// 使用 .. 语法从另一个实例复制
+let p3 = Person {
+    name: "Charlie".to_string(),
+    ..p1
+};
+
+// mut 使字段可修改
+let mut p4 = Person {
+    name: "Dave".to_string(),
+    age: 35,
+    email: "dave@example.com".to_string(),
+};
+p4.age = 36;
+```
+
+#### 元组结构体
+
+```rust
+// 没有字段名，通过位置访问
+struct Color(i32, i32, i32);
+struct Point(f64, f64, f64);
+
+let red = Color(255, 0, 0);
+let origin = Point(0.0, 0.0, 0.0);
+
+// 访问字段
+let r = red.0;
+let g = red.1;
+let b = red.2;
+
+// 解构
+let Color(r, g, b) = red;
+let Point(x, y, z) = origin;
+```
+
+#### 单元结构体
+
+```rust
+// 没有任何字段，通常用于标记类型或实现 trait
+struct Marker;
+struct Token;
+
+let _marker = Marker;
+let _token = Token;
+```
+
+### Enum 和 Pattern Matching
+
+```rust
+// 枚举定义（类似 TS 的联合类型或 ADT）
+enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+// 带关联数据的枚举
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(String),
+    ChangeColor(i32, i32, i32),
+}
+
+// 创建枚举实例
+let dir = Direction::North;
+let msg1 = Message::Quit;
+let msg2 = Message::Move { x: 10, y: 20 };
+let msg3 = Message::Write("Hello".to_string());
+
+// Pattern matching（match 表达式）
+match dir {
+    Direction::North => println!("Go North"),
+    Direction::South => println!("Go South"),
+    Direction::East => println!("Go East"),
+    Direction::West => println!("Go West"),
+}
+
+// match 与关联数据
+match msg2 {
+    Message::Quit => println!("Quit"),
+    Message::Move { x, y } => println!("Move to ({}, {})", x, y),
+    Message::Write(text) => println!("Text: {}", text),
+    Message::ChangeColor(r, g, b) => println!("Color: ({}, {}, {})", r, g, b),
+}
+
+// match 表达式返回值
+let result = match dir {
+    Direction::North => "N",
+    Direction::South => "S",
+    Direction::East => "E",
+    Direction::West => "W",
+};
+
+// if let：简化的 match（当只关心一个分支时）
+if let Direction::North = dir {
+    println!("Heading north!");
+}
+
+// while let
+enum State {
+    On,
+    Off,
+}
+let mut state = State::On;
+while let State::On = state {
+    // 某些操作...
+    state = State::Off;
+}
+```
+
+### Trait 定义和实现
+
+```rust
+// 定义 trait（类似 TS 的 interface）
+trait Animal {
+    fn speak(&self) -> String;
+    fn move_distance(&self, distance: f64) -> f64;
+
+    // 带默认实现的方法
+    fn describe(&self) -> String {
+        format!("This is an animal that says: {}", self.speak())
+    }
+}
+
+// 为 struct 实现 trait
+struct Dog {
+    name: String,
+}
+
+impl Animal for Dog {
+    fn speak(&self) -> String {
+        "Woof!".to_string()
+    }
+
+    fn move_distance(&self, distance: f64) -> f64 {
+        distance * 1.2 // 狗跑得快一些
+    }
+}
+
+// 使用 trait 方法
+let dog = Dog { name: "Rex".to_string() };
+println!("{}", dog.speak()); // "Woof!"
+println!("{}", dog.describe()); // "This is an animal that says: Woof!"
+
+// 为多个类型实现同一个 trait
+struct Cat {
+    name: String,
+}
+
+impl Animal for Cat {
+    fn speak(&self) -> String {
+        "Meow!".to_string()
+    }
+
+    fn move_distance(&self, distance: f64) -> f64 {
+        distance * 0.8 // 猫跑得慢一些
+    }
+}
+
+// Trait 作为函数参数（编译时多态）
+fn make_sound(animal: &dyn Animal) {
+    println!("{}", animal.speak());
+}
+
+make_sound(&dog);
+make_sound(&Cat { name: "Whiskers".to_string() });
+
+// 返回实现某 trait 的类型
+fn create_animal(is_dog: bool) -> Box<dyn Animal> {
+    if is_dog {
+        Box::new(Dog { name: "Max".to_string() })
+    } else {
+        Box::new(Cat { name: "Luna".to_string() })
+    }
+}
+```
+
+## 3. 所有权系统
+
+### 所有权的三条规则
+
+Rust 的核心机制，确保内存安全（无需垃圾回收）。
+
+```rust
+// 1. 每个值都有一个所有者
+let s1 = String::from("hello"); // s1 是所有者
+
+// 2. 一个值同时只能有一个所有者
+let s2 = s1; // s1 的所有权转移给 s2，s1 不再有效
+// println!("{}", s1); // 编译错误！s1 不再拥有该值
+
+// 3. 当所有者离开作用域时，值被释放
+{
+    let s3 = String::from("scope");
+} // s3 离开作用域，内存被释放
+// println!("{}", s3); // 编译错误！s3 已不在作用域内
+
+// 栈上的数据会自动复制（Copy trait）
+let x = 5;
+let y = x;    // 5 被复制，x 仍有效
+println!("{}", x); // OK
+
+// 大多数堆分配的类型（String, Vec, etc）没有实现 Copy
+// 所以会发生所有权转移
+let v1 = vec![1, 2, 3];
+let v2 = v1;  // 所有权转移
+// println!("{}", v1); // 编译错误
+```
+
+### 借用
+
+借用（Borrow）允许你临时使用一个值，而不获取所有权。
+
+#### 不可变借用
+
+```rust
+// 使用 & 创建不可变引用
+let s1 = String::from("hello");
+let s2 = &s1;  // 借用 s1，不转移所有权
+let s3 = &s1;  // 可以有多个不可变借用
+
+println!("{}", s1); // OK，s1 仍然有效
+println!("{}", s2); // OK
+println!("{}", s3); // OK
+
+// 函数接收不可变引用
+fn print_length(s: &String) {
+    println!("Length: {}", s.len());
+}
+
+print_length(&s1); // 借用 s1
+println!("{}", s1); // s1 仍然有效
+
+// 不可变借用期间，原所有者无法修改值
+let s = String::from("rust");
+let r1 = &s;
+let r2 = &s;
+println!("{}, {}", r1, r2); // 借用在此结束
+// 现在可以修改 s
+let s = String::from("modified"); // 隐藏原值
+```
+
+#### 可变借用
+
+```rust
+// 使用 &mut 创建可变引用
+let mut s = String::from("hello");
+let r = &mut s;
+
+// 通过可变引用修改值
+r.push_str(" world");
+println!("{}", s); // "hello world"
+
+// 关键规则：同时只能有一个可变借用
+let mut s = String::from("rust");
+let r1 = &mut s;
+// let r2 = &mut s; // 编译错误！不能有两个可变借用
+r1.push_str("!");
+println!("{}", s);
+
+// 不可变借用和可变借用不能共存
+let mut s = String::from("rust");
+let r1 = &s;     // 不可变借用
+let r2 = &s;     // 不可变借用
+// let r3 = &mut s; // 编译错误！不能在有不可变借用的情况下创建可变借用
+println!("{}, {}", r1, r2); // 借用在此结束
+let r3 = &mut s; // OK，现在没有不可变借用了
+r3.push_str("!");
+
+// 函数接收可变引用
+fn append_exclamation(s: &mut String) {
+    s.push_str("!");
+}
+
+let mut text = String::from("hello");
+append_exclamation(&mut text);
+println!("{}", text); // "hello!"
+```
+
+### 生命周期注解
+
+生命周期是编译时检查，用于确保引用在引用对象有效期间有效。
+
+```rust
+// 简单的生命周期注解
+fn longest<'a>(s1: &'a str, s2: &'a str) -> &'a str {
+    if s1.len() > s2.len() {
+        s1
+    } else {
+        s2
+    }
+}
+
+// 'a 表示返回的引用与输入参数的生命周期一致
+
+// 生命周期消除规则：编译器可以自动推断的不需要显式标注
+
+// 这个函数返回引用，需要明确生命周期
+fn first_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[..i];
+        }
+    }
+    &s[..]
+}
+
+// 多个生命周期参数
+fn compare<'a, 'b>(s1: &'a str, s2: &'b str) -> &'a str {
+    if s1.len() > s2.len() {
+        s1
+    } else {
+        s1 // 总是返回 s1 的引用
+    }
+}
+
+// Struct 中的生命周期
+struct References<'a> {
+    part: &'a str,
+}
+
+let text = String::from("some text");
+let refs = References { part: &text };
+println!("{}", refs.part);
+
+// 生命周期与 trait 对象
+trait Reader<'a> {
+    fn read(&self) -> &'a str;
+}
+
+// 'static 生命周期：引用在整个程序运行期间有效
+let s: &'static str = "This is a static string literal";
+
+// 函数指针的生命周期通常与其参数绑定
+fn call_multiple<'a>(s: &'a str, f: fn(&'a str) -> &'a str) -> &'a str {
+    f(s)
+}
+```
+
+## 4. 函数和闭包
+
+### 函数定义和返回值
+
+```rust
+// 基础函数定义
+fn add(a: i32, b: i32) -> i32 {
+    a + b  // 末尾无分号，这是返回值表达式
+}
+
+// 显式返回（带分号）
+fn add_with_return(a: i32, b: i32) -> i32 {
+    return a + b; // 这样也可以，但不太 Rust 风格
+}
+
+// 调用函数
+let result = add(5, 3); // result = 8
+
+// 无返回值的函数（返回单位类型 ()）
+fn print_number(n: i32) {
+    println!("The number is {}", n);
+}
+
+// 函数作为参数（函数指针）
+fn apply_operation(a: i32, b: i32, op: fn(i32, i32) -> i32) -> i32 {
+    op(a, b)
+}
+
+let result = apply_operation(5, 3, add); // 5 + 3 = 8
+
+// 隐式类型推断
+fn infer_types(x: i32) {
+    let doubled = x * 2;      // doubled 推断为 i32
+    let floated = x as f64;   // 显式类型转换
+}
+
+// 提前返回
+fn early_return(x: i32) -> i32 {
+    if x < 0 {
+        return 0;
+    }
+    x * 2
+}
+
+// 多个返回值（使用元组）
+fn divide(dividend: i32, divisor: i32) -> (i32, i32) {
+    (dividend / divisor, dividend % divisor)
+}
+
+let (quotient, remainder) = divide(17, 5);
+println!("{}, {}", quotient, remainder); // 3, 2
+```
+
+### 闭包语法和捕获方式
+
+```rust
+// 闭包是匿名函数，可以捕获环境中的变量
+// 语法：|参数| { 函数体 }
+
+// 基础闭包
+let add_one = |x: i32| -> i32 { x + 1 };
+println!("{}", add_one(5)); // 6
+
+// 类型推断
+let add_one = |x| x + 1; // 编译器推断 x 和返回类型
+
+// 单行闭包无需大括号
+let add_one = |x| x + 1;
+let result = add_one(5); // 6
+
+// 多行闭包需要大括号
+let complex = |x: i32| {
+    let doubled = x * 2;
+    doubled + 1
+};
+
+// 捕获方式 1：不捕获任何东西
+let y = 10;
+let no_capture = |x: i32| x + 5; // 只使用参数
+println!("{}", no_capture(3)); // 8
+
+// 捕获方式 2：借用（immutable borrow）
+let y = 10;
+let borrow = |x: i32| x + y; // 借用 y
+println!("{}", borrow(5)); // 15
+println!("{}", y); // y 仍然可用
+
+// 捕获方式 3：可变借用
+let mut y = 10;
+let mut borrow_mut = |x: i32| {
+    y += x;
+    y
+};
+println!("{}", borrow_mut(5)); // 15
+// println!("{}", y); // 编译错误！y 被可变借用了
+
+// 闭包返回后 y 才可用
+println!("{}", y); // 15
+
+// 捕获方式 4：转移所有权（move）
+let s = String::from("hello");
+let takes_ownership = move || {
+    println!("{}", s);
+}; // s 的所有权转移到闭包中
+
+// println!("{}", s); // 编译错误！s 已被转移
+takes_ownership(); // OK
+
+// move 闭包通常用于线程或长生命周期的回调
+let data = vec![1, 2, 3];
+let closure = move || {
+    println!("{:?}", data);
+};
+
+// 闭包作为函数返回值（需要 impl Trait 或 trait 对象）
+fn make_adder(x: i32) -> impl Fn(i32) -> i32 {
+    move |y: i32| x + y
+}
+
+let add5 = make_adder(5);
+println!("{}", add5(3)); // 8
+
+// Fn vs FnMut vs FnOnce
+// Fn：只读借用，可以调用多次
+// FnMut：可变借用，可以调用多次但会修改捕获的变量
+// FnOnce：转移所有权，只能调用一次
+
+fn call_with_fn<F: Fn(i32) -> i32>(f: F, x: i32) -> i32 {
+    f(x)
+}
+
+fn call_with_fn_mut<F: FnMut(i32) -> i32>(mut f: F, x: i32) -> i32 {
+    f(x)
+}
+
+let double = |x: i32| x * 2;
+println!("{}", call_with_fn(double, 5)); // 10
+
+let mut counter = 0;
+let increment = |x: i32| {
+    counter += 1;
+    x + 1
+};
+println!("{}", call_with_fn_mut(increment, 5)); // 6
+println!("{}", counter); // 1
+
+// 迭代器与闭包配合
+let numbers = vec![1, 2, 3, 4, 5];
+let doubled: Vec<i32> = numbers.iter().map(|x| x * 2).collect();
+println!("{:?}", doubled); // [2, 4, 6, 8, 10]
+
+// filter 也用闭包
+let evens: Vec<i32> = numbers.iter().filter(|x| x % 2 == 0).copied().collect();
+println!("{:?}", evens); // [2, 4]
+```
+
+## 5. 流程控制
+
+### if/else 和 match 表达式
+
+```rust
+// 基础 if/else
+let x = 5;
+if x > 0 {
+    println!("positive");
+} else if x < 0 {
+    println!("negative");
+} else {
+    println!("zero");
+}
+
+// 没有三元运算符，但 if 是表达式（可以返回值）
+let x = 5;
+let result = if x > 0 { "positive" } else { "non-positive" };
+println!("{}", result); // "positive"
+
+// if 表达式必须返回同一类型
+let x = 5;
+let result = if x > 0 {
+    10
+} else {
+    5
+};
+println!("{}", result); // 10
+
+// 这个会编译错误：类型不一致
+// let result = if x > 0 { 10 } else { "text" }; // Error!
+
+// match 表达式（TS 中没有直接对应）
+let value = 2;
+match value {
+    1 => println!("one"),
+    2 => println!("two"),
+    3 | 4 => println!("three or four"),  // 多个值
+    5..=10 => println!("five to ten"),   // 范围
+    _ => println!("other"),              // 默认分支（必须）
+}
+
+// match 作为表达式返回值
+let number = 3;
+let description = match number {
+    1 => "one",
+    2 => "two",
+    3 => "three",
+    _ => "many",
+};
+println!("{}", description); // "three"
+
+// match 与守卫（guard）
+let x = 5;
+match x {
+    1 | 2 => println!("one or two"),
+    n if n < 0 => println!("negative"),
+    n if n % 2 == 0 => println!("even"),
+    _ => println!("odd"),
+}
+
+// 在 match 中绑定值
+let pair = (2, -2);
+match pair {
+    (x, y) if x == y => println!("equal"),
+    (x, y) if x + y == 0 => println!("opposite"),
+    (x, y) => println!("{}, {}", x, y),
+}
+
+// match 的详尽性检查（必须覆盖所有情况）
+enum Status {
+    Active,
+    Inactive,
+    Pending,
+}
+
+let status = Status::Active;
+match status {
+    Status::Active => println!("active"),
+    Status::Inactive => println!("inactive"),
+    Status::Pending => println!("pending"),
+    // 如果枚举添加新变体，编译会失败
+}
+```
+
+### 循环
+
+#### loop
+
+```rust
+// loop 是无限循环，通过 break 退出
+let mut count = 0;
+loop {
+    count += 1;
+    println!("{}", count);
+    if count == 3 {
+        break;
+    }
+}
+
+// loop 可以返回值
+let mut counter = 0;
+let result = loop {
+    counter += 1;
+    if counter == 10 {
+        break counter * 2;  // 返回 20
+    }
+};
+println!("{}", result); // 20
+
+// 嵌套循环的标签和 break
+let mut x = 0;
+'outer: loop {
+    let mut y = 0;
+    loop {
+        println!("{}, {}", x, y);
+        y += 1;
+        if y == 3 {
+            break;
+        }
+        if x == 2 {
+            break 'outer;  // 跳出外层循环
+        }
+    }
+    x += 1;
+}
+
+// continue 跳过当前迭代
+let mut count = 0;
+loop {
+    count += 1;
+    if count == 2 {
+        continue;
+    }
+    println!("{}", count);
+    if count == 5 {
+        break;
+    }
+}
+```
+
+#### while
+
+```rust
+// while 循环：条件为真时执行
+let mut count = 0;
+while count < 3 {
+    println!("{}", count);
+    count += 1;
+}
+
+// while let（在某个条件下循环）
+let mut optional = Some(0);
+while let Some(i) = optional {
+    println!("{}", i);
+    if i < 2 {
+        optional = Some(i + 1);
+    } else {
+        optional = None;
+    }
+}
+```
+
+#### for
+
+```rust
+// for 循环遍历可迭代对象
+for i in 0..3 {
+    println!("{}", i); // 0, 1, 2
+}
+
+// 范围包含两端
+for i in 0..=3 {
+    println!("{}", i); // 0, 1, 2, 3
+}
+
+// 反向范围
+for i in (0..3).rev() {
+    println!("{}", i); // 2, 1, 0
+}
+
+// 遍历数组
+let arr = [10, 20, 30];
+for element in arr {
+    println!("{}", element);
+}
+
+// 遍历数组的引用（不转移所有权）
+let arr = [10, 20, 30];
+for element in &arr {
+    println!("{}", element);
+}
+
+// 遍历数组并获取索引
+for (index, element) in arr.iter().enumerate() {
+    println!("{}: {}", index, element);
+}
+
+// 遍历可变引用
+let mut arr = [10, 20, 30];
+for element in &mut arr {
+    *element += 1;
+}
+println!("{:?}", arr); // [11, 21, 31]
+
+// 遍历 Vec
+let vec = vec![1, 2, 3];
+for item in vec {
+    println!("{}", item);
+}
+
+// 遍历字符串
+let s = "hello";
+for ch in s.chars() {
+    println!("{}", ch);
+}
+
+// for 与 break/continue
+for i in 0..10 {
+    if i == 3 {
+        continue;  // 跳过 3
+    }
+    if i == 7 {
+        break;     // 在 7 时退出
+    }
+    println!("{}", i);
+}
+
+// 遍历字典（HashMap）
+use std::collections::HashMap;
+
+let mut map = HashMap::new();
+map.insert("a", 1);
+map.insert("b", 2);
+
+for (key, value) in &map {
+    println!("{}: {}", key, value);
+}
+```
+
+## 6. 泛型和 Trait Bounds
+
+### 泛型函数和结构体
+
+```rust
+// 泛型函数（类似 TS 的泛型）
+fn first<T>(list: &[T]) -> &T {
+    &list[0]
+}
+
+let numbers = vec![1, 2, 3];
+let first_num = first(&numbers);
+
+let strings = vec!["a", "b", "c"];
+let first_str = first(&strings);
+
+// 多个泛型参数
+fn pair<T, U>(first: T, second: U) -> (T, U) {
+    (first, second)
+}
+
+let result = pair(5, "hello"); // (5, "hello")
+
+// 泛型结构体
+struct Point<T> {
+    x: T,
+    y: T,
+}
+
+let int_point = Point { x: 5, y: 10 };
+let float_point = Point { x: 1.5, y: 2.5 };
+
+// 泛型结构体的实现块
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+
+println!("{}", int_point.x()); // 5
+
+// 为特定类型的泛型实现方法
+impl Point<i32> {
+    fn sum(&self) -> i32 {
+        self.x + self.y
+    }
+}
+
+let int_point = Point { x: 5, y: 10 };
+println!("{}", int_point.sum()); // 15
+
+// float_point 没有 sum 方法，只有 i32 版本有
+
+// 多个泛型参数的结构体
+struct Pair<T, U> {
+    first: T,
+    second: U,
+}
+
+impl<T, U> Pair<T, U> {
+    fn new(first: T, second: U) -> Self {
+        Pair { first, second }
+    }
+}
+
+let pair = Pair::new(5, "hello");
+
+// 泛型枚举
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// 在 Rust 中这些已经定义了，可以直接使用
+let some_value: Option<i32> = Some(5);
+let no_value: Option<i32> = None;
+
+// 在 match 中使用泛型 enum
+match some_value {
+    Some(val) => println!("Value: {}", val),
+    None => println!("No value"),
+}
+```
+
+### Trait Bounds
+
+```rust
+// 定义 trait
+trait Drawable {
+    fn draw(&self);
+}
+
+// 定义泛型函数，限制 T 必须实现 Drawable
+fn print_drawing<T: Drawable>(item: &T) {
+    item.draw();
+}
+
+// 实现 trait
+struct Circle;
+impl Drawable for Circle {
+    fn draw(&self) {
+        println!("Drawing a circle");
+    }
+}
+
+print_drawing(&Circle);
+
+// 多个 trait bounds（用 +）
+trait HasSpeed {
+    fn speed(&self) -> u32;
+}
+
+fn describe_fast<T: Drawable + HasSpeed>(item: &T) {
+    item.draw();
+    println!("Speed: {}", item.speed());
+}
+
+struct Car;
+impl Drawable for Car {
+    fn draw(&self) {
+        println!("Drawing a car");
+    }
+}
+
+impl HasSpeed for Car {
+    fn speed(&self) -> u32 {
+        200
+    }
+}
+
+describe_fast(&Car);
+
+// where 语句（更清晰的语法）
+fn generic_function<T, U>(a: T, b: U) -> bool
+where
+    T: Drawable + std::fmt::Debug,
+    U: HasSpeed,
+{
+    a.draw();
+    println!("Speed: {}", b.speed());
+    true
+}
+
+// 在 trait bounds 中使用关联类型
+trait Container {
+    type Item;
+    fn get(&self) -> &Self::Item;
+}
+
+struct Box<T> {
+    item: T,
+}
+
+impl<T> Container for Box<T> {
+    type Item = T;
+    fn get(&self) -> &T {
+        &self.item
+    }
+}
+
+// 泛型约束：生命周期 bounds
+fn longest<'a, T: std::fmt::Display>(s1: &'a str, s2: &'a str, item: T) -> &'a str {
+    println!("{}", item);
+    if s1.len() > s2.len() {
+        s1
+    } else {
+        s2
+    }
+}
+
+// 为实现某 trait 的所有类型实现另一个 trait
+trait A {}
+trait B {}
+
+impl<T> B for T
+where
+    T: A,
+{
+    // B 的实现
+}
+
+// Trait bounds 与函数返回值
+trait Animal {
+    fn speak(&self) -> String;
+}
+
+struct Dog;
+impl Animal for Dog {
+    fn speak(&self) -> String {
+        "Woof!".to_string()
+    }
+}
+
+// 返回实现某 trait 的值
+fn create_animal(is_dog: bool) -> Box<dyn Animal> {
+    if is_dog {
+        Box::new(Dog)
+    } else {
+        Box::new(Dog) // 实际应该有另一个类型
+    }
+}
+
+// 使用 impl Trait 返回（编译时多态）
+fn create_animal_static() -> impl Animal {
+    Dog
+}
+
+// 泛型常数参数
+struct Array<T, const N: usize> {
+    data: [T; N],
+}
+
+let arr: Array<i32, 3> = Array { data: [1, 2, 3] };
+
+// 借用检查器与 trait bounds 结合
+fn process<'a, T: std::fmt::Display>(item: &'a T) -> &'a str {
+    println!("{}", item);
+    "processed"
+}
+```
+
+## 7. 模块和可见性
+
+### 模块声明和导入
+
+```rust
+// 定义模块
+mod math {
+    pub fn add(a: i32, b: i32) -> i32 {
+        a + b
+    }
+
+    fn internal_helper() {
+        // 这是私有函数
+    }
+}
+
+// 使用模块中的公共函数
+let result = math::add(5, 3);
+
+// 嵌套模块
+mod parent {
+    pub mod child {
+        pub fn greet() {
+            println!("Hello from child");
+        }
+    }
+}
+
+parent::child::greet();
+
+// use 语句简化访问
+use math::add;
+let result = add(5, 3); // 不需要 math:: 前缀
+
+// 导入整个模块
+use parent::child;
+child::greet();
+
+// 导入多个项（用花括号）
+use math::{add, subtract};
+
+// 导入所有公共项（*)
+use math::*;
+add(5, 3); // 直接使用
+
+// 别名
+use parent::child as c;
+c::greet();
+
+// 从外部 crate 导入
+// use std::collections::HashMap;
+// use serde::{Serialize, Deserialize};
+
+// 模块通常放在单独的文件中
+// 文件结构：
+// src/
+//   lib.rs (或 main.rs)
+//   math/
+//     mod.rs
+//   utils/
+//     mod.rs
+//     helpers.rs
+
+// 在 lib.rs 中声明模块文件：
+// mod math;
+// mod utils;
+
+// 模块内的相对导入
+mod a {
+    pub fn foo() {}
+}
+
+mod b {
+    // 导入同级模块
+    use super::a::foo;
+    // 或者
+    use crate::a::foo; // 从 crate 根开始
+}
+
+// pub use 重导出（将内部模块的项公开）
+pub use math::add;
+// 现在调用者可以直接 use crate::add
+
+// 通配符导出（不推荐，但可用）
+pub use math::*;
+```
+
+### pub 关键字
+
+```rust
+// 私有（默认）
+fn private_function() {}
+struct PrivateStruct;
+
+// 公开
+pub fn public_function() {}
+pub struct PublicStruct {
+    pub field: i32,
+    private_field: String,
+}
+
+// 实现块中的可见性
+impl PublicStruct {
+    pub fn public_method(&self) {
+        self.private_method(); // 可以访问私有方法
+    }
+
+    fn private_method(&self) {
+        // 只在模块内可见
+    }
+}
+
+// 枚举的可见性
+pub enum Status {
+    Active,
+    Inactive,
+}
+
+// 枚举变体的可见性（如果枚举是 pub，所有变体也是 pub）
+
+// Trait 的可见性
+pub trait Drawable {
+    fn draw(&self);
+}
+
+// pub(crate)：在整个 crate 内可见
+pub(crate) fn crate_visible() {}
+
+// pub(super)：在父模块可见
+mod parent {
+    pub(super) fn parent_visible() {
+        // 在 parent 的父模块中可见
+    }
+
+    mod child {
+        // 可以访问 parent_visible
+        fn access() {
+            super::parent_visible();
+        }
+    }
+}
+
+// pub(in path)：指定特定路径可见
+mod a {
+    pub(in crate::a) fn visible_in_a() {}
+
+    mod b {
+        fn access() {
+            super::visible_in_a(); // OK
+        }
+    }
+}
+
+// 泛型类型的可见性
+pub struct Container<T> {
+    pub item: T,
+}
+
+// 生命周期参数的可见性（总是public）
+pub fn borrow<'a>(x: &'a i32) -> &'a i32 {
+    x
+}
+
+// Const 和 Static 的可见性
+pub const MAXIMUM: i32 = 100;
+pub static GREETING: &str = "Hello";
+
+// 类型别名的可见性
+pub type Kilometers = i32;
+
+// 函数指针类型的可见性
+pub type Callback = fn(i32) -> i32;
+
+// 模块私有的辅助函数模式
+mod utils {
+    pub fn public_api(input: i32) -> i32 {
+        helper(input) * 2
+    }
+
+    fn helper(x: i32) -> i32 {
+        x + 1
+    }
+}
+
+// Trait 对象的可见性
+pub trait Printable {
+    fn print(&self);
+}
+
+pub fn print_anything(item: &dyn Printable) {
+    item.print();
+}
+
+// 结构体字段的分别可见性
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
+    private_z: i32, // 私有字段
+}
+
+impl Point {
+    pub fn new(x: i32, y: i32, z: i32) -> Self {
+        Point {
+            x,
+            y,
+            private_z: z,
+        }
+    }
+
+    pub fn z(&self) -> i32 {
+        self.private_z
+    }
+}
+
+// 在其他模块中使用
+use utils::public_api;
+let result = public_api(5);
+```
+
+## 8. 错误处理
+
+### `Option<T>` 和 `Result<T, E>`
+
+```rust
+// Option<T>：表示值可能存在或不存在（类似 TS 的 Optional）
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+// 创建 Option
+let some_number = Some(5);
+let no_number: Option<i32> = None;
+
+// match 模式匹配
+match some_number {
+    Some(num) => println!("Number: {}", num),
+    None => println!("No number"),
+}
+
+// unwrap：获取值，如果是 None 则 panic
+let num = Some(5).unwrap(); // 5
+// let num = None::<i32>.unwrap(); // 会 panic
+
+// expect：带错误消息的 unwrap
+let num = Some(5).expect("Expected a number");
+// let num = None::<i32>.expect("Failed to get number"); // panic with message
+
+// unwrap_or：提供默认值
+let num = Some(5).unwrap_or(0);      // 5
+let num = None::<i32>.unwrap_or(0);  // 0
+
+// unwrap_or_else：使用闭包计算默认值
+let num = None::<i32>.unwrap_or_else(|| 10 * 2); // 20
+
+// map：转换 Option 中的值
+let num = Some(5).map(|x| x * 2); // Some(10)
+let num = None::<i32>.map(|x| x * 2); // None
+
+// and_then：链接返回 Option 的操作
+fn double_if_even(x: i32) -> Option<i32> {
+    if x % 2 == 0 {
+        Some(x * 2)
+    } else {
+        None
+    }
+}
+
+let result = Some(4).and_then(double_if_even); // Some(8)
+let result = Some(3).and_then(double_if_even); // None
+
+// filter：根据条件过滤
+let result = Some(5).filter(|x| x > &3); // Some(5)
+let result = Some(2).filter(|x| x > &3); // None
+
+// is_some 和 is_none
+let opt = Some(5);
+if opt.is_some() {
+    println!("Has value");
+}
+
+// if let 与 Option
+if let Some(num) = Some(5) {
+    println!("Number: {}", num);
+}
+
+// Result<T, E>：表示操作可能成功（Ok）或失败（Err）
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+// 创建 Result
+let ok_result: Result<i32, String> = Ok(5);
+let err_result: Result<i32, String> = Err("Something went wrong".to_string());
+
+// match 处理 Result
+match ok_result {
+    Ok(value) => println!("Success: {}", value),
+    Err(error) => println!("Error: {}", error),
+}
+
+// unwrap 和 expect（与 Option 类似）
+let value = Ok(5).unwrap(); // 5
+let value = Ok(5).expect("Failed"); // 5
+
+// unwrap_err：获取错误值
+let error = Err("oops").unwrap_err(); // "oops"
+
+// map 和 and_then
+let result = Ok(5).map(|x| x * 2); // Ok(10)
+let result = Err::<i32, &str>("error").map(|x| x * 2); // Err("error")
+
+fn parse_number(s: &str) -> Result<i32, std::num::ParseIntError> {
+    s.parse()
+}
+
+let result = Ok("5")
+    .and_then(|s| parse_number(s))
+    .map(|x| x * 2); // Ok(10)
+
+// map_err：转换错误类型
+let result = Err::<i32, &str>("error")
+    .map_err(|e| format!("Parse error: {}", e)); // Err("Parse error: error")
+
+// ok 和 err：转换为 Option
+let result: Result<i32, String> = Ok(5);
+let opt: Option<i32> = result.ok(); // Some(5)
+
+let result: Result<i32, String> = Err("error".to_string());
+let opt: Option<String> = result.err(); // Some("error")
+
+// 自定义错误类型
+#[derive(Debug)]
+enum CustomError {
+    InvalidInput(String),
+    Processing(String),
+}
+
+fn validate_input(input: &str) -> Result<i32, CustomError> {
+    if input.is_empty() {
+        return Err(CustomError::InvalidInput("Input cannot be empty".to_string()));
+    }
+    input
+        .parse::<i32>()
+        .map_err(|_| CustomError::InvalidInput("Not a number".to_string()))
+}
+
+// 使用自定义错误
+match validate_input("42") {
+    Ok(num) => println!("Parsed: {}", num),
+    Err(CustomError::InvalidInput(msg)) => println!("Invalid: {}", msg),
+    Err(CustomError::Processing(msg)) => println!("Processing: {}", msg),
+}
+
+// if let 与 Result
+if let Ok(num) = validate_input("42") {
+    println!("Number: {}", num);
+}
+
+// Result 的合并（多个操作都成功）
+fn add_numbers(a: &str, b: &str) -> Result<i32, CustomError> {
+    let num_a = validate_input(a)?;
+    let num_b = validate_input(b)?;
+    Ok(num_a + num_b)
+}
+```
+
+### ? 操作符
+
+```rust
+// ? 操作符简化 Result 链式调用
+// 如果是 Err，立即返回该错误；如果是 Ok，提取值
+
+fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 {
+        Err("Cannot divide by zero".to_string())
+    } else {
+        Ok(a / b)
+    }
+}
+
+// 不用 ?
+fn calculate_without_question_mark(a: f64, b: f64, c: f64) -> Result<f64, String> {
+    let step1 = match divide(a, b) {
+        Ok(val) => val,
+        Err(e) => return Err(e),
+    };
+    let step2 = match divide(step1, c) {
+        Ok(val) => val,
+        Err(e) => return Err(e),
+    };
+    Ok(step2)
+}
+
+// 用 ?
+fn calculate_with_question_mark(a: f64, b: f64, c: f64) -> Result<f64, String> {
+    let step1 = divide(a, b)?;
+    let step2 = divide(step1, c)?;
+    Ok(step2)
+}
+
+// 在 main 函数中使用 ?（需要返回 Result）
+fn main_with_result() -> Result<(), Box<dyn std::error::Error>> {
+    let num = validate_input("42")?;
+    println!("{}", num);
+    Ok(())
+}
+
+// ? 也可以用于 Option
+fn find_first_even(list: &[i32]) -> Option<i32> {
+    for &num in list {
+        if num % 2 == 0 {
+            return Some(num);
+        }
+    }
+    None
+}
+
+fn process_optional(list: &[i32]) -> Option<i32> {
+    let first_even = find_first_even(list)?;
+    Some(first_even * 2)
+}
+
+// 混合使用 Option 和 Result（需要转换）
+fn mixed_result() -> Result<i32, String> {
+    let opt: Option<i32> = Some(5);
+    // 将 Option 转为 Result
+    let value = opt.ok_or("Value not found".to_string())?;
+    Ok(value * 2)
+}
+
+// ? 的本质：实现了 From trait 的错误自动转换
+fn automatic_error_conversion(a: &str) -> Result<i32, String> {
+    // ParseIntError 自动转为 String
+    let num: i32 = a.parse()?;
+    Ok(num)
+}
+
+// 在迭代中使用 ?
+fn parse_numbers(strings: &[&str]) -> Result<Vec<i32>, String> {
+    let mut numbers = Vec::new();
+    for s in strings {
+        let num: i32 = s.parse().map_err(|e| format!("Parse error: {}", e))?;
+        numbers.push(num);
+    }
+    Ok(numbers)
+}
+
+// 使用 collect 优雅地处理 Result 集合
+fn parse_numbers_elegant(strings: &[&str]) -> Result<Vec<i32>, String> {
+    strings
+        .iter()
+        .map(|s| s.parse::<i32>().map_err(|e| format!("Parse error: {}", e)))
+        .collect()
+}
+
+// 链式调用与 ? 结合
+fn process_data(input: &str) -> Result<String, String> {
+    let num: i32 = input.parse()?;
+    let doubled = divide(num as f64, 2.0)?;
+    Ok(format!("Result: {}", doubled))
+}
+
+// 使用 anyhow/thiserror 简化错误处理（第三方库）
+// use anyhow::{Result, Context};
+// fn read_config() -> Result<String> {
+//     let data = std::fs::read_to_string("config.txt")
+//         .context("Failed to read config")?;
+//     Ok(data)
+// }
+```
+
+## 9. 异步编程
+
+### async/await 语法
+
+```rust
+// 定义异步函数（返回 impl Future）
+async fn fetch_data() -> String {
+    "data".to_string()
+}
+
+// 异步函数必须在异步上下文中调用（用 await）
+// 这个例子假设在 tokio runtime 中运行
+#[tokio::main]
+async fn main() {
+    let data = fetch_data().await;
+    println!("{}", data);
+}
+
+// 异步函数可以返回任何类型
+async fn divide(a: i32, b: i32) -> Result<i32, String> {
+    if b == 0 {
+        Err("Cannot divide by zero".to_string())
+    } else {
+        Ok(a / b)
+    }
+}
+
+// 使用 await 获取结果
+#[tokio::main]
+async fn main_with_error() {
+    match divide(10, 2).await {
+        Ok(result) => println!("Result: {}", result),
+        Err(e) => println!("Error: {}", e),
+    }
+}
+
+// 模拟异步操作（通常是 I/O 操作）
+use std::time::Duration;
+
+async fn slow_operation() -> i32 {
+    // 在实际代码中，这会是网络请求、文件读取等
+    // tokio::time::sleep(Duration::from_secs(1)).await;
+    42
+}
+
+// 链接多个异步操作
+async fn chained_operations() -> i32 {
+    let first = slow_operation().await;
+    let second = slow_operation().await;
+    first + second
+}
+
+// 并发执行多个异步操作（使用 tokio::join!）
+use tokio::join;
+
+async fn concurrent_operations() -> (i32, i32) {
+    let (a, b) = join!(slow_operation(), slow_operation());
+    (a, b)
+}
+
+// 并发执行可变数量的异步操作（使用 FuturesUnordered 或 select!）
+use tokio::select;
+
+async fn race_operations() -> i32 {
+    select! {
+        a = slow_operation() => a,
+        b = slow_operation() => b,
+    }
+}
+
+// spawn：在后台运行异步任务
+async fn spawn_example() {
+    let handle = tokio::spawn(async {
+        slow_operation().await
+    });
+
+    // 可以在此做其他事情
+    let result = handle.await.unwrap(); // 等待任务完成
+    println!("Result: {}", result);
+}
+
+// 处理异步错误
+async fn operation_with_error() -> Result<i32, String> {
+    Err("Something went wrong".to_string())
+}
+
+async fn handle_error() -> Result<(), String> {
+    let result = operation_with_error().await?;
+    println!("Result: {}", result);
+    Ok(())
+}
+
+// 在循环中使用 await
+async fn loop_with_await() {
+    for i in 0..3 {
+        let value = slow_operation().await;
+        println!("Iteration {}: {}", i, value);
+    }
+}
+
+// 闭包中使用 async（async 闭包）
+async fn closure_example() {
+    let async_closure = async {
+        slow_operation().await
+    };
+
+    let result = async_closure.await;
+    println!("{}", result);
+}
+
+// async block（创建匿名 Future）
+async fn async_block_example() {
+    let future = async {
+        let a = slow_operation().await;
+        let b = slow_operation().await;
+        a + b
+    };
+
+    let result = future.await;
+    println!("{}", result);
+}
+
+// 从异步函数中返回 Future
+fn returns_future() -> impl std::future::Future<Output = i32> {
+    async {
+        slow_operation().await
+    }
+}
+
+// 异步 trait 方法
+trait AsyncReader {
+    async fn read(&self) -> String;
+}
+
+struct FileReader;
+
+impl AsyncReader for FileReader {
+    async fn read(&self) -> String {
+        "file content".to_string()
+    }
+}
+```
+
+### Future trait
+
+```rust
+// Future trait 的基本概念
+// pub trait Future {
+//     type Output;
+//     fn poll(mut self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output>;
+// }
+
+use std::future::Future;
+use std::pin::Pin;
+use std::task::{Context, Poll};
+
+// 实现自定义 Future
+struct MyFuture {
+    count: u32,
+}
+
+impl Future for MyFuture {
+    type Output = String;
+
+    fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
+        self.count += 1;
+        if self.count >= 3 {
+            Poll::Ready("Done!".to_string())
+        } else {
+            Poll::Pending
+        }
+    }
+}
+
+// 使用自定义 Future
+async fn use_custom_future() {
+    let future = MyFuture { count: 0 };
+    let result = future.await;
+    println!("{}", result);
+}
+
+// join!（等待多个 Future）
+use tokio::join;
+
+async fn join_example() {
+    async fn task1() -> i32 { 1 }
+    async fn task2() -> i32 { 2 }
+
+    let (a, b) = join!(task1(), task2());
+    println!("{}, {}", a, b);
+}
+
+// select!（等待第一个完成的 Future）
+use tokio::select;
+
+async fn select_example() {
+    async fn task1() -> &'static str { "task1" }
+    async fn task2() -> &'static str { "task2" }
+
+    let result = select! {
+        r1 = task1() => r1,
+        r2 = task2() => r2,
+    };
+    println!("{}", result);
+}
+
+// 转换 Future（map、then）
+async fn future_transformation() {
+    let future = async { 5 };
+    // 虽然 Future trait 没有 map，但可以在 await 后使用 map
+    let result = future.await;
+    let doubled = result * 2;
+    println!("{}", doubled);
+}
+
+// 使用 futures crate 的 FutureExt trait
+use futures::future::FutureExt;
+
+async fn future_ext_example() {
+    let future = async { 5 };
+    let mapped = future.map(|x| x * 2);
+    let result = mapped.await;
+    println!("{}", result);
+}
+
+// 条件等待
+async fn conditional_wait() {
+    async fn maybe_ready(ready: bool) -> Poll<i32> {
+        if ready {
+            Poll::Ready(42)
+        } else {
+            Poll::Pending
+        }
+    }
+
+    // 在实际代码中需要通过 Waker 来重新唤醒
+}
+```
+
+### 并发基础
+
+```rust
+// 创建并发任务
+#[tokio::main]
+async fn spawn_tasks() {
+    let handle1 = tokio::spawn(async {
+        println!("Task 1");
+        1
+    });
+
+    let handle2 = tokio::spawn(async {
+        println!("Task 2");
+        2
+    });
+
+    // 等待任务完成
+    let result1 = handle1.await.unwrap();
+    let result2 = handle2.await.unwrap();
+    println!("{}, {}", result1, result2);
+}
+
+// 收集多个任务的结果
+#[tokio::main]
+async fn collect_results() {
+    let handles: Vec<_> = (0..5)
+        .map(|i| {
+            tokio::spawn(async move {
+                println!("Task {}", i);
+                i * 2
+            })
+        })
+        .collect();
+
+    let results: Vec<_> = futures::future::join_all(handles)
+        .await
+        .into_iter()
+        .filter_map(|r| r.ok())
+        .collect();
+
+    println!("{:?}", results);
+}
+
+// Mutex 在异步代码中的使用
+use tokio::sync::Mutex;
+
+#[tokio::main]
+async fn async_mutex_example() {
+    let counter = Mutex::new(0);
+
+    {
+        let mut num = counter.lock().await;
+        *num += 1;
+    } // 释放锁
+
+    println!("Counter: {}", *counter.lock().await);
+}
+
+// 通道（Channel）用于任务间通信
+use tokio::sync::mpsc;
+
+#[tokio::main]
+async fn channel_example() {
+    let (tx, mut rx) = mpsc::channel(32);
+
+    tokio::spawn(async move {
+        for i in 0..5 {
+            tx.send(i).await.ok();
+        }
+    });
+
+    while let Some(value) = rx.recv().await {
+        println!("Received: {}", value);
+    }
+}
+
+// broadcast 通道（一对多）
+use tokio::sync::broadcast;
+
+#[tokio::main]
+async fn broadcast_example() {
+    let (tx, _rx) = broadcast::channel(16);
+
+    // 发送者
+    tokio::spawn({
+        let tx = tx.clone();
+        async move {
+            for i in 0..3 {
+                tx.send(i).ok();
+            }
+        }
+    });
+
+    // 接收者 1
+    tokio::spawn({
+        let mut rx = tx.subscribe();
+        async move {
+            while let Ok(value) = rx.recv().await {
+                println!("Receiver 1: {}", value);
+            }
+        }
+    });
+
+    // 接收者 2
+    tokio::spawn({
+        let mut rx = tx.subscribe();
+        async move {
+            while let Ok(value) = rx.recv().await {
+                println!("Receiver 2: {}", value);
+            }
+        }
+    });
+
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+}
+
+// RwLock 在异步代码中的使用
+use tokio::sync::RwLock;
+
+#[tokio::main]
+async fn async_rwlock_example() {
+    let data = RwLock::new(vec![1, 2, 3]);
+
+    // 多个读者
+    let read1 = data.read().await;
+    let read2 = data.read().await;
+    println!("{:?}, {:?}", &read1[..], &read2[..]);
+    drop(read1);
+    drop(read2);
+
+    // 写者（需要独占访问）
+    let mut write = data.write().await;
+    write.push(4);
+}
+
+// 超时处理
+use tokio::time::timeout;
+
+#[tokio::main]
+async fn timeout_example() {
+    let future = async {
+        // 模拟长时间操作
+        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        "Done"
+    };
+
+    match timeout(std::time::Duration::from_secs(1), future).await {
+        Ok(result) => println!("Success: {}", result),
+        Err(_) => println!("Timeout!"),
+    }
+}
+
+// 取消任务
+#[tokio::main]
+async fn cancellation_example() {
+    let handle = tokio::spawn(async {
+        loop {
+            println!("Working...");
+            tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+        }
+    });
+
+    tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+    handle.abort(); // 取消任务
+}
+
+// 使用 select! 实现超时
+#[tokio::main]
+async fn select_timeout_example() {
+    let future = async {
+        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        "Done"
+    };
+
+    select! {
+        result = future => println!("Result: {}", result),
+        _ = tokio::time::sleep(std::time::Duration::from_secs(1)) => {
+            println!("Timeout!");
+        }
+    }
+}
+
+// 并发 I/O 操作
+#[tokio::main]
+async fn concurrent_io() {
+    let futures = vec![
+        async { "data1" },
+        async { "data2" },
+        async { "data3" },
+    ];
+
+    let results = futures::future::join_all(futures).await;
+    println!("{:?}", results);
+}
+```
+
+## 10. 宏（Macro）
+
+### 声明宏
+
+```rust
+// 声明宏（Declarative Macros）使用 macro_rules! 定义
+// 基于模式匹配进行代码生成
+
+// 简单例子：打印变量
+macro_rules! println_var {
+    ($var:expr) => {
+        println!("Variable: {}", $var);
+    };
+}
+
+println_var!(42); // 输出：Variable: 42
+
+// 多个匹配分支
+macro_rules! calculate {
+    ($a:expr, +, $b:expr) => {
+        $a + $b
+    };
+    ($a:expr, -, $b:expr) => {
+        $a - $b
+    };
+    ($a:expr, *, $b:expr) => {
+        $a * $b
+    };
+}
+
+let result = calculate!(5, +, 3); // 8
+let result = calculate!(5, -, 3); // 2
+let result = calculate!(5, *, 3); // 15
+
+// 捕获不同类型的令牌（token）
+macro_rules! my_macro {
+    ($a:expr) => {
+        println!("Expression: {:?}", $a);
+    };
+    ($a:ty) => {
+        println!("Type: {:?}", stringify!($a));
+    };
+    ($a:ident) => {
+        println!("Identifier: {}", stringify!($a));
+    };
+}
+
+my_macro!(42);      // Expression
+my_macro!(i32);     // Type
+my_macro!(my_var);  // Identifier
+
+// 令牌类型：
+// expr - 表达式
+// stmt - 语句
+// block - 代码块
+// pat - 模式
+// ty - 类型
+// ident - 标识符
+// path - 路径
+// tt - 单个令牌树
+// item - 项（fn、struct 等）
+// meta - 元数据
+
+// 可变参数宏（重复）
+macro_rules! sum {
+    ($($num:expr),*) => {
+        {
+            let mut total = 0;
+            $(
+                total += $num;
+            )*
+            total
+        }
+    };
+}
+
+let result = sum!(1, 2, 3, 4, 5); // 15
+
+// 至少一个参数的可变参数
+macro_rules! vec_double {
+    ($first:expr $(, $rest:expr)*) => {
+        {
+            let mut vec = vec![$first * 2];
+            $(
+                vec.push($rest * 2);
+            )*
+            vec
+        }
+    };
+}
+
+let v = vec_double!(1, 2, 3); // [2, 4, 6]
+
+// 嵌套重复
+macro_rules! matrix {
+    ($($($val:expr),*);*) => {
+        vec![
+            $(
+                vec![$($val),*]
+            ),*
+        ]
+    };
+}
+
+let m = matrix!(
+    1, 2, 3;
+    4, 5, 6;
+    7, 8, 9
+);
+
+// 宏中的递归
+macro_rules! count {
+    () => {
+        0
+    };
+    ($x:expr) => {
+        1
+    };
+    ($x:expr, $($rest:expr),*) => {
+        1 + count!($($rest),*)
+    };
+}
+
+let c = count!(a, b, c, d); // 4
+
+// 使用 stringify! 获取令牌的字符串表示
+macro_rules! debug_print {
+    ($val:expr) => {
+        println!("{} = {:?}", stringify!($val), $val);
+    };
+}
+
+let x = 5;
+debug_print!(x); // 输出：x = 5
+
+// 使用 concat! 连接字符串
+macro_rules! make_name {
+    ($first:expr, $last:expr) => {
+        concat!($first, "_", $last)
+    };
+}
+
+let name = make_name!("John", "Doe"); // "John_Doe"
+
+// Rust 内置宏
+// println!、vec!、assert!、panic! 等都是声明宏
+
+// println! 的简化版本实现（概念）
+macro_rules! simple_print {
+    ($fmt:expr) => {
+        println!($fmt)
+    };
+    ($fmt:expr, $($arg:expr),*) => {
+        println!($fmt, $($arg),*)
+    };
+}
+
+simple_print!("Hello {}", "World");
+
+// 条件编译宏
+macro_rules! debug_assert_eq {
+    ($left:expr, $right:expr) => {
+        #[cfg(debug_assertions)]
+        {
+            assert_eq!($left, $right);
+        }
+    };
+}
+
+// 导出宏供其他模块使用
+#[macro_export]
+macro_rules! my_public_macro {
+    () => {
+        println!("Public macro!");
+    };
+}
+
+// 在同一 crate 中使用
+// my_public_macro!();
+
+// 导入宏
+// use crate::my_public_macro;
+```
+
+### 过程宏基础
+
+```rust
+// 过程宏（Procedural Macros）是真正的 Rust 函数
+// 需要在单独的 crate 中定义（proc-macro crate）
+
+// 在 Cargo.toml 中：
+// [lib]
+// proc-macro = true
+
+// 三种过程宏：
+// 1. 自定义派生宏（#[derive(...)]）
+// 2. 属性宏（#[...]）
+// 3. 函数宏（macro_name!(...)）
+
+// 例子：自定义派生宏 #[derive(MyDebug)]
+use proc_macro::TokenStream;
+use quote::quote;
+use syn;
+
+#[proc_macro_derive(MyDebug)]
+pub fn my_debug_derive(input: TokenStream) -> TokenStream {
+    // 解析输入的令牌流为语法树
+    let input = syn::parse_macro_input!(input as syn::DeriveInput);
+
+    // 获取类型名
+    let name = &input.ident;
+
+    // 生成代码
+    let expanded = quote! {
+        impl std::fmt::Debug for #name {
+            fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                write!(f, "MyDebug: {}", stringify!(#name))
+            }
+        }
+    };
+
+    TokenStream::from(expanded)
+}
+
+// 使用自定义派生宏：
+// #[derive(MyDebug)]
+// struct MyStruct {
+//     x: i32,
+// }
+
+// 属性宏例子
+#[proc_macro_attribute]
+pub fn my_attribute(attr: TokenStream, item: TokenStream) -> TokenStream {
+    // attr: 属性的参数
+    // item: 被装饰的项
+
+    let item = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &item.sig.ident;
+
+    let expanded = quote! {
+        #item
+
+        // 在函数后添加代码
+        println!("Function {} completed", stringify!(#name));
+    };
+
+    TokenStream::from(expanded)
+}
+
+// 使用属性宏：
+// #[my_attribute]
+// fn my_function() {
+//     println!("Hello!");
+// }
+
+// 函数宏例子
+#[proc_macro]
+pub fn my_macro_fn(input: TokenStream) -> TokenStream {
+    let input = syn::parse_macro_input!(input as syn::Expr);
+
+    let expanded = quote! {
+        {
+            let value = #input;
+            println!("Macro result: {:?}", value);
+            value
+        }
+    };
+
+    TokenStream::from(expanded)
+}
+
+// 使用函数宏：
+// let result = my_macro_fn!(5 + 3);
+
+// 更复杂的派生宏例子：生成 Builder 模式
+#[proc_macro_derive(Builder)]
+pub fn builder_derive(input: TokenStream) -> TokenStream {
+    let input = syn::parse_macro_input!(input as syn::DeriveInput);
+    let name = &input.ident;
+    let builder_name = quote::format_ident!("{}Builder", name);
+
+    // 提取结构体字段
+    let fields = match &input.data {
+        syn::Data::Struct(data) => match &data.fields {
+            syn::Fields::Named(fields) => fields,
+            _ => panic!("Only named fields supported"),
+        },
+        _ => panic!("Only structs supported"),
+    };
+
+    // 为每个字段生成 builder 方法
+    let builder_methods = fields.named.iter().map(|f| {
+        let field_name = &f.ident;
+        let field_type = &f.ty;
+
+        quote! {
+            pub fn #field_name(mut self, value: #field_type) -> Self {
+                self.#field_name = Some(value);
+                self
+            }
+        }
+    });
+
+    // 生成 Builder 结构体
+    let builder_fields = fields.named.iter().map(|f| {
+        let field_name = &f.ident;
+        let field_type = &f.ty;
+
+        quote! {
+            #field_name: Option<#field_type>
+        }
+    });
+
+    let expanded = quote! {
+        pub struct #builder_name {
+            #(#builder_fields),*
+        }
+
+        impl #builder_name {
+            pub fn new() -> Self {
+                Self {
+                    #(#(stringify!(#fields)): None),*
+                }
+            }
+
+            #(#builder_methods)*
+
+            pub fn build(self) -> Result<#name, String> {
+                Ok(#name {
+                    // ... 构造原始结构体
+                })
+            }
+        }
+    };
+
+    TokenStream::from(expanded)
+}
+
+// 使用 Builder 派生宏：
+// #[derive(Builder)]
+// struct User {
+//     name: String,
+//     age: u32,
+//     email: String,
+// }
+//
+// let user = UserBuilder::new()
+//     .name("Alice".to_string())
+//     .age(30)
+//     .email("alice@example.com".to_string())
+//     .build()?;
+
+// 常用的过程宏库：
+// - serde：序列化/反序列化
+// - thiserror：错误类型定义
+// - anyhow：灵活的错误处理
+// - async-trait：异步 trait 方法
+// - tokio 的属性宏（#[tokio::main]）
+// - warp：web 框架
+// - rocket：web 框架
+
+// 声明宏 vs 过程宏的对比：
+// 声明宏：
+//   - 基于模式匹配
+//   - 在同一 crate 中定义
+//   - 编译速度快
+//   - 适合简单的代码生成
+//
+// 过程宏：
+//   - 真正的 Rust 函数
+//   - 需要单独的 proc-macro crate
+//   - 编译速度慢
+//   - 适合复杂的代码生成和转换
+//   - 可以访问完整的语法树
+
+// 示例：使用 serde 派生宏
+// #[derive(serde::Serialize, serde::Deserialize)]
+// #[derive(Debug)]
+// struct Person {
+//     name: String,
+//     age: u32,
+// }
+//
+// let person = Person {
+//     name: "Alice".to_string(),
+//     age: 30,
+// };
+// let json = serde_json::to_string(&person)?;
+
+// 示例：使用 thiserror 定义错误类型
+// #[derive(thiserror::Error, Debug)]
+// pub enum MyError {
+//     #[error("IO error: {0}")]
+//     Io(#[from] std::io::Error),
+//     #[error("Parse error: {0}")]
+//     Parse(String),
+// }
+```
