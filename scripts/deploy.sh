@@ -11,6 +11,8 @@ fi
 
 REMOTE_URL=$(git remote get-url "$REMOTE_NAME")
 
+cd dist
+
 git init
 
 git add -A
