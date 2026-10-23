@@ -1,14 +1,537 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <title>我的网站</title>
-    <meta charset="UTF-8" />
-  </head>
-  <body>
-    <h1>欢迎来到我的网站</h1>
-    <p>这是一个简单的HTML页面示例。</p>
-    <ul>
-        <li><a href="/tools/svg-editor.html">Svg Editor</a></li>
-    </ul>
-  </body>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xyzwps.com — 工具与小东西</title>
+<meta name="description" content="xyzwps.com：独立工具与小东西。Albedo，浏览器里的 SVG 工作台；wsld，WSL 容器的 Windows 图形外壳。">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3f1ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="xyzwps.com — 工具与小东西">
+<meta property="og:description" content="独立工具与小东西。Albedo，浏览器里的 SVG 工作台；wsld，WSL 容器的 Windows 图形外壳。">
+<meta property="og:url" content="https://xyzwps.com/">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f3f1ec;
+    --paper: #fffefa;
+    --ink: #18181a;
+    --muted: #5b5953;
+    --faint: #6e6a61;
+    --line: #e2ded4;
+    --grid: #e9e5db;
+    --accent: #b83f28;
+    --ok: #2f8f68;
+    --ok-soft: rgba(47, 143, 104, 0.14);
+    --glow: #fffefa;
+    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", system-ui, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101113;
+      --paper: #18191c;
+      --ink: #edebe6;
+      --muted: #aaa79f;
+      --faint: #858179;
+      --line: #2b2b2f;
+      --grid: #1c1d20;
+      --accent: #ff8a6d;
+      --ok: #5cc08e;
+      --ok-soft: rgba(92, 192, 142, 0.14);
+      --glow: #16171a;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(80rem 34rem at 50% -14rem, var(--glow) 0%, transparent 70%),
+      var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent); color: var(--bg); }
+  a { color: inherit; }
+  a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* 顶部淡淡的方格，像一张工作台的面纸 */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, transparent 58vh);
+    mask-image: linear-gradient(to bottom, #000 0, transparent 58vh);
+    opacity: 0.8;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ---------- 顶栏 ---------- */
+  .site-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font: 700 0.9rem/1 var(--mono);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .brand-mark {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+  .brand-tld { color: var(--faint); font-weight: 500; }
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 0.82rem;
+  }
+  .site-nav a {
+    color: var(--muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .site-nav a:hover { color: var(--ink); }
+  .site-nav .arrow { color: var(--faint); font-size: 0.9em; }
+
+  /* ---------- 头图 ---------- */
+  .hero { padding: 5rem 0 4.6rem; }
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    font: 600 0.67rem/1.2 var(--mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .kicker::before {
+    content: "";
+    width: 1.6rem;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.75;
+  }
+  .hero h1 {
+    margin: 1.05rem 0 1.2rem;
+    font-size: clamp(2.7rem, 6.2vw, 4.5rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.055em;
+  }
+  .hero h1 .dot { color: var(--accent); }
+  .lede {
+    margin: 0;
+    max-width: 38rem;
+    font-size: 1.02rem;
+    line-height: 1.8;
+    color: var(--muted);
+    text-wrap: pretty;
+    word-break: keep-all;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+  .hero-note {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 1.9rem 0 0;
+    font: 500 0.76rem/1.5 var(--mono);
+    color: var(--faint);
+  }
+  .hero-note::before {
+    content: "";
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: var(--ok);
+    box-shadow: 0 0 0 3px var(--ok-soft);
+  }
+
+  /* ---------- 项目区 ---------- */
+  .projects { padding-bottom: 4.5rem; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    margin-bottom: 1.3rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+  .section-head .count {
+    font: 0.7rem/1 var(--mono);
+    color: var(--accent);
+  }
+  .section-head .en {
+    margin-left: auto;
+    font: 600 0.66rem/1 var(--mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.15rem;
+    counter-reset: project;
+  }
+  .project {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    counter-increment: project;
+    padding: 1.6rem 1.6rem 1.4rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+  .project::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--bar);
+  }
+  .project:hover,
+  .project:focus-within {
+    transform: translateY(-2px);
+    border-color: var(--brand);
+    box-shadow: 0 22px 50px -38px rgba(20, 18, 14, 0.45);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .badge {
+    flex: 0 0 auto;
+    width: 3.4rem;
+    height: 3.4rem;
+    display: grid;
+    place-items: center;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 13px;
+  }
+  .badge img {
+    display: block;
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 7px;
+  }
+  .kind {
+    font: 600 0.65rem/1.4 var(--mono);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .num {
+    margin-left: auto;
+    font: 0.68rem/1 var(--mono);
+    letter-spacing: 0.05em;
+    color: var(--faint);
+  }
+  .num::before { content: counter(project, decimal-leading-zero); }
+
+  .project h3 {
+    margin: 1.15rem 0 0.18rem;
+    font-size: 1.55rem;
+    line-height: 1.25;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+  }
+  .project h3 a { text-decoration: none; }
+  .project h3 a:hover { color: var(--brand-strong); }
+  .tagline {
+    margin: 0;
+    font-size: 0.97rem;
+    font-weight: 550;
+    line-height: 1.5;
+  }
+  .desc {
+    margin: 0.65rem 0 0;
+    font-size: 0.86rem;
+    line-height: 1.72;
+    color: var(--muted);
+    text-wrap: pretty;
+    word-break: keep-all;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 1.1rem 0 1.3rem;
+    padding: 0;
+    list-style: none;
+  }
+  .tags li {
+    padding: 0.12rem 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font: 0.67rem/1.6 var(--mono);
+    color: var(--muted);
+  }
+
+  .card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 1.3rem;
+    border-top: 1px solid var(--line);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.43rem 0.82rem;
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .btn:hover {
+    background: var(--brand-strong);
+    color: #fff;
+    text-decoration: none;
+  }
+  .btn .arrow {
+    font-size: 0.95em;
+    transition: transform 0.15s ease;
+  }
+  .btn:hover .arrow { transform: translateX(2px); }
+
+  .minor {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    font-size: 0.79rem;
+  }
+  .minor a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .minor a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .minor .arrow { color: var(--faint); }
+
+  .projects-note {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.15rem 0 0;
+    font: 0.73rem/1.5 var(--mono);
+    color: var(--faint);
+  }
+  .projects-note::before {
+    content: "";
+    width: 2.2rem;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* ---------- 页脚 ---------- */
+  .site-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem 1.5rem;
+    padding: 1.4rem 0 2.2rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.76rem;
+    color: var(--faint);
+  }
+  .site-foot p { margin: 0; }
+  .site-foot nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.1rem;
+  }
+  .site-foot a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .site-foot a:hover { color: var(--ink); }
+
+  /* ---------- 窄屏 ---------- */
+  @media (max-width: 56rem) {
+    .hero { padding: 4rem 0 3.7rem; }
+    .projects-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 40rem) {
+    .wrap { padding: 0 1.15rem; }
+    .site-head { padding: 1.15rem 0; }
+    .site-nav { gap: 0.9rem; font-size: 0.78rem; }
+    .hero { padding: 3.2rem 0 3rem; }
+    .hero h1 { font-size: clamp(2.35rem, 10.5vw, 2.9rem); }
+    .lede { font-size: 0.96rem; }
+    .section-head .en { display: none; }
+    .project { padding: 1.35rem 1.25rem 1.2rem; }
+    .badge { width: 3rem; height: 3rem; border-radius: 11px; }
+    .badge img { width: 2.1rem; height: 2.1rem; }
+    .project h3 { font-size: 1.4rem; }
+    .card-actions { align-items: flex-start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .project, .btn, .btn .arrow { transition: none; }
+    .project:hover, .project:focus-within { transform: none; }
+    .btn:hover .arrow { transform: none; }
+  }
+</style>
+</head>
+<body id="top">
+<div class="backdrop" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="site-head">
+    <a class="brand" href="./" aria-label="xyzwps.com 首页">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>xyzwps<span class="brand-tld">.com</span></span>
+    </a>
+    <nav class="site-nav" aria-label="站点导航">
+      <a href="#projects">项目</a>
+      <a href="https://github.com/xyzwps">GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="kicker">XYZWPS / TOOLS</p>
+      <h1 id="hero-title">这里只有工具<span class="dot">。</span></h1>
+      <p class="lede"><strong>网页里的，桌面上的。</strong>自己写，自己用——没有账号，没有信息流，打开就能用。</p>
+      <p class="hero-note">先放这些，后面还会有新的。</p>
+    </section>
+
+    <section class="projects" id="projects" aria-labelledby="projects-title">
+      <div class="section-head">
+        <h2 id="projects-title">项目</h2>
+        <span class="count" aria-hidden="true">02</span>
+        <span class="en">PROJECTS</span>
+      </div>
+
+      <!-- 加项目：复制一个 <article class="project">，改 --brand / --brand-strong / --bar、图标、文案和链接；
+           序号由 CSS 自动生成。记得把上面的 02 改成新数量。 -->
+      <div class="projects-grid">
+        <article class="project"
+          style="--brand:#d9533a; --brand-strong:#b83f28; --bar:linear-gradient(90deg,#f2c75c 0%,#e35b3f 52%,#98a6e8 100%)">
+          <div class="card-head">
+            <span class="badge">
+              <img src="assets/imgs/albedo-logo.svg" alt="" width="160" height="160">
+            </span>
+            <span class="kind">WEB · SVG</span>
+            <span class="num" aria-hidden="true"></span>
+          </div>
+          <h3><a href="pages/albedo.html">Albedo</a></h3>
+          <p class="tagline">浏览器里的 SVG 工作台。</p>
+          <p class="desc">画图形、改路径、排图层，再把干净的结果导出成 SVG。单文件，离线可用。</p>
+          <ul class="tags">
+            <li>单文件</li>
+            <li>离线</li>
+            <li>中英界面</li>
+          </ul>
+          <div class="card-actions">
+            <a class="btn" href="tools/albedo.html">打开编辑器 <span class="arrow" aria-hidden="true">→</span></a>
+            <div class="minor">
+              <a href="pages/albedo.html">项目介绍</a>
+              <a href="https://github.com/xyzwps/albedo" aria-label="Albedo 的 GitHub 仓库">GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project"
+          style="--brand:#e07f00; --brand-strong:#a85f00; --bar:linear-gradient(90deg,#ff9402 0%,#ffc078 60%,#ff9402 100%)">
+          <div class="card-head">
+            <span class="badge">
+              <img src="assets/imgs/wsld.png" alt="" width="372" height="372">
+            </span>
+            <span class="kind">WINDOWS · WSL</span>
+            <span class="num" aria-hidden="true"></span>
+          </div>
+          <h3><a href="pages/wsld.html">wsld</a></h3>
+          <p class="tagline">给 WSL 容器一个窗口。</p>
+          <p class="desc">容器、镜像、日志和 wslc run 都收进一个窗口，不用再记一串参数。</p>
+          <ul class="tags">
+            <li>Windows 11</li>
+            <li>WSL 3</li>
+            <li>WinUI 3</li>
+          </ul>
+          <div class="card-actions">
+            <a class="btn" href="https://github.com/xyzwps/wsld/releases">下载安装包 <span class="arrow" aria-hidden="true">→</span></a>
+            <div class="minor">
+              <a href="pages/wsld.html">项目介绍</a>
+              <a href="https://github.com/xyzwps/wsld" aria-label="wsld 的 GitHub 仓库">GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <p class="projects-note">下一个项目还在做。</p>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <p>xyzwps.com · 静态页面，无账号，无统计。</p>
+    <nav aria-label="页脚导航">
+      <a href="version.html">构建版本</a>
+      <a href="https://github.com/xyzwps/xyzwps.github.io">源码</a>
+      <a href="#top">回到顶部</a>
+    </nav>
+  </footer>
+</div>
+</body>
 </html>

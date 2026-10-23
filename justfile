@@ -3,3 +3,6 @@ build:
 
 deploy:
     ./scripts/deploy.sh
+
+serve: build
+    node scripts/serve.js
