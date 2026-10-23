@@ -1,0 +1,267 @@
+/* ==========================================================================
+   framework.css — xyzwps.com 的共享样式基础
+   --------------------------------------------------------------------------
+   三个页面（index / pages/albedo / pages/wsld）共用的东西都在这里：
+
+     1. 主题变量     .theme-paper（首页的暖纸色） / .theme-tool（项目页的中性色）
+     2. 基础排版     reset、body、链接、焦点环
+     3. 通用组件     按钮、区块标题、页脚、行内代码、暗色面板
+
+   页面只负责两件事：
+     - <body class="theme-paper"> 或 <body class="theme-tool"> 选主题；
+     - 引入自己的布局文件：home.css / project.css，再在页面 <style> 里写
+       该页独有的东西（强调色、插图配色等）。
+
+   新项目页的骨架：
+     <link rel="stylesheet" href="../assets/css/framework.css">
+     <link rel="stylesheet" href="../assets/css/project.css">
+     <body class="theme-tool">
+     <style>.theme-tool { --accent: #…; --btn-bg: #…; --btn-ink: #…; }</style>
+
+   可复用组件：
+     .btn--primary / .btn--outline / .btn--solid 按钮
+     .section-head                               区块标题
+     .site-foot                                  页脚（详情页加 --inset）
+     code                                        行内代码
+     .panel / .callout / .term / .req            暗色面板与说明区块
+
+   改完样式记得 ./scripts/build.sh。
+   ========================================================================== */
+
+/* ---------- 1. 主题变量 ---------- */
+:root {
+  color-scheme: light dark;
+
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", system-ui, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --shadow-card: 0 1px 2px rgba(16, 18, 22, 0.04), 0 18px 48px -30px rgba(16, 18, 22, 0.25);
+}
+
+/* 首页：暖白纸 + 陶土红 */
+.theme-paper {
+  --bg: #f3f1ec;
+  --paper: #fffefa;
+  --ink: #18181a;
+  --muted: #5b5953;
+  --faint: #6e6a61;
+  --line: #e2ded4;
+  --grid: #e9e5db;
+  --accent: #b83f28;
+  --accent-soft: rgba(184, 63, 40, 0.08);
+  --ok: #2f8f68;
+  --ok-soft: rgba(47, 143, 104, 0.14);
+  --glow: #fffefa;
+}
+
+/* 项目详情页：中性灰 + 每个项目自己的强调色（在页面 <style> 里覆盖） */
+.theme-tool {
+  --bg: #f4f5f7;
+  --paper: #ffffff;
+  --ink: #1b1c1f;
+  --muted: #5f636b;
+  --faint: #71767f;
+  --line: #e4e6eb;
+  --grid: #eef0f4;
+  --accent: #c8472e;
+  --accent-soft: #fff1ec;
+  --btn-bg: #c8472e;
+  --btn-ink: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-paper {
+    --bg: #101113;
+    --paper: #18191c;
+    --ink: #edebe6;
+    --muted: #aaa79f;
+    --faint: #858179;
+    --line: #2b2b2f;
+    --grid: #1c1d20;
+    --accent: #ff8a6d;
+    --accent-soft: rgba(255, 138, 109, 0.1);
+    --ok: #5cc08e;
+    --ok-soft: rgba(92, 192, 142, 0.14);
+    --glow: #16171a;
+  }
+
+  .theme-tool {
+    --bg: #0e0f12;
+    --paper: #17181c;
+    --ink: #e9eaee;
+    --muted: #a5aab5;
+    --faint: #7d838f;
+    --line: #282a31;
+    --grid: #202228;
+    --accent: #ff8a6d;
+    --accent-soft: rgba(227, 91, 63, 0.14);
+    --btn-bg: #ff8a6d;
+    --btn-ink: #221310;
+  }
+}
+
+/* ---------- 2. 基础排版 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.btn:focus-visible { border-radius: var(--radius-sm); }
+
+/* ---------- 3. 按钮 ----------
+   .btn            结构（内边距、圆角、字重、过渡）
+   .btn--primary   实心强调色，用于主操作
+   .btn--outline   描边按钮，用于次要操作
+   .btn--solid     墨色实心按钮（首页卡片）
+   .btn .arrow     往右挪一点的箭头                                   */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.46rem 0.95rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
+}
+.btn:hover { text-decoration: none; }
+
+.btn--primary {
+  background: var(--btn-bg, var(--accent));
+  border-color: var(--btn-bg, var(--accent));
+  color: var(--btn-ink, #fff);
+}
+.btn--primary:hover {
+  filter: brightness(1.06);
+  color: var(--btn-ink, #fff);
+}
+
+.btn--outline {
+  border-color: var(--line);
+  color: var(--ink);
+}
+.btn--outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn--solid {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+.btn--solid:hover {
+  background: var(--brand-strong, var(--accent));
+  border-color: var(--brand-strong, var(--accent));
+  color: #fff;
+}
+
+.btn .arrow {
+  font-size: 0.95em;
+  transition: transform 0.15s ease;
+}
+.btn:hover .arrow { transform: translateX(2px); }
+
+/* ---------- 4. 区块标题 ----------
+   .rule 是一条自动撑开的细线；首页用 .count + 右对齐的 .en。 */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 1.25rem;
+}
+.section-head h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+.section-head .en {
+  font: 600 0.68rem/1 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.section-head .count {
+  font: 0.7rem/1 var(--mono);
+  color: var(--accent);
+}
+.section-head .rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---------- 5. 页脚 ----------
+   基础版只有分隔线、排版和链接色；上下留白由页面决定。 */
+.site-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  color: var(--faint);
+}
+.site-foot p { margin: 0; }
+.site-foot nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.1rem;
+}
+.site-foot a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.site-foot a:hover { color: var(--ink); }
+
+/* ---------- 6. 行内代码 ----------
+   需要换底色时，在容器上改 --code-bg，别重写整套规则。 */
+code, kbd {
+  padding: 0.08em 0.35em;
+  background: var(--code-bg, var(--bg));
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-size: 0.86em;
+  white-space: nowrap;
+}
+
+/* ---------- 7. 暗色面板 ----------
+   终端窗口、运行环境卡片之类共用的底。 */
+.panel {
+  background: #15171c;
+  border: 1px solid #262a32;
+  border-radius: var(--radius-md);
+  color: #e7eaf0;
+  font-family: var(--mono);
+}
+
+/* ---------- 8. 动效偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn .arrow { transition: none; }
+  .btn:hover .arrow { transform: none; }
+}

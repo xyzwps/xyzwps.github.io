@@ -1,0 +1,257 @@
+/* ==========================================================================
+   project.css — 项目详情页布局（pages/albedo.html、pages/wsld.html）
+   依赖：framework.css（主题变量、按钮、区块标题、页脚、行内代码、面板）
+   这里只放两个项目页共用的骨架；每个项目的强调色与专属插图在各自
+   页面的 <style> 里覆盖。
+   ========================================================================== */
+
+body {
+  padding: 2.5rem 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  line-height: 1.7;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+main {
+  width: 100%;
+  max-width: 56rem;
+  padding: 1.6rem 2.75rem 2rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- 面包屑 ---------- */
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font: 0.74rem/1 var(--mono);
+  color: var(--faint);
+}
+.crumbs a { color: var(--muted); }
+.crumbs .sep { opacity: 0.55; }
+
+/* ---------- 头图 ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 20.5rem);
+  align-items: center;
+  gap: 3rem;
+  padding: 2.2rem 0 2.8rem;
+}
+
+.app-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.app-head h1 { font-size: 2.5rem; line-height: 1; }
+.app-head .eyebrow { margin-bottom: 0.16rem; }
+.app-icon {
+  flex: 0 0 auto;
+  width: 3.4rem;
+  height: 3.4rem;
+  display: block;
+  border-radius: 14px;
+  background: #000;
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.55);
+}
+
+.eyebrow {
+  margin: 0;
+  font: 600 0.7rem/1 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.6rem;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.tagline {
+  margin: 1rem 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 550;
+  color: var(--ink);
+}
+
+.lede {
+  margin: 0;
+  max-width: 33rem;
+  font-size: 0.93rem;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.7rem;
+}
+
+.meta {
+  margin: 0.95rem 0 0;
+  font-size: 0.76rem;
+  color: var(--faint);
+}
+
+.art { margin: 0; }
+.art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 16px 30px rgba(20, 22, 26, 0.12));
+}
+.art figcaption {
+  margin-top: 0.85rem;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--faint);
+}
+
+/* ---------- 功能清单 ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.7rem 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.features li {
+  display: grid;
+  grid-template-columns: 1.55rem minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+}
+.features .icon { color: var(--accent); }
+.features .icon svg { display: block; width: 1.35rem; height: 1.35rem; }
+.features h3 { margin: 0 0 0.25rem; font-size: 0.92rem; font-weight: 650; }
+.features p { margin: 0; font-size: 0.83rem; line-height: 1.6; color: var(--muted); }
+
+/* ---------- 说明区块（构建说明 / 安装说明） ---------- */
+.callout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 19rem);
+  align-items: center;
+  gap: 2.2rem;
+  margin-top: 2.6rem;
+  padding: 1.5rem 1.6rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+}
+.callout h2 { margin: 0 0 0.55rem; font-size: 0.97rem; font-weight: 650; }
+.callout p { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.callout p + p { margin-top: 0.75rem; }
+.callout code { --code-bg: var(--paper); }
+.callout .hint { font-size: 0.78rem; color: var(--faint); }
+
+/* ---------- 终端窗口（Albedo） ---------- */
+.term { overflow: hidden; border-radius: 11px; }
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #262a32;
+}
+.term-bar i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #3a3f49;
+}
+.term-bar i:nth-child(1) { background: var(--brand, #e35b3f); }
+.term-bar i:nth-child(2) { background: var(--yellow, #f2c75c); }
+.term-bar i:nth-child(3) { background: var(--peri, #98a6e8); }
+.term-bar span {
+  margin-left: 0.35rem;
+  font: 0.66rem/1 var(--mono);
+  color: #838a97;
+}
+.term pre {
+  margin: 0;
+  padding: 0.75rem 1rem 0.9rem;
+  overflow-x: auto;
+  font: 0.78rem/1.9 var(--mono);
+  color: #e7eaf0;
+}
+.term code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  white-space: pre;
+}
+.term .prompt { color: #8a919e; user-select: none; }
+
+/* ---------- 运行环境卡片（wsld） ---------- */
+.req { padding: 0.9rem 1rem 1rem; }
+.req-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid #262a32;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8b929e;
+}
+.req-head .led {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--green, #3fb950);
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.12);
+}
+.req dl { margin: 0.7rem 0 0; display: grid; gap: 0.42rem; }
+.req dl div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.req dt { color: #7f8693; }
+.req dd { margin: 0; text-align: right; color: #e7eaf0; }
+
+/* ---------- 页脚 ---------- */
+.site-foot--inset {
+  margin-top: 2.2rem;
+  padding-top: 1.25rem;
+}
+.site-foot--inset a:hover { color: var(--accent); }
+
+/* ---------- 窄屏 ---------- */
+@media (max-width: 54rem) {
+  main { padding: 1.5rem 1.5rem 1.75rem; border-radius: var(--radius-lg); }
+  .hero { grid-template-columns: 1fr; gap: 2.1rem; padding: 1.6rem 0 2.2rem; }
+  .art { width: 100%; max-width: 23rem; margin: 0 auto; }
+  .features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+  .callout { grid-template-columns: 1fr; gap: 1.3rem; }
+  h1, .app-head h1 { font-size: 2.2rem; }
+}
+@media (max-width: 34rem) {
+  body { padding: 0; }
+  main { min-height: 100vh; border: 0; border-radius: 0; padding: 1.25rem 1.15rem 1.5rem; }
+  .features { grid-template-columns: 1fr; }
+  h1, .app-head h1 { font-size: 2rem; }
+  .app-icon { width: 3rem; height: 3rem; border-radius: 12px; }
+  .callout { padding: 1.2rem; }
+}

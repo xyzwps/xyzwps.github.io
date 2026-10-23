@@ -7,34 +7,20 @@
 <meta name="description" content="wsld 是 wslc 命令行的 WinUI 3 图形外壳：容器、镜像、日志和 run 命令都能在窗口里完成。">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/framework.css">
+<link rel="stylesheet" href="../assets/css/project.css">
 <style>
-  :root {
-    color-scheme: light dark;
-    --ink: #1b1c1f;
-    --muted: #5f636b;
-    --faint: #71767f;
-    --paper: #ffffff;
-    --bg: #f4f5f7;
-    --line: #e4e6eb;
-    --grid: #eef0f4;
+  /* wsld 的强调色与插图阴影 */
+  .theme-tool {
     --accent: #c2410c;
     --accent-soft: #fff4e5;
     --btn-bg: #ff9402;
     --btn-ink: #1b1205;
     --brand: #ff9402;
     --green: #3fb950;
-    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", system-ui, sans-serif;
-    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --ink: #eceef2;
-      --muted: #a6abb5;
-      --faint: #858b97;
-      --paper: #17181c;
-      --bg: #0e0f12;
-      --line: #282a31;
-      --grid: #202228;
+    .theme-tool {
       --accent: #ffb35c;
       --accent-soft: rgba(255, 148, 2, 0.14);
       --btn-bg: #ff9402;
@@ -42,287 +28,14 @@
     }
   }
 
-  *, *::before, *::after { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    padding: 2.5rem 1.25rem;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    background: var(--bg);
-    color: var(--ink);
-    font: 16px/1.7 var(--sans);
-    -webkit-font-smoothing: antialiased;
-  }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; text-underline-offset: 3px; }
-  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-
-  main {
-    width: 100%;
-    max-width: 56rem;
-    padding: 1.6rem 2.75rem 2rem;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    box-shadow: 0 1px 2px rgba(16, 18, 22, 0.04), 0 18px 48px -30px rgba(16, 18, 22, 0.25);
-  }
-
-  /* ---------- 面包屑 ---------- */
-  .crumbs {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    font: 0.74rem/1 var(--mono);
-    color: var(--faint);
-  }
-  .crumbs a { color: var(--muted); }
-  .crumbs .sep { opacity: 0.55; }
-
-  /* ---------- 头图 ---------- */
-  .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 20.5rem);
-    align-items: center;
-    gap: 3rem;
-    padding: 2.2rem 0 2.8rem;
-  }
-  .app-head {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-  }
-  .app-icon {
-    flex: 0 0 auto;
-    width: 3.4rem;
-    height: 3.4rem;
-    display: block;
-    border-radius: 14px;
-    background: #000;
-    box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.55);
-  }
-  .eyebrow {
-    margin: 0 0 0.16rem;
-    font: 600 0.7rem/1 var(--mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  h1 {
-    margin: 0;
-    font-size: 2.5rem;
-    line-height: 1;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-  }
-  .tagline {
-    margin: 1.15rem 0 0.55rem;
-    font-size: 1.05rem;
-    font-weight: 550;
-    color: var(--ink);
-  }
-  .lede {
-    margin: 0;
-    max-width: 33rem;
-    font-size: 0.93rem;
-    color: var(--muted);
-  }
-  .lede code {
-    padding: 0.08em 0.3em;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 4px;
-    font: 0.88em var(--mono);
-    white-space: nowrap;
-  }
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-    margin-top: 1.6rem;
-  }
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.46rem 0.95rem;
-    border: 1px solid var(--line);
-    border-radius: 9px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--ink);
-  }
-  .btn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
-  .btn.primary {
-    background: var(--btn-bg);
-    border-color: var(--btn-bg);
-    color: var(--btn-ink);
-  }
-  .btn.primary:hover { filter: brightness(1.04); color: var(--btn-ink); }
-  .meta {
-    margin: 0.95rem 0 0;
-    font-size: 0.76rem;
-    color: var(--faint);
-  }
-
-  .art { margin: 0; }
-  .art svg {
-    display: block;
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0 18px 30px rgba(10, 12, 16, 0.22));
-  }
-  .art figcaption {
-    margin-top: 0.85rem;
-    font-size: 0.76rem;
-    line-height: 1.55;
-    text-align: center;
-    color: var(--faint);
-  }
+  .tagline { margin: 1.15rem 0 0.55rem; }
+  .actions { margin-top: 1.6rem; }
+  .lede code { font-size: 0.88em; padding: 0.08em 0.3em; }
+  .art svg { filter: drop-shadow(0 18px 30px rgba(10, 12, 16, 0.22)); }
   .art text { font-family: var(--sans); }
-
-  /* ---------- 区块标题 ---------- */
-  .section-head {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin: 0 0 1.25rem;
-  }
-  .section-head h2 { margin: 0; font-size: 0.95rem; font-weight: 650; }
-  .section-head .en {
-    font: 600 0.68rem/1 var(--mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
-  .section-head .rule { flex: 1; height: 1px; background: var(--line); }
-
-  /* ---------- 功能清单 ---------- */
-  .features {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.7rem 2rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .features li {
-    display: grid;
-    grid-template-columns: 1.55rem minmax(0, 1fr);
-    gap: 0.7rem;
-    align-items: start;
-  }
-  .features .icon { color: var(--accent); }
-  .features .icon svg { display: block; width: 1.35rem; height: 1.35rem; }
-  .features h3 { margin: 0 0 0.25rem; font-size: 0.92rem; font-weight: 650; }
-  .features p { margin: 0; font-size: 0.83rem; line-height: 1.6; color: var(--muted); }
-
-  /* ---------- 安装说明 ---------- */
-  .install {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 19rem);
-    align-items: center;
-    gap: 2.2rem;
-    margin-top: 2.6rem;
-    padding: 1.5rem 1.6rem;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 15px;
-  }
-  .install h2 { margin: 0 0 0.55rem; font-size: 0.97rem; font-weight: 650; }
-  .install p { margin: 0; font-size: 0.85rem; color: var(--muted); }
-  .install p + p { margin-top: 0.75rem; }
-  .install code {
-    padding: 0.08em 0.35em;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 5px;
-    font: 0.86em var(--mono);
-    white-space: nowrap;
-  }
-  .install .hint { font-size: 0.78rem; color: var(--faint); }
-
-  .req {
-    padding: 0.9rem 1rem 1rem;
-    background: #15171c;
-    border: 1px solid #2b2f37;
-    border-radius: 12px;
-    color: #e7eaf0;
-    font-family: var(--mono);
-  }
-  .req-head {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding-bottom: 0.55rem;
-    border-bottom: 1px solid #262a32;
-    font-size: 0.66rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #8b929e;
-  }
-  .req-head .led {
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.12);
-  }
-  .req dl { margin: 0.7rem 0 0; display: grid; gap: 0.42rem; }
-  .req dl div {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    font-size: 0.72rem;
-    line-height: 1.4;
-  }
-  .req dt { color: #7f8693; }
-  .req dd { margin: 0; text-align: right; color: #e7eaf0; }
-
-  /* ---------- 页脚 ---------- */
-  footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.7rem 1.5rem;
-    margin-top: 2.2rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.78rem;
-    color: var(--faint);
-  }
-  footer p { margin: 0; }
-  footer nav { display: flex; flex-wrap: wrap; gap: 1.1rem; }
-  footer a { color: var(--muted); }
-  footer a:hover { color: var(--accent); }
-
-  /* ---------- 窄屏 ---------- */
-  @media (max-width: 54rem) {
-    main { padding: 1.5rem 1.5rem 1.75rem; border-radius: 16px; }
-    .hero { grid-template-columns: 1fr; gap: 2.1rem; padding: 1.6rem 0 2.2rem; }
-    .art { width: 100%; max-width: 23rem; margin: 0 auto; }
-    .features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
-    .install { grid-template-columns: minmax(0, 1fr) minmax(0, 17rem); gap: 1.6rem; }
-    h1 { font-size: 2.2rem; }
-  }
-  @media (max-width: 46rem) {
-    .install { grid-template-columns: 1fr; gap: 1.3rem; }
-  }
-  @media (max-width: 34rem) {
-    body { padding: 0; }
-    main { min-height: 100vh; border: 0; border-radius: 0; padding: 1.25rem 1.15rem 1.5rem; }
-    .features { grid-template-columns: 1fr; }
-    h1 { font-size: 2rem; }
-    .app-icon { width: 3rem; height: 3rem; border-radius: 12px; }
-    .install { padding: 1.2rem; }
-  }
 </style>
 </head>
-<body>
+<body class="theme-tool">
 <main>
   <nav class="crumbs" aria-label="面包屑">
     <a href="../index.html">xyzwps.com</a>
@@ -346,8 +59,8 @@
         wsld 是 <code>wslc</code> 的 WinUI 3 图形外壳。<code>wslc</code> 是 WSL 3 的容器命令行；wsld 把容器、镜像、日志和 <code>run</code> 命令都收进一个窗口——能点、能看，也能把命令复制走。
       </p>
       <div class="actions">
-        <a class="btn primary" href="https://github.com/xyzwps/wsld/releases">下载安装包 <span aria-hidden="true">→</span></a>
-        <a class="btn" href="https://github.com/xyzwps/wsld">GitHub</a>
+        <a class="btn btn--primary" href="https://github.com/xyzwps/wsld/releases">下载安装包 <span aria-hidden="true">→</span></a>
+        <a class="btn btn--outline" href="https://github.com/xyzwps/wsld">GitHub</a>
       </div>
       <p class="meta">Windows 11 · 需要 WSL 3（wslc） · 安装包已带运行时</p>
     </div>
@@ -539,7 +252,7 @@
     </ul>
   </section>
 
-  <section class="install" aria-labelledby="install-title">
+  <section class="callout" aria-labelledby="install-title">
     <div>
       <h2 id="install-title">装好就能用</h2>
       <p>
@@ -552,7 +265,7 @@
       </p>
     </div>
 
-    <aside class="req" aria-label="运行环境">
+    <aside class="panel req" aria-label="运行环境">
       <div class="req-head"><span class="led" aria-hidden="true"></span>运行环境</div>
       <dl>
         <div><dt>system</dt><dd>Windows 11</dd></div>
@@ -563,7 +276,7 @@
     </aside>
   </section>
 
-  <footer>
+  <footer class="site-foot site-foot--inset">
     <p>WinUI 3 · Windows App SDK 2.5 · .NET 9</p>
     <nav aria-label="相关链接">
       <a href="https://github.com/xyzwps/wsld">GitHub</a>

@@ -1,3 +1,4 @@
+# 首次使用先运行 npm install
 build:
     ./scripts/build.sh
 
