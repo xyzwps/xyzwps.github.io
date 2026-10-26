@@ -1,0 +1,3097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05070c">
+<meta name="description" content="全屏康威生命游戏：自由绘制细胞，载入经典图形，观察演化。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23070d14'/%3E%3Cg fill='%235eead4'%3E%3Crect x='7' y='7' width='5' height='5' rx='1'/%3E%3Crect x='14' y='14' width='5' height='5' rx='1'/%3E%3Crect x='21' y='14' width='5' height='5' rx='1'/%3E%3Crect x='7' y='21' width='5' height='5' rx='1'/%3E%3Crect x='14' y='21' width='5' height='5' rx='1'/%3E%3C/g%3E%3C/svg%3E">
+<title>生命游戏 · Conway's Game of Life</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #05070c;
+    --ink: #e9f8f6;
+    --muted: #8298a7;
+    --muted-2: #59707f;
+    --mint: #5eead4;
+    --teal: #2dd4bf;
+    --cyan: #22d3ee;
+    --violet: #a78bfa;
+    --rose: #fb7185;
+    --line: rgba(148, 197, 220, 0.13);
+    --line-soft: rgba(148, 197, 220, 0.075);
+    --glass: rgba(8, 15, 23, 0.72);
+    --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    --mono: "SFMono-Regular", ui-monospace, "Cascadia Code", "Roboto Mono", Menlo, monospace;
+  }
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
+
+  [hidden] { display: none !important; }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  html { background: var(--bg); }
+
+  body {
+    position: fixed;
+    inset: 0;
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overscroll-behavior: none;
+    background:
+      radial-gradient(1150px 720px at 16% -8%, rgba(20, 184, 166, 0.11), transparent 62%),
+      radial-gradient(1000px 760px at 88% 8%, rgba(99, 102, 241, 0.12), transparent 66%),
+      radial-gradient(1050px 760px at 48% 112%, rgba(8, 145, 178, 0.10), transparent 68%),
+      linear-gradient(180deg, #060910 0%, #04070c 52%, #030509 100%);
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  input { font: inherit; }
+
+  button { -webkit-tap-highlight-color: transparent; }
+
+  ::selection { background: rgba(94, 234, 212, 0.24); }
+
+  :focus-visible {
+    outline: 2px solid rgba(94, 234, 212, 0.9);
+    outline-offset: 3px;
+  }
+
+  /* Ambient light behind the world */
+  .aurora {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .aurora span {
+    position: absolute;
+    display: block;
+    width: 62vw;
+    height: 62vw;
+    min-width: 480px;
+    min-height: 480px;
+    border-radius: 50%;
+    filter: blur(110px);
+    opacity: 0.15;
+    will-change: transform;
+  }
+
+  .aurora span:nth-child(1) {
+    top: -32%;
+    left: -18%;
+    background: #0f766e;
+    animation: drift-a 26s ease-in-out infinite alternate;
+  }
+
+  .aurora span:nth-child(2) {
+    top: -26%;
+    right: -24%;
+    background: #4f46e5;
+    opacity: 0.13;
+    animation: drift-b 31s ease-in-out infinite alternate;
+  }
+
+  .aurora span:nth-child(3) {
+    bottom: -46%;
+    left: 30%;
+    background: #0369a1;
+    opacity: 0.09;
+    animation: drift-a 36s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes drift-a {
+    from { transform: translate3d(-2%, -1%, 0) scale(1); }
+    to { transform: translate3d(5%, 4%, 0) scale(1.08); }
+  }
+
+  @keyframes drift-b {
+    from { transform: translate3d(2%, 1%, 0) scale(1.03); }
+    to { transform: translate3d(-5%, 4%, 0) scale(0.96); }
+  }
+
+  #gridCanvas,
+  #worldCanvas {
+    position: fixed;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #gridCanvas {
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  #worldCanvas {
+    z-index: 2;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  body.tool-erase #worldCanvas { cursor: cell; }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 78% 74% at 50% 46%, transparent 46%, rgba(2, 4, 8, 0.38) 100%),
+      linear-gradient(180deg, rgba(2, 4, 8, 0.24) 0%, transparent 16%, transparent 82%, rgba(2, 4, 8, 0.38) 100%);
+  }
+
+  .vignette::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.035;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+
+  /* ── Top HUD ───────────────────────────────────────────── */
+  .hud {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding:
+      calc(18px + env(safe-area-inset-top))
+      clamp(16px, 3vw, 38px)
+      20px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(3, 6, 11, 0.76) 0%, rgba(3, 6, 11, 0.32) 52%, transparent 100%);
+    animation: hud-in 0.8s cubic-bezier(0.22, 0.82, 0.3, 1) both;
+  }
+
+  .hud > * { pointer-events: auto; }
+
+  @keyframes hud-in {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .logo {
+    display: grid;
+    grid-template-columns: repeat(3, 6px);
+    grid-template-rows: repeat(3, 6px);
+    gap: 3px;
+    width: 42px;
+    height: 42px;
+    padding: 8px;
+    flex: none;
+    border: 1px solid rgba(148, 197, 220, 0.16);
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(15, 32, 40, 0.88), rgba(6, 14, 21, 0.9));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 8px 24px rgba(0, 0, 0, 0.26);
+  }
+
+  .logo i {
+    width: 6px;
+    height: 6px;
+    border-radius: 1.5px;
+    background: rgba(148, 197, 220, 0.13);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .logo i.live {
+    background: var(--mint);
+    box-shadow: 0 0 7px rgba(94, 234, 212, 0.7);
+  }
+
+  .brand-copy { min-width: 0; }
+
+  .brand-copy h1 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.2;
+    font-weight: 620;
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+  }
+
+  .brand-copy p {
+    margin: 5px 0 0;
+    color: var(--muted-2);
+    font-family: var(--mono);
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: 0.25em;
+    white-space: nowrap;
+  }
+
+  .readout {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    margin-left: auto;
+    padding: 9px 15px;
+    border: 1px solid var(--line-soft);
+    border-radius: 14px;
+    background: rgba(6, 13, 20, 0.52);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
+  }
+
+  .readout-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .readout-label {
+    color: var(--muted-2);
+    font-size: 9px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+  }
+
+  .readout-value {
+    color: #dcfbf7;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 600;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 18px rgba(94, 234, 212, 0.22);
+  }
+
+  .readout-divider {
+    width: 1px;
+    height: 17px;
+    flex: none;
+    background: var(--line-soft);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--mint);
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .status-pill i {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    flex: none;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .status-pill i::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    opacity: 0;
+    animation: status-ping 2.3s ease-out infinite;
+  }
+
+  body.is-paused .status-pill { color: #fbbf24; }
+  body.is-paused .status-pill i::after { animation: none; }
+
+  @keyframes status-ping {
+    0% { opacity: 0.55; transform: scale(0.7); }
+    65%, 100% { opacity: 0; transform: scale(1.7); }
+  }
+
+  .status-pill b { font-weight: 500; }
+
+  .hud-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+  }
+
+  .glass-btn {
+    width: 40px;
+    height: 40px;
+    display: inline-grid;
+    place-items: center;
+    padding: 0;
+    color: var(--muted);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    background: rgba(8, 16, 24, 0.55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    cursor: pointer;
+    transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+
+  .glass-btn:hover {
+    color: var(--ink);
+    border-color: rgba(94, 234, 212, 0.28);
+    background: rgba(17, 34, 42, 0.72);
+  }
+
+  .glass-btn:active { transform: scale(0.95); }
+  .glass-btn svg { width: 18px; height: 18px; }
+
+  /* ── Bottom control dock ──────────────────────────────── */
+  .dock {
+    position: fixed;
+    z-index: 30;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: max-content;
+    max-width: calc(100vw - 16px);
+    padding: 9px;
+    border: 1px solid rgba(148, 197, 220, 0.14);
+    border-radius: 22px;
+    background:
+      linear-gradient(180deg, rgba(15, 26, 37, 0.84), rgba(6, 12, 19, 0.88));
+    box-shadow:
+      0 28px 80px rgba(0, 0, 0, 0.56),
+      0 2px 16px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.075),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    transform: translateX(-50%);
+    animation: dock-in 0.78s 0.08s cubic-bezier(0.22, 0.82, 0.3, 1) both;
+  }
+
+  @keyframes dock-in {
+    from { opacity: 0; transform: translate(-50%, 16px) scale(0.985); }
+    to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  }
+
+  .dock-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .dock-divider {
+    width: 1px;
+    height: 26px;
+    flex: none;
+    margin: 0 2px;
+    background: var(--line-soft);
+  }
+
+  .btn {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: var(--muted);
+    background: transparent;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 520;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      color 0.18s ease,
+      background 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.14s ease;
+  }
+
+  .btn:hover {
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.055);
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  .btn svg {
+    width: 17px;
+    height: 17px;
+    flex: none;
+  }
+
+  .btn-icon {
+    width: 42px;
+    padding: 0;
+  }
+
+  .btn.primary {
+    height: 44px;
+    padding: 0 17px;
+    border-color: transparent;
+    border-radius: 13px;
+    color: #03221f;
+    background: linear-gradient(135deg, #a7fff2 0%, #5eead4 38%, #22d3ee 100%);
+    font-size: 12.5px;
+    font-weight: 740;
+    letter-spacing: 0.025em;
+    box-shadow:
+      0 7px 26px rgba(34, 211, 238, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(3, 75, 68, 0.18);
+  }
+
+  .btn.primary:hover {
+    color: #021a18;
+    background: linear-gradient(135deg, #bdfff5 0%, #72f5e0 38%, #36ddf5 100%);
+    box-shadow:
+      0 9px 32px rgba(34, 211, 238, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .btn.primary svg { width: 15px; height: 15px; }
+
+  #playBtn .icon-play { display: none; }
+  body.is-paused #playBtn .icon-play { display: block; }
+  body.is-paused #playBtn .icon-pause { display: none; }
+
+  .btn.accent {
+    color: #a8fff2;
+    background: rgba(45, 212, 191, 0.07);
+    border-color: rgba(94, 234, 212, 0.15);
+  }
+
+  .btn.accent:hover {
+    color: #d9fffa;
+    background: rgba(45, 212, 191, 0.13);
+    border-color: rgba(94, 234, 212, 0.26);
+  }
+
+  .keycap {
+    display: inline-grid;
+    place-items: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border: 1px solid rgba(148, 197, 220, 0.13);
+    border-radius: 4px;
+    color: var(--muted-2);
+    font-family: var(--mono);
+    font-size: 8px;
+    line-height: 1;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .btn.accent:hover .keycap { color: var(--mint); border-color: rgba(94, 234, 212, 0.24); }
+
+  .segmented {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.022);
+  }
+
+  .tool-btn {
+    appearance: none;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    color: var(--muted-2);
+    background: transparent;
+    cursor: pointer;
+    transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .tool-btn svg { width: 16px; height: 16px; }
+
+  .tool-btn:hover { color: var(--ink); }
+
+  .tool-btn.active {
+    color: var(--mint);
+    background: rgba(45, 212, 191, 0.13);
+    box-shadow: inset 0 0 0 1px rgba(94, 234, 212, 0.15);
+  }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 7px 0 5px;
+    min-height: 38px;
+  }
+
+  .speed-label {
+    color: var(--muted-2);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+  }
+
+  .speed-slider {
+    --fill: 18.6%;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 92px;
+    height: 4px;
+    margin: 0;
+    border: 0;
+    border-radius: 99px;
+    outline: none;
+    background: linear-gradient(
+      90deg,
+      var(--mint) 0%,
+      var(--cyan) var(--fill),
+      rgba(255, 255, 255, 0.10) var(--fill),
+      rgba(255, 255, 255, 0.10) 100%
+    );
+    cursor: pointer;
+  }
+
+  .speed-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 99px;
+    background: transparent;
+  }
+
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 13px;
+    height: 13px;
+    margin-top: -4.5px;
+    border: 2px solid #053f3a;
+    border-radius: 50%;
+    background: #d7fff9;
+    box-shadow:
+      0 0 0 3px rgba(94, 234, 212, 0.12),
+      0 0 14px rgba(94, 234, 212, 0.46);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .speed-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.12);
+    box-shadow:
+      0 0 0 4px rgba(94, 234, 212, 0.15),
+      0 0 18px rgba(94, 234, 212, 0.58);
+  }
+
+  .speed-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .speed-slider::-moz-range-progress {
+    height: 4px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--mint), var(--cyan));
+  }
+
+  .speed-slider::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: 2px solid #053f3a;
+    border-radius: 50%;
+    background: #d7fff9;
+    box-shadow: 0 0 12px rgba(94, 234, 212, 0.46);
+  }
+
+  .speed-value {
+    min-width: 44px;
+    color: #b8fff6;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* ── Toast ─────────────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    z-index: 60;
+    top: calc(88px + env(safe-area-inset-top));
+    left: 50%;
+    max-width: calc(100vw - 32px);
+    padding: 10px 16px;
+    border: 1px solid rgba(94, 234, 212, 0.18);
+    border-radius: 18px;
+    color: #cffff8;
+    background: rgba(7, 19, 24, 0.88);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4), 0 0 24px rgba(45, 212, 191, 0.08);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    font-size: 11.5px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    text-align: center;
+    white-space: normal;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .toast[data-tone="muted"] {
+    color: #ffd9a0;
+    border-color: rgba(251, 191, 36, 0.2);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4), 0 0 24px rgba(251, 191, 36, 0.08);
+  }
+
+  .toast[data-tone="rose"] {
+    color: #ffd4db;
+    border-color: rgba(251, 113, 133, 0.24);
+  }
+
+  /* ── Shared overlay scrim ─────────────────────────────── */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(1, 3, 6, 0.52);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.32s ease, visibility 0s linear 0.32s;
+  }
+
+  .scrim.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.32s ease;
+  }
+
+  /* ── Pattern library drawer ───────────────────────────── */
+  .library {
+    position: fixed;
+    z-index: 80;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: min(470px, 100vw);
+    border-left: 1px solid rgba(148, 197, 220, 0.12);
+    background:
+      radial-gradient(700px 500px at 100% 0%, rgba(45, 212, 191, 0.075), transparent 62%),
+      linear-gradient(180deg, rgba(11, 19, 29, 0.985), rgba(5, 10, 16, 0.99));
+    box-shadow: -30px 0 100px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(102%);
+    transition:
+      transform 0.45s cubic-bezier(0.22, 0.82, 0.25, 1),
+      opacity 0.35s ease,
+      visibility 0s linear 0.45s;
+  }
+
+  .library.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    transition:
+      transform 0.45s cubic-bezier(0.22, 0.82, 0.25, 1),
+      opacity 0.35s ease;
+  }
+
+  .library-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding:
+      calc(26px + env(safe-area-inset-top))
+      24px
+      17px;
+    border-bottom: 1px solid var(--line-soft);
+    flex: none;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 9px;
+    color: var(--mint);
+    font-family: var(--mono);
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.23em;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 16px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.65;
+  }
+
+  .library-head h2 {
+    margin: 0;
+    font-size: 25px;
+    line-height: 1.15;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+
+  .library-head .subtitle {
+    margin: 7px 0 0;
+    color: var(--muted-2);
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.18em;
+  }
+
+  .close-btn {
+    appearance: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    padding: 0;
+    color: var(--muted);
+    border: 1px solid var(--line-soft);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.025);
+    cursor: pointer;
+    transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  }
+
+  .close-btn:hover {
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(148, 197, 220, 0.2);
+  }
+
+  .close-btn:active { transform: scale(0.94); }
+  .close-btn svg { width: 16px; height: 16px; }
+
+  .library-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 15px 24px 28px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(94, 234, 212, 0.22) transparent;
+  }
+
+  .library-scroll::-webkit-scrollbar { width: 5px; }
+  .library-scroll::-webkit-scrollbar-track { background: transparent; }
+  .library-scroll::-webkit-scrollbar-thumb {
+    border-radius: 99px;
+    background: rgba(94, 234, 212, 0.18);
+  }
+
+  .library-lede {
+    max-width: 36em;
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.8;
+  }
+
+  .pattern-section + .pattern-section { margin-top: 26px; }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 11px;
+  }
+
+  .section-index {
+    color: rgba(94, 234, 212, 0.65);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .section-name {
+    margin: 0;
+    color: #d6ebe8;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+  }
+
+  .section-en {
+    color: var(--muted-2);
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    margin-left: auto;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    max-width: 42px;
+    background: var(--line-soft);
+  }
+
+  .pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .pattern-card {
+    appearance: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    text-align: left;
+    color: inherit;
+    border: 1px solid rgba(148, 197, 220, 0.09);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.022);
+    cursor: pointer;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .pattern-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(94, 234, 212, 0.27);
+    background: rgba(45, 212, 191, 0.045);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(94, 234, 212, 0.04) inset;
+  }
+
+  .pattern-thumb {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 84px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(148, 197, 220, 0.065);
+    background:
+      radial-gradient(circle at 50% 45%, rgba(45, 212, 191, 0.065), transparent 68%),
+      radial-gradient(rgba(148, 197, 220, 0.19) 0.65px, transparent 0.75px) 0 0 / 9px 9px;
+  }
+
+  .pattern-thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 32px rgba(5, 10, 16, 0.5);
+    pointer-events: none;
+  }
+
+  .pattern-thumb canvas {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .thumb-badge {
+    position: absolute;
+    z-index: 2;
+    top: 7px;
+    right: 8px;
+    padding: 3px 5px;
+    border: 1px solid rgba(148, 197, 220, 0.1);
+    border-radius: 4px;
+    color: var(--muted);
+    background: rgba(4, 9, 14, 0.64);
+    font-family: var(--mono);
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  .pattern-info {
+    display: block;
+    padding: 11px 12px 13px;
+  }
+
+  .pattern-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    min-width: 0;
+  }
+
+  .pattern-name {
+    display: block;
+    overflow: hidden;
+    color: #e5f8f5;
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pattern-en {
+    display: block;
+    flex: none;
+    color: var(--muted-2);
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  .pattern-desc {
+    display: -webkit-box;
+    margin-top: 6px;
+    overflow: hidden;
+    color: #8298a5;
+    font-size: 10.5px;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .library-foot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+    min-height: 47px;
+    padding: 12px 24px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line-soft);
+    color: var(--muted-2);
+    font-size: 9px;
+    letter-spacing: 0.02em;
+    background: rgba(5, 10, 16, 0.42);
+  }
+
+  .library-foot kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 18px;
+    height: 16px;
+    padding: 0 4px;
+    border: 1px solid var(--line-soft);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 8px;
+  }
+
+  /* ── Help dialog ──────────────────────────────────────── */
+  .help-modal {
+    position: fixed;
+    z-index: 90;
+    top: 50%;
+    left: 50%;
+    width: min(620px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    padding: 27px 28px 24px;
+    border: 1px solid rgba(148, 197, 220, 0.16);
+    border-radius: 24px;
+    background:
+      radial-gradient(650px 460px at 90% -10%, rgba(99, 102, 241, 0.13), transparent 58%),
+      radial-gradient(600px 380px at 0% 110%, rgba(45, 212, 191, 0.075), transparent 62%),
+      linear-gradient(160deg, rgba(14, 23, 34, 0.99), rgba(5, 10, 16, 0.995));
+    box-shadow:
+      0 40px 120px rgba(0, 0, 0, 0.68),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate(-50%, -47%) scale(0.97);
+    transition:
+      opacity 0.28s ease,
+      transform 0.36s cubic-bezier(0.22, 0.82, 0.25, 1),
+      visibility 0s linear 0.36s;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(94, 234, 212, 0.2) transparent;
+  }
+
+  .help-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+    transition:
+      opacity 0.28s ease,
+      transform 0.36s cubic-bezier(0.22, 0.82, 0.25, 1);
+  }
+
+  .help-modal::-webkit-scrollbar { width: 5px; }
+  .help-modal::-webkit-scrollbar-thumb {
+    border-radius: 99px;
+    background: rgba(94, 234, 212, 0.18);
+  }
+
+  .help-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  .help-head-copy { flex: 1; min-width: 0; }
+
+  .help-head h2 {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+
+  .help-head p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+
+  .rule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+    margin: 20px 0 18px;
+  }
+
+  .rule-card {
+    padding: 14px 13px;
+    border: 1px solid var(--line-soft);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.022);
+  }
+
+  .rule-icon {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    margin-bottom: 13px;
+    border: 1px solid rgba(94, 234, 212, 0.18);
+    border-radius: 8px;
+    color: var(--mint);
+    background: rgba(45, 212, 191, 0.07);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .rule-card:nth-child(2) .rule-icon {
+    color: #7dd3fc;
+    border-color: rgba(56, 189, 248, 0.18);
+    background: rgba(14, 165, 233, 0.07);
+  }
+
+  .rule-card:nth-child(3) .rule-icon {
+    color: #fda4af;
+    border-color: rgba(251, 113, 133, 0.18);
+    background: rgba(244, 63, 94, 0.06);
+  }
+
+  .rule-card h3 {
+    margin: 0 0 6px;
+    color: #e0f6f2;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .rule-card p {
+    margin: 0;
+    color: #869ba7;
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .help-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 0 24px;
+    padding: 11px 13px;
+    border: 1px solid rgba(148, 197, 220, 0.08);
+    border-radius: 10px;
+    color: #879aa6;
+    background: rgba(255, 255, 255, 0.018);
+    font-size: 10.5px;
+    line-height: 1.75;
+  }
+
+  .help-note svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    margin-top: 1px;
+    color: var(--mint);
+    opacity: 0.8;
+  }
+
+  .shortcut-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 10px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+  }
+
+  .shortcut-head::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line-soft);
+  }
+
+  .shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 18px;
+    margin: 0 0 24px;
+  }
+
+  .shortcut-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 32px;
+    border-bottom: 1px solid rgba(148, 197, 220, 0.05);
+    color: #93a8b4;
+    font-size: 11.5px;
+  }
+
+  .shortcut-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: none;
+  }
+
+  .shortcut-key kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 24px;
+    height: 22px;
+    padding: 0 6px;
+    border: 1px solid rgba(148, 197, 220, 0.13);
+    border-bottom-color: rgba(148, 197, 220, 0.22);
+    border-radius: 5px;
+    color: #bad4d2;
+    background: rgba(255, 255, 255, 0.035);
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+  }
+
+  .shortcut-key .plus {
+    color: var(--muted-2);
+    font-size: 8px;
+  }
+
+  .help-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .help-foot p {
+    margin: 0;
+    color: var(--muted-2);
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .mobile-only { display: none; }
+
+  .help-close {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 40px;
+    padding: 0 17px;
+    flex: none;
+    border: 1px solid rgba(94, 234, 212, 0.2);
+    border-radius: 11px;
+    color: #d8fff9;
+    background: rgba(45, 212, 191, 0.11);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  }
+
+  .help-close:hover {
+    background: rgba(45, 212, 191, 0.18);
+    border-color: rgba(94, 234, 212, 0.32);
+  }
+
+  .help-close:active { transform: scale(0.97); }
+
+  /* ── Responsive ───────────────────────────────────────── */
+  @media (max-width: 760px) {
+    .hud {
+      gap: 10px;
+      padding:
+        calc(12px + env(safe-area-inset-top))
+        14px
+        15px;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      padding: 6px;
+      grid-template-columns: repeat(3, 5px);
+      grid-template-rows: repeat(3, 5px);
+      gap: 3px;
+      border-radius: 10px;
+    }
+
+    .logo i { width: 5px; height: 5px; }
+
+    .brand { gap: 9px; }
+    .brand-copy h1 { font-size: 13px; letter-spacing: 0.12em; }
+    .brand-copy p { display: none; }
+
+    .readout {
+      gap: 10px;
+      padding: 6px 9px;
+      border-radius: 11px;
+    }
+
+    .readout-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+
+    .readout-label { font-size: 8px; letter-spacing: 0.12em; }
+    .readout-value { font-size: 11.5px; text-align: left; }
+    .readout-divider { height: 20px; }
+    .status-pill { font-size: 9px; }
+    .hud-actions { gap: 6px; }
+    .glass-btn { width: 36px; height: 36px; border-radius: 10px; }
+    .glass-btn svg { width: 16px; height: 16px; }
+
+    .dock {
+      width: calc(100vw - 20px);
+      max-width: none;
+      gap: 5px;
+      padding: 7px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      border-radius: 18px;
+    }
+
+    .dock-group { gap: 2px; }
+    .dock-divider { display: none; }
+    .btn { height: 40px; padding: 0 9px; font-size: 11px; }
+    .btn.primary { height: 42px; padding: 0 13px; font-size: 12px; }
+    .btn-icon { width: 40px; padding: 0; }
+    .speed-control { min-height: 34px; padding: 0 4px; gap: 7px; }
+    .speed-slider { width: 76px; }
+    .speed-value { min-width: 41px; font-size: 9px; }
+    .speed-label { font-size: 8px; }
+    .keycap { display: none; }
+    .segmented { padding: 2px; }
+    .tool-btn { width: 32px; height: 32px; }
+
+    #resetBtn,
+    #clearBtn,
+    #randomBtn {
+      width: auto;
+      padding: 0 8px;
+    }
+
+    .toast {
+      top: calc(68px + env(safe-area-inset-top));
+      font-size: 11.5px;
+      border-radius: 16px;
+    }
+
+    .library { width: 100vw; }
+    .library-head { padding: calc(20px + env(safe-area-inset-top)) 18px 14px; }
+    .library-head h2 { font-size: 22px; }
+    .library-scroll { padding: 13px 18px 24px; }
+    .library-foot { padding-left: 18px; padding-right: 18px; }
+    .library-foot kbd,
+    .library-foot span:last-child { display: none; }
+    .pattern-thumb { height: 76px; }
+    .pattern-desc { font-size: 10px; }
+    .shortcut-head,
+    .shortcut-grid { display: none; }
+    .help-note { margin-bottom: 20px; }
+    .help-foot { justify-content: flex-end; }
+    .help-foot p { display: none; }
+    .desktop-only { display: none; }
+    .mobile-only { display: inline; }
+  }
+
+  @media (max-width: 480px) {
+    .status-item { display: none; }
+    .readout-divider:last-of-type { display: none; }
+    .readout { margin-left: auto; }
+    .help-modal { padding: 22px 18px 20px; border-radius: 20px; }
+    .help-head h2 { font-size: 21px; }
+    .rule-grid { grid-template-columns: 1fr; }
+    .rule-card { display: flex; align-items: flex-start; gap: 11px; padding: 11px 12px; }
+    .rule-icon { margin-bottom: 0; flex: none; }
+    .rule-card h3 { flex: none; margin-top: 2px; }
+    .rule-card p { flex: 1; min-width: 0; font-size: 11px; }
+    .shortcut-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 360px) {
+    .readout { margin-left: auto; }
+    .speed-label { display: none; }
+    .pattern-grid { gap: 8px; }
+
+    .pattern-card .pattern-en { display: none; }
+
+    #resetBtn,
+    #clearBtn,
+    #randomBtn {
+      width: 40px;
+      padding: 0;
+    }
+
+    #resetBtn .btn-label,
+    #clearBtn .btn-label,
+    #randomBtn .btn-label { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+<canvas id="gridCanvas" aria-hidden="true"></canvas>
+<canvas id="worldCanvas" aria-label="生命游戏画布：按住并拖动可绘制细胞，右键擦除" title="拖动绘制细胞 · 右键擦除"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<header class="hud">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <i></i><i class="live"></i><i></i>
+      <i></i><i></i><i class="live"></i>
+      <i class="live"></i><i class="live"></i><i class="live"></i>
+    </div>
+    <div class="brand-copy">
+      <h1>生命游戏</h1>
+      <p>CONWAY'S GAME OF LIFE</p>
+    </div>
+  </div>
+
+  <div class="readout" aria-label="游戏状态">
+    <div class="readout-item">
+      <span class="readout-label">代数</span>
+      <span class="readout-value" id="genValue">0</span>
+    </div>
+    <span class="readout-divider" aria-hidden="true"></span>
+    <div class="readout-item">
+      <span class="readout-label">种群</span>
+      <span class="readout-value" id="popValue">0</span>
+    </div>
+    <span class="readout-divider" aria-hidden="true"></span>
+    <div class="readout-item status-item">
+      <span class="readout-label">状态</span>
+      <span class="status-pill" id="statusPill"><i aria-hidden="true"></i><b id="statusText">运行中</b></span>
+    </div>
+  </div>
+
+  <div class="hud-actions">
+    <button class="glass-btn" id="helpBtn" type="button" aria-label="查看玩法与快捷键" title="玩法与快捷键 (?)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M9.4 9.1a2.7 2.7 0 1 1 3.7 2.5c-.8.35-1.1.85-1.1 1.65v.35"></path>
+        <path d="M12 17.4h.01"></path>
+      </svg>
+    </button>
+    <button class="glass-btn" id="fullscreenBtn" type="button" aria-label="进入全屏" title="全屏 (F)">
+      <svg class="icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"></path>
+      </svg>
+      <svg class="icon-compress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" hidden>
+        <path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<footer class="dock" id="dock" aria-label="游戏控制">
+  <div class="dock-group">
+    <button class="btn primary" id="playBtn" type="button" aria-label="暂停演化" title="暂停 / 继续 (Space)">
+      <svg class="icon-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M8.5 5v14M15.5 5v14"></path>
+      </svg>
+      <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+        <path d="M8 5.4v13.2L19 12 8 5.4Z"></path>
+      </svg>
+      <span id="playLabel">暂停</span>
+    </button>
+
+    <button class="btn btn-icon" id="stepBtn" type="button" aria-label="单步演化" title="单步演化 (S)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M6 5v14"></path>
+        <path d="m18 5-8 7 8 7V5Z"></path>
+      </svg>
+    </button>
+
+    <button class="btn" id="resetBtn" type="button" aria-label="重置到初始图形" title="重置到初始图形 (R)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M4.6 9.2A8 8 0 1 1 4 13.4"></path>
+        <path d="M4.5 4.5v5h5"></path>
+      </svg>
+      <span class="btn-label">重置</span>
+    </button>
+
+    <button class="btn" id="clearBtn" type="button" aria-label="清空画布" title="清空画布 (C)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M4 7h16"></path>
+        <path d="M9 7V4.5h6V7"></path>
+        <path d="m7 7 .8 12.5h8.4L17 7"></path>
+        <path d="M10 11v5M14 11v5"></path>
+      </svg>
+      <span class="btn-label">清空</span>
+    </button>
+  </div>
+
+  <span class="dock-divider" aria-hidden="true"></span>
+
+  <div class="dock-group">
+    <div class="segmented" role="group" aria-label="绘制工具">
+      <button class="tool-btn active" data-tool="draw" type="button" aria-label="绘制细胞" aria-pressed="true" title="绘制细胞 (D)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="m14.5 4.5 5 5L9 20H4v-5L14.5 4.5Z"></path>
+          <path d="m12.5 6.5 5 5"></path>
+        </svg>
+      </button>
+      <button class="tool-btn" data-tool="erase" type="button" aria-label="擦除细胞" aria-pressed="false" title="擦除细胞 (E)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="m8.5 19.5-4-4a1.8 1.8 0 0 1 0-2.5L13 4.5a1.8 1.8 0 0 1 2.5 0l4.5 4.5a1.8 1.8 0 0 1 0 2.5l-8 8H8.5Z"></path>
+          <path d="m9 9 6.5 6.5"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <span class="dock-divider" aria-hidden="true"></span>
+
+  <div class="dock-group">
+    <button class="btn accent" id="presetBtn" type="button" aria-label="打开经典图形库" title="经典图形库 (G)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <rect x="4" y="4" width="6.5" height="6.5" rx="1.2"></rect>
+        <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"></rect>
+        <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"></rect>
+        <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"></rect>
+      </svg>
+      <span class="btn-label">图形库</span>
+      <span class="keycap" aria-hidden="true">G</span>
+    </button>
+
+    <button class="btn" id="randomBtn" type="button" aria-label="生成随机星群" title="生成随机星群">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+        <circle cx="9" cy="9" r="1.1" fill="currentColor" stroke="none"></circle>
+        <circle cx="15" cy="15" r="1.1" fill="currentColor" stroke="none"></circle>
+        <circle cx="9" cy="15" r="1.1" fill="currentColor" stroke="none"></circle>
+        <circle cx="15" cy="9" r="1.1" fill="currentColor" stroke="none"></circle>
+      </svg>
+      <span class="btn-label">随机</span>
+    </button>
+  </div>
+
+  <span class="dock-divider" aria-hidden="true"></span>
+
+  <div class="speed-control">
+    <span class="speed-label">速度</span>
+    <input class="speed-slider" id="speedSlider" type="range" min="1" max="60" value="12" step="1" aria-label="演化速度" aria-valuetext="每秒 12 代">
+    <output class="speed-value" id="speedValue" for="speedSlider">12 / 秒</output>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="scrim" id="libraryScrim" aria-hidden="true"></div>
+<aside class="library" id="library" role="dialog" aria-modal="true" aria-labelledby="libraryTitle" aria-hidden="true" inert>
+  <header class="library-head">
+    <div>
+      <p class="eyebrow">PATTERN LIBRARY</p>
+      <h2 id="libraryTitle">经典图形</h2>
+      <p class="subtitle">CONWAY'S GREATEST HITS</p>
+    </div>
+    <button class="close-btn" id="libraryClose" type="button" aria-label="关闭图形库">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M6 6l12 12M18 6 6 18"></path>
+      </svg>
+    </button>
+  </header>
+
+  <div class="library-scroll">
+    <p class="library-lede">选择一种经典图案，它会出现在画布中央并立即开始演化。你也可以先暂停，再把它当作起点继续绘制。</p>
+    <div id="librarySections"></div>
+  </div>
+
+  <footer class="library-foot">
+    <span>提示</span>
+    <span>点击卡片载入</span>
+    <kbd>Esc</kbd>
+    <span>关闭</span>
+  </footer>
+</aside>
+
+<div class="scrim" id="helpScrim" aria-hidden="true"></div>
+<section class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" aria-hidden="true" inert>
+  <div class="help-head">
+    <div class="help-head-copy">
+      <p class="eyebrow">FIELD GUIDE</p>
+      <h2 id="helpTitle">生命的规则</h2>
+      <p>每个细胞根据周围八个邻居的数量决定下一代。规则很简单，结果却从不重复。</p>
+    </div>
+    <button class="close-btn" id="helpClose" type="button" aria-label="关闭玩法说明">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M6 6l12 12M18 6 6 18"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="rule-grid">
+    <div class="rule-card">
+      <span class="rule-icon" aria-hidden="true">＋</span>
+      <h3>新生</h3>
+      <p>死细胞周围恰好有 3 个活细胞时，下一代诞生。</p>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon" aria-hidden="true">＝</span>
+      <h3>存续</h3>
+      <p>活细胞周围有 2 或 3 个活细胞时，继续存活。</p>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon" aria-hidden="true">−</span>
+      <h3>消亡</h3>
+      <p>其余情况，细胞都会因孤独或拥挤而死亡。</p>
+    </div>
+  </div>
+
+  <div class="help-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <path d="M4 12a8 8 0 1 0 2.4-5.7"></path>
+      <path d="M4 4v4h4"></path>
+    </svg>
+    <span>画布边界是环绕相连的：从右边飞出的滑翔机会从左边出现。<span class="desktop-only">拖动鼠标或手指绘制细胞，右键可直接擦除。</span><span class="mobile-only">用手指拖动即可绘制细胞，也可以打开图形库选择经典图案。</span></span>
+  </div>
+
+  <p class="shortcut-head">快捷键</p>
+  <div class="shortcut-grid">
+    <div class="shortcut-row"><span>播放 / 暂停</span><span class="shortcut-key"><kbd>Space</kbd></span></div>
+    <div class="shortcut-row"><span>单步演化</span><span class="shortcut-key"><kbd>S</kbd></span></div>
+    <div class="shortcut-row"><span>重置初始图形</span><span class="shortcut-key"><kbd>R</kbd></span></div>
+    <div class="shortcut-row"><span>清空画布</span><span class="shortcut-key"><kbd>C</kbd></span></div>
+    <div class="shortcut-row"><span>打开图形库</span><span class="shortcut-key"><kbd>G</kbd></span></div>
+    <div class="shortcut-row"><span>绘制 / 擦除</span><span class="shortcut-key"><kbd>D</kbd><span class="plus">/</span><kbd>E</kbd></span></div>
+    <div class="shortcut-row"><span>全屏</span><span class="shortcut-key"><kbd>F</kbd></span></div>
+    <div class="shortcut-row"><span>关闭面板</span><span class="shortcut-key"><kbd>Esc</kbd></span></div>
+  </div>
+
+  <div class="help-foot">
+    <p>规则 B3 / S23 · 环面边界 · 经典图案在图形库中</p>
+    <button class="help-close" id="helpDone" type="button">回到游戏</button>
+  </div>
+</section>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ────────────────────────────────────────────────────────
+     Pattern data
+     ──────────────────────────────────────────────────────── */
+  const PRESET_GROUPS = [
+    {
+      title: "振荡器",
+      en: "OSCILLATORS",
+      patterns: [
+        { id: "blinker", name: "闪烁灯", en: "Blinker", rle: "3o!", desc: "最简单的振荡器，在横竖之间往返，周期为 2。" },
+        { id: "toad", name: "蟾蜍", en: "Toad", rle: "b3o$3o!", desc: "两排交错的细胞，此起彼伏，周期为 2。" },
+        { id: "beacon", name: "信标", en: "Beacon", rle: "2o2b$2o2b$2b2o$2b2o!", desc: "两个方块一明一暗，像海面上的灯火。" },
+        { id: "pulsar", name: "脉冲星", en: "Pulsar", rle: "2b3o3b3o2b2$o4bobo4bo$o4bobo4bo$o4bobo4bo$2b3o3b3o2b$13b$2b3o3b3o2b$o4bobo4bo$o4bobo4bo$o4bobo4bo$13b$2b3o3b3o!", desc: "最优雅的振荡器之一，48 个细胞，周期为 3。" },
+        { id: "pentadecathlon", name: "十五周期", en: "Pentadecathlon", rle: "2bo4bo2b$2ob4ob2o$2bo4bo2b!", desc: "细长的长周期振荡器，每 15 代完成一次呼吸。" }
+      ]
+    },
+    {
+      title: "静物",
+      en: "STILL LIFES",
+      patterns: [
+        { id: "block", name: "方块", en: "Block", rle: "2o$2o!", desc: "最稳定的结构，四个细胞永远保持不变。" },
+        { id: "beehive", name: "蜂窝", en: "Beehive", rle: "b2o$o2bo$b2o!", desc: "六格静物，安静地停在原地，像一只蜂巢。" }
+      ]
+    },
+    {
+      title: "飞船",
+      en: "SPACESHIPS",
+      patterns: [
+        { id: "glider", name: "滑翔机", en: "Glider", rle: "bob$2bo$3o!", desc: "最小的飞船，每 4 代斜向移动一格。" },
+        { id: "lwss", name: "轻型飞船", en: "LWSS", rle: "bo2bo$o4b$o3bo$4o!", desc: "每 4 代水平前进两格的轻型飞船。" }
+      ]
+    },
+    {
+      title: "混沌与枪",
+      en: "CHAOS & GUNS",
+      patterns: [
+        { id: "r-pentomino", name: "R 五连体", en: "R-pentomino", rle: "b2o$2o$bo!", desc: "只有 5 个细胞，却要演化 1103 代才安定下来。" },
+        { id: "acorn", name: "橡果", en: "Acorn", rle: "bo5b$3bo3b$2o2b3o!", desc: "一枚 7 格种子，能持续翻涌 5206 代。" },
+        { id: "diehard", name: "顽固分子", en: "Diehard", rle: "6bo$2o$bo3b3o!", desc: "7 个细胞挣扎 130 代，然后彻底消失。" },
+        { id: "gosper-gun", name: "滑翔机枪", en: "Gosper Gun", rle: "24bo$22bobo$12b2o6b2o12b2o$11bo3bo4b2o12b2o$2o8bo5bo3b2o$2o8bo3bob2o4bobo$10bo5bo7bo$11bo3bo$12b2o!", desc: "著名的滑翔机枪，每 30 代发射一艘滑翔机。" }
+      ]
+    }
+  ];
+
+  const AGE_COLORS = [
+    { body: "#f3fffd", glow: "#a5f3fc" },
+    { body: "#a8fff2", glow: "#5eead4" },
+    { body: "#6cf9e3", glow: "#2dd4bf" },
+    { body: "#3fe3ce", glow: "#14b8a6" },
+    { body: "#28d3e9", glow: "#06b6d4" },
+    { body: "#38bdf8", glow: "#0ea5e9" },
+    { body: "#818cf8", glow: "#6366f1" },
+    { body: "#a78bfa", glow: "#8b5cf6" },
+    { body: "#c084fc", glow: "#a855f7" }
+  ];
+
+  const INITIAL_PATTERN_ID = "pulsar";
+  const MAX_CELL_SIZE = 20;
+  const MIN_CELL_SIZE = 7;
+
+  /* ────────────────────────────────────────────────────────
+     DOM
+     ──────────────────────────────────────────────────────── */
+  const gridCanvas = document.getElementById("gridCanvas");
+  const worldCanvas = document.getElementById("worldCanvas");
+  const gridCtx = gridCanvas.getContext("2d");
+  const ctx = worldCanvas.getContext("2d", { alpha: true });
+
+  const dom = {
+    hud: document.querySelector(".hud"),
+    dock: document.getElementById("dock"),
+    gen: document.getElementById("genValue"),
+    pop: document.getElementById("popValue"),
+    status: document.getElementById("statusText"),
+    playBtn: document.getElementById("playBtn"),
+    playLabel: document.getElementById("playLabel"),
+    stepBtn: document.getElementById("stepBtn"),
+    resetBtn: document.getElementById("resetBtn"),
+    clearBtn: document.getElementById("clearBtn"),
+    presetBtn: document.getElementById("presetBtn"),
+    randomBtn: document.getElementById("randomBtn"),
+    speedSlider: document.getElementById("speedSlider"),
+    speedValue: document.getElementById("speedValue"),
+    fullscreenBtn: document.getElementById("fullscreenBtn"),
+    helpBtn: document.getElementById("helpBtn"),
+    toast: document.getElementById("toast"),
+    library: document.getElementById("library"),
+    libraryScrim: document.getElementById("libraryScrim"),
+    libraryClose: document.getElementById("libraryClose"),
+    librarySections: document.getElementById("librarySections"),
+    helpModal: document.getElementById("helpModal"),
+    helpScrim: document.getElementById("helpScrim"),
+    helpClose: document.getElementById("helpClose"),
+    helpDone: document.getElementById("helpDone"),
+    toolButtons: Array.from(document.querySelectorAll("[data-tool]"))
+  };
+
+  /* ────────────────────────────────────────────────────────
+     State
+     ──────────────────────────────────────────────────────── */
+  const state = {
+    cols: 0,
+    rows: 0,
+    cell: 10,
+    gridX: 0,
+    gridY: 0,
+    board: new Uint8Array(0),
+    nextBoard: new Uint8Array(0),
+    ages: new Uint8Array(0),
+    nextAges: new Uint8Array(0),
+    initial: new Uint8Array(0),
+    generation: 0,
+    population: 0,
+    paused: true,
+    speed: 12,
+    tool: "draw",
+    painting: false,
+    paintValue: 1,
+    pointerId: null,
+    lastCell: null,
+    hover: { x: -1, y: -1 },
+    needsRender: true,
+    accumulator: 0,
+    lastFrame: 0,
+    sprites: null,
+    spriteCell: 0,
+    viewW: 0,
+    viewH: 0,
+    dpr: 1,
+    savedFocus: null
+  };
+
+  let toastTimer = 0;
+  let onboardingTimer = 0;
+  let resizeTimer = 0;
+  let overlay = null;
+  let rafId = 0;
+
+  const numberFormat = new Intl.NumberFormat("zh-CN");
+
+  /* ────────────────────────────────────────────────────────
+     Utilities
+     ──────────────────────────────────────────────────────── */
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function parseRLE(rle) {
+    let x = 0;
+    let y = 0;
+    let run = "";
+    const cells = [];
+    let width = 0;
+    let height = 0;
+
+    for (const char of rle) {
+      if (char >= "0" && char <= "9") {
+        run += char;
+        continue;
+      }
+
+      const amount = run ? parseInt(run, 10) : 1;
+      run = "";
+
+      if (char === "b") {
+        x += amount;
+      } else if (char === "o") {
+        for (let i = 0; i < amount; i += 1) {
+          cells.push([x, y]);
+          width = Math.max(width, x + 1);
+          height = Math.max(height, y + 1);
+          x += 1;
+        }
+      } else if (char === "$") {
+        y += amount;
+        x = 0;
+      } else if (char === "!") {
+        break;
+      }
+    }
+
+    return { cells, width, height, count: cells.length };
+  }
+
+  for (const group of PRESET_GROUPS) {
+    for (const pattern of group.patterns) {
+      pattern.data = parseRLE(pattern.rle);
+    }
+  }
+
+  const INITIAL_PATTERN = PRESET_GROUPS
+    .flatMap((group) => group.patterns)
+    .find((pattern) => pattern.id === INITIAL_PATTERN_ID);
+
+  function hexToRgba(hex, alpha) {
+    const value = hex.replace("#", "");
+    const r = parseInt(value.slice(0, 2), 16);
+    const g = parseInt(value.slice(2, 4), 16);
+    const b = parseInt(value.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  function mixHex(hex, target, ratio) {
+    const parse = (value) => [
+      parseInt(value.slice(1, 3), 16),
+      parseInt(value.slice(3, 5), 16),
+      parseInt(value.slice(5, 7), 16)
+    ];
+    const a = parse(hex);
+    const b = parse(target);
+    const mixed = a.map((channel, index) => Math.round(channel + (b[index] - channel) * ratio));
+    return `rgb(${mixed[0]}, ${mixed[1]}, ${mixed[2]})`;
+  }
+
+  function roundedRectPath(context, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    context.beginPath();
+    context.moveTo(x + r, y);
+    context.lineTo(x + width - r, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + r);
+    context.lineTo(x + width, y + height - r);
+    context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+    context.lineTo(x + r, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - r);
+    context.lineTo(x, y + r);
+    context.quadraticCurveTo(x, y, x + r, y);
+    context.closePath();
+  }
+
+  function showToast(message, tone = "mint", duration = 2600) {
+    window.clearTimeout(toastTimer);
+    dom.toast.textContent = message;
+    dom.toast.dataset.tone = tone;
+    dom.toast.classList.add("is-visible");
+    toastTimer = window.setTimeout(() => {
+      dom.toast.classList.remove("is-visible");
+    }, duration);
+  }
+
+  function cancelOnboarding() {
+    window.clearTimeout(onboardingTimer);
+    onboardingTimer = 0;
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Layout
+     ──────────────────────────────────────────────────────── */
+  function computeLayout() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const mobile = width <= 760;
+
+    const hudRect = dom.hud.getBoundingClientRect();
+    const dockRect = dom.dock.getBoundingClientRect();
+    const sidePad = mobile ? 11 : clamp(width * 0.026, 24, 42);
+    const topPad = mobile ? 10 : 18;
+    const bottomPad = mobile ? 12 : 18;
+    const availableW = Math.max(240, width - sidePad * 2);
+    const availableH = Math.max(140, dockRect.top - hudRect.bottom - topPad - bottomPad);
+
+    const cellTarget = mobile
+      ? Math.min(availableW / 46, availableH / 76)
+      : Math.min(availableW / 82, availableH / 45);
+    let cell = clamp(
+      Math.floor(cellTarget),
+      MIN_CELL_SIZE,
+      mobile ? 12 : MAX_CELL_SIZE
+    );
+
+    let cols = Math.max(24, Math.floor(availableW / cell));
+    let rows = Math.max(18, Math.floor(availableH / cell));
+
+    // Keep the grid inside the visible area on very small screens.
+    while ((cols * cell > availableW || rows * cell > availableH) && cell > 3) {
+      cell -= 1;
+      cols = Math.max(24, Math.floor(availableW / cell));
+      rows = Math.max(18, Math.floor(availableH / cell));
+    }
+
+    const gridW = cols * cell;
+    const gridH = rows * cell;
+    const gridX = Math.round((width - gridW) / 2);
+    const areaTop = hudRect.bottom + topPad;
+    const gridY = Math.round(areaTop + Math.max(0, (availableH - gridH) / 2));
+
+    return {
+      width,
+      height,
+      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      cell,
+      cols,
+      rows,
+      gridX,
+      gridY,
+      gridW,
+      gridH,
+      mobile
+    };
+  }
+
+  function configureCanvas(canvas, context, width, height, dpr) {
+    const pixelWidth = Math.round(width * dpr);
+    const pixelHeight = Math.round(height * dpr);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+    }
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function ensureBoardSize(layout, { seed = false } = {}) {
+    const sameSize =
+      state.cols === layout.cols &&
+      state.rows === layout.rows &&
+      state.board.length === layout.cols * layout.rows;
+    if (sameSize) return false;
+
+    const previousBoard = state.board;
+    const previousAges = state.ages;
+    const previousInitial = state.initial;
+    const previousCols = state.cols;
+    const previousRows = state.rows;
+
+    const newSize = layout.cols * layout.rows;
+    const newBoard = new Uint8Array(newSize);
+    const newAges = new Uint8Array(newSize);
+    const newInitial = new Uint8Array(newSize);
+
+    if (previousBoard.length && previousCols && previousRows) {
+      const offsetX = Math.floor((layout.cols - previousCols) / 2);
+      const offsetY = Math.floor((layout.rows - previousRows) / 2);
+
+      for (let y = 0; y < previousRows; y += 1) {
+        const newY = y + offsetY;
+        if (newY < 0 || newY >= layout.rows) continue;
+        for (let x = 0; x < previousCols; x += 1) {
+          const newX = x + offsetX;
+          if (newX < 0 || newX >= layout.cols) continue;
+          const oldIndex = y * previousCols + x;
+          const newIndex = newY * layout.cols + newX;
+          newBoard[newIndex] = previousBoard[oldIndex];
+          newAges[newIndex] = previousAges[oldIndex];
+          newInitial[newIndex] = previousInitial[oldIndex] || 0;
+        }
+      }
+    }
+
+    state.cols = layout.cols;
+    state.rows = layout.rows;
+    state.board = newBoard;
+    state.nextBoard = new Uint8Array(newSize);
+    state.ages = newAges;
+    state.nextAges = new Uint8Array(newSize);
+    state.initial = newInitial;
+    state.population = countPopulation(newBoard);
+    state.hover.x = -1;
+    state.hover.y = -1;
+    state.lastCell = null;
+
+    if (seed) seedInitialPattern();
+    return true;
+  }
+
+  function resizeWorld({ seed = false } = {}) {
+    const layout = computeLayout();
+    configureCanvas(gridCanvas, gridCtx, layout.width, layout.height, layout.dpr);
+    configureCanvas(worldCanvas, ctx, layout.width, layout.height, layout.dpr);
+
+    state.viewW = layout.width;
+    state.viewH = layout.height;
+    state.dpr = layout.dpr;
+    state.cell = layout.cell;
+    state.gridX = layout.gridX;
+    state.gridY = layout.gridY;
+
+    ensureBoardSize(layout, { seed });
+
+    if (state.spriteCell !== state.cell || !state.sprites) {
+      buildSprites();
+    }
+
+    paintGrid();
+    updateSpeedUI();
+    state.needsRender = true;
+  }
+
+  function paintGrid() {
+    const width = state.viewW;
+    const height = state.viewH;
+    const dpr = state.dpr;
+    if (!width || !height) return;
+
+    gridCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    gridCtx.clearRect(0, 0, width, height);
+
+    const { cell, gridX, gridY, cols, rows } = state;
+    const gridW = cols * cell;
+    const gridH = rows * cell;
+
+    // A barely-there wash keeps the playfield distinct from the page.
+    const wash = gridCtx.createRadialGradient(
+      gridX + gridW / 2,
+      gridY + gridH / 2,
+      Math.min(gridW, gridH) * 0.08,
+      gridX + gridW / 2,
+      gridY + gridH / 2,
+      Math.max(gridW, gridH) * 0.68
+    );
+    wash.addColorStop(0, "rgba(8, 27, 33, 0.16)");
+    wash.addColorStop(0.65, "rgba(4, 12, 18, 0.08)");
+    wash.addColorStop(1, "rgba(2, 6, 10, 0)");
+    gridCtx.fillStyle = wash;
+    gridCtx.fillRect(0, 0, width, height);
+
+    // Dot matrix.
+    const dotRadius = cell >= 10 ? 0.95 : 0.72;
+    const dotAlpha = cell >= 10 ? 0.17 : 0.15;
+    gridCtx.fillStyle = `rgba(139, 197, 211, ${dotAlpha})`;
+    gridCtx.beginPath();
+    for (let y = 0; y < rows; y += 1) {
+      const centerY = gridY + y * cell + cell / 2;
+      for (let x = 0; x < cols; x += 1) {
+        const centerX = gridX + x * cell + cell / 2;
+        gridCtx.moveTo(centerX + dotRadius, centerY);
+        gridCtx.arc(centerX, centerY, dotRadius, 0, Math.PI * 2);
+      }
+    }
+    gridCtx.fill();
+
+    // Fine corner brackets frame the field without boxing it in.
+    const bracket = Math.min(18, Math.max(10, cell * 1.2));
+    const margin = Math.max(7, cell * 0.7);
+    const left = gridX - margin;
+    const right = gridX + gridW + margin;
+    const top = gridY - margin;
+    const bottom = gridY + gridH + margin;
+    gridCtx.strokeStyle = "rgba(94, 234, 212, 0.20)";
+    gridCtx.lineWidth = 1;
+    gridCtx.beginPath();
+    gridCtx.moveTo(left, top + bracket);
+    gridCtx.lineTo(left, top);
+    gridCtx.lineTo(left + bracket, top);
+    gridCtx.moveTo(right - bracket, top);
+    gridCtx.lineTo(right, top);
+    gridCtx.lineTo(right, top + bracket);
+    gridCtx.moveTo(left, bottom - bracket);
+    gridCtx.lineTo(left, bottom);
+    gridCtx.lineTo(left + bracket, bottom);
+    gridCtx.moveTo(right - bracket, bottom);
+    gridCtx.lineTo(right, bottom);
+    gridCtx.lineTo(right, bottom - bracket);
+    gridCtx.stroke();
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Cell rendering
+     ──────────────────────────────────────────────────────── */
+  function buildSprites() {
+    const cell = state.cell;
+    const dpr = state.dpr || 1;
+    const gap = cell >= 9 ? 1.15 : cell >= 7 ? 0.9 : 0.7;
+    const pad = Math.max(3, Math.ceil(cell * 1.02));
+    const size = cell + pad * 2;
+    const pixelSize = Math.max(8, Math.ceil(size * dpr));
+    const radius = Math.max(1.2, Math.min(3.1, (cell - gap * 2) * 0.28));
+
+    const sprites = AGE_COLORS.map((color) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = pixelSize;
+      canvas.height = pixelSize;
+      const spriteCtx = canvas.getContext("2d");
+      spriteCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const center = size / 2;
+      const glow = spriteCtx.createRadialGradient(center, center, cell * 0.08, center, center, center);
+      glow.addColorStop(0, hexToRgba(color.glow, 0.44));
+      glow.addColorStop(0.2, hexToRgba(color.glow, 0.20));
+      glow.addColorStop(0.48, hexToRgba(color.glow, 0.065));
+      glow.addColorStop(0.78, hexToRgba(color.glow, 0.018));
+      glow.addColorStop(1, hexToRgba(color.glow, 0));
+      spriteCtx.fillStyle = glow;
+      spriteCtx.fillRect(0, 0, size, size);
+
+      const bodyX = pad + gap;
+      const bodyY = pad + gap;
+      const bodyW = cell - gap * 2;
+      const bodyH = cell - gap * 2;
+
+      spriteCtx.save();
+      spriteCtx.shadowColor = hexToRgba(color.glow, 0.7);
+      spriteCtx.shadowBlur = Math.max(3, cell * 0.66);
+      const bodyGradient = spriteCtx.createLinearGradient(bodyX, bodyY, bodyX, bodyY + bodyH);
+      bodyGradient.addColorStop(0, mixHex(color.body, "#ffffff", 0.28));
+      bodyGradient.addColorStop(0.52, color.body);
+      bodyGradient.addColorStop(1, mixHex(color.body, "#001318", 0.22));
+      spriteCtx.fillStyle = bodyGradient;
+      roundedRectPath(spriteCtx, bodyX, bodyY, bodyW, bodyH, radius);
+      spriteCtx.fill();
+      spriteCtx.restore();
+
+      spriteCtx.strokeStyle = "rgba(255, 255, 255, 0.26)";
+      spriteCtx.lineWidth = Math.max(0.5, Math.min(1, cell * 0.075));
+      roundedRectPath(
+        spriteCtx,
+        bodyX + 0.3,
+        bodyY + 0.3,
+        Math.max(0, bodyW - 0.6),
+        Math.max(0, bodyH - 0.6),
+        Math.max(0.5, radius - 0.3)
+      );
+      spriteCtx.stroke();
+
+      return canvas;
+    });
+
+    state.sprites = { images: sprites, pad, size };
+    state.spriteCell = cell;
+  }
+
+  function render() {
+    if (!state.viewW || !state.viewH) return;
+    ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+    ctx.clearRect(0, 0, state.viewW, state.viewH);
+    if (!state.board.length || !state.sprites) return;
+
+    const { board, ages, cell, cols, gridX, gridY } = state;
+    const { images, pad, size } = state.sprites;
+
+    for (let y = 0; y < state.rows; y += 1) {
+      const rowStart = y * cols;
+      const pixelY = gridY + y * cell - pad;
+      for (let x = 0; x < cols; x += 1) {
+        const index = rowStart + x;
+        if (!board[index]) continue;
+        const sprite = images[Math.min(ages[index], images.length - 1)];
+        ctx.drawImage(sprite, gridX + x * cell - pad, pixelY, size, size);
+      }
+    }
+
+    drawHoverPreview();
+  }
+
+  function drawHoverPreview() {
+    const { hover, board, cell, cols, rows, gridX, gridY } = state;
+    if (hover.x < 0 || hover.y < 0 || hover.x >= cols || hover.y >= rows) return;
+    if (state.painting && state.pointerId !== null) {
+      // Keep the cell beneath the pointer visible while drawing.
+    }
+
+    const erase = state.tool === "erase" || (state.painting && state.paintValue === 0);
+    const color = erase ? "#fb7185" : "#5eead4";
+    const alive = !!board[hover.y * cols + hover.x];
+    const x = gridX + hover.x * cell;
+    const y = gridY + hover.y * cell;
+    const inset = Math.max(1, cell * 0.12);
+
+    ctx.save();
+    if (alive && !erase) {
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
+      ctx.lineWidth = 1.1;
+      ctx.strokeRect(x + inset - 0.5, y + inset - 0.5, cell - inset * 2 + 1, cell - inset * 2 + 1);
+    } else {
+      ctx.fillStyle = hexToRgba(color, erase ? 0.17 : 0.13);
+      roundedRectPath(ctx, x + inset, y + inset, cell - inset * 2, cell - inset * 2, Math.min(2.4, cell * 0.25));
+      ctx.fill();
+      ctx.strokeStyle = hexToRgba(color, 0.72);
+      ctx.lineWidth = 1.1;
+      roundedRectPath(
+        ctx,
+        x + inset + 0.5,
+        y + inset + 0.5,
+        Math.max(0, cell - inset * 2 - 1),
+        Math.max(0, cell - inset * 2 - 1),
+        Math.min(2.1, cell * 0.22)
+      );
+      ctx.stroke();
+    }
+
+    if (state.tool === "erase" || erase) {
+      const cx = x + cell / 2;
+      const cy = y + cell / 2;
+      const mark = Math.max(1.5, cell * 0.16);
+      ctx.strokeStyle = hexToRgba(color, alive ? 0.95 : 0.55);
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx - mark, cy - mark);
+      ctx.lineTo(cx + mark, cy + mark);
+      ctx.moveTo(cx + mark, cy - mark);
+      ctx.lineTo(cx - mark, cy + mark);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Board / simulation
+     ──────────────────────────────────────────────────────── */
+  function countPopulation(board) {
+    let population = 0;
+    for (let i = 0; i < board.length; i += 1) population += board[i];
+    return population;
+  }
+
+  function stopAccumulator() {
+    state.accumulator = 0;
+    state.lastFrame = performance.now();
+  }
+
+  function setPaused(paused, { announce = false, forcedMessage = "" } = {}) {
+    if (paused === state.paused) {
+      syncUI();
+      return;
+    }
+
+    state.paused = paused;
+    if (paused) {
+      state.accumulator = 0;
+      if (announce) showToast(forcedMessage || "已暂停", "muted", 1700);
+    } else {
+      stopAccumulator();
+      if (announce) showToast(forcedMessage || "继续演化", "mint", 1500);
+    }
+    syncUI();
+    state.needsRender = true;
+  }
+
+  function updateHUD() {
+    dom.gen.textContent = numberFormat.format(state.generation);
+    dom.pop.textContent = numberFormat.format(state.population);
+    dom.status.textContent = state.paused ? "已暂停" : "运行中";
+    dom.playLabel.textContent = state.paused ? "继续" : "暂停";
+    dom.playBtn.setAttribute("aria-label", state.paused ? "继续演化" : "暂停演化");
+    document.body.classList.toggle("is-paused", state.paused);
+    document.body.classList.toggle("tool-erase", state.tool === "erase");
+    for (const button of dom.toolButtons) {
+      const active = button.dataset.tool === state.tool;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+  }
+
+  function syncUI() {
+    updateHUD();
+  }
+
+  function updateSpeedUI() {
+    const percent = ((state.speed - 1) / 59) * 100;
+    dom.speedSlider.style.setProperty("--fill", `${percent}%`);
+    dom.speedSlider.value = String(state.speed);
+    dom.speedSlider.setAttribute("aria-valuetext", `每秒 ${state.speed} 代`);
+    dom.speedValue.textContent = `${state.speed} / 秒`;
+  }
+
+  function setSpeed(speed) {
+    state.speed = clamp(Math.round(speed), 1, 60);
+    state.accumulator = 0;
+    state.lastFrame = performance.now();
+    updateSpeedUI();
+  }
+
+  function seedInitialPattern() {
+    if (!INITIAL_PATTERN || !state.board.length) return;
+    placeCells(INITIAL_PATTERN.data, { autoStart: true });
+  }
+
+  function placeCells(patternData, { autoStart = false } = {}) {
+    const { cols, rows } = state;
+    state.board.fill(0);
+    state.ages.fill(0);
+
+    const offsetX = Math.max(0, Math.floor((cols - patternData.width) / 2));
+    const offsetY = Math.max(0, Math.floor((rows - patternData.height) / 2));
+
+    for (const [x, y] of patternData.cells) {
+      const px = x + offsetX;
+      const py = y + offsetY;
+      if (px < 0 || px >= cols || py < 0 || py >= rows) continue;
+      state.board[py * cols + px] = 1;
+    }
+
+    state.generation = 0;
+    state.population = countPopulation(state.board);
+    state.initial = state.board.slice();
+    state.paused = !autoStart;
+    stopAccumulator();
+    state.needsRender = true;
+    updateHUD();
+  }
+
+  function loadPattern(pattern, { autoStart = true, silent = false } = {}) {
+    placeCells(pattern.data, { autoStart });
+    if (!silent) {
+      showToast(
+        `已载入「${pattern.name}」${pattern.data.count ? ` · ${pattern.data.count} 个细胞` : ""}`,
+        "mint",
+        2100
+      );
+    }
+  }
+
+  function resetToInitial() {
+    if (!state.initial.length) return;
+    state.board.set(state.initial);
+    state.ages.fill(0);
+    state.generation = 0;
+    state.population = countPopulation(state.board);
+    state.paused = true;
+    stopAccumulator();
+    state.needsRender = true;
+    updateHUD();
+    showToast("已回到初始图形", "mint", 1700);
+  }
+
+  function clearBoard() {
+    state.board.fill(0);
+    state.ages.fill(0);
+    state.initial = new Uint8Array(state.board.length);
+    state.generation = 0;
+    state.population = 0;
+    state.paused = true;
+    stopAccumulator();
+    state.needsRender = true;
+    updateHUD();
+    showToast("画布已清空 · 拖动即可绘制", "muted", 2000);
+  }
+
+  function randomize() {
+    const { cols, rows } = state;
+    const width = Math.max(7, Math.floor(cols * 0.52));
+    const height = Math.max(7, Math.floor(rows * 0.5));
+    const offsetX = Math.floor((cols - width) / 2);
+    const offsetY = Math.floor((rows - height) / 2);
+
+    state.board.fill(0);
+    state.ages.fill(0);
+
+    let placed = 0;
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const centerBias = 1 - Math.min(1, Math.hypot(x - width / 2, y - height / 2) / (width * 0.7));
+        if (Math.random() < 0.16 + centerBias * 0.16) {
+          state.board[(offsetY + y) * cols + (offsetX + x)] = 1;
+          placed += 1;
+        }
+      }
+    }
+
+    if (placed < 8) {
+      for (let i = 0; i < 24; i += 1) {
+        const x = offsetX + Math.floor(Math.random() * width);
+        const y = offsetY + Math.floor(Math.random() * height);
+        state.board[y * cols + x] = 1;
+      }
+    }
+
+    state.generation = 0;
+    state.population = countPopulation(state.board);
+    state.initial = state.board.slice();
+    state.paused = false;
+    stopAccumulator();
+    state.needsRender = true;
+    updateHUD();
+    showToast("随机星群已生成 · 开始演化", "mint", 2000);
+  }
+
+  function evolve() {
+    const { cols, rows, board, ages, nextBoard, nextAges } = state;
+    if (!cols || !rows) return;
+
+    let population = 0;
+    const maxAge = AGE_COLORS.length - 1;
+
+    for (let y = 0; y < rows; y += 1) {
+      const row = y * cols;
+      const rowUp = (y === 0 ? rows - 1 : y - 1) * cols;
+      const rowDown = (y === rows - 1 ? 0 : y + 1) * cols;
+
+      for (let x = 0; x < cols; x += 1) {
+        const left = x === 0 ? cols - 1 : x - 1;
+        const right = x === cols - 1 ? 0 : x + 1;
+        const index = row + x;
+
+        const neighbors =
+          board[rowUp + left] +
+          board[rowUp + x] +
+          board[rowUp + right] +
+          board[row + left] +
+          board[row + right] +
+          board[rowDown + left] +
+          board[rowDown + x] +
+          board[rowDown + right];
+
+        const alive = board[index] === 1;
+        const survives = alive ? neighbors === 2 || neighbors === 3 : neighbors === 3;
+
+        nextBoard[index] = survives ? 1 : 0;
+        if (survives) {
+          nextAges[index] = alive ? Math.min(ages[index] + 1, maxAge) : 0;
+          population += 1;
+        } else {
+          nextAges[index] = 0;
+        }
+      }
+    }
+
+    state.board = nextBoard;
+    state.nextBoard = board;
+    state.ages = nextAges;
+    state.nextAges = ages;
+    state.generation += 1;
+    state.population = population;
+    state.needsRender = true;
+
+    if (state.population === 0) {
+      state.paused = true;
+      state.accumulator = 0;
+      updateHUD();
+      showToast("种群已灭绝 · 按「重置」或载入新图形", "muted", 3000);
+    }
+  }
+
+  function stepOnce({ manual = false } = {}) {
+    if (!state.population) {
+      if (manual) showToast("画布是空的 · 先绘制细胞或载入图形", "muted", 2200);
+      return false;
+    }
+
+    if (!state.paused) {
+      state.paused = true;
+      updateHUD();
+    }
+
+    evolve();
+    stopAccumulator();
+    updateHUD();
+    return true;
+  }
+
+  function togglePlay() {
+    if (state.paused) {
+      if (!state.population) {
+        showToast("画布是空的 · 先绘制细胞或载入图形", "muted", 2200);
+        return;
+      }
+      state.paused = false;
+      stopAccumulator();
+      updateHUD();
+    } else {
+      state.paused = true;
+      state.accumulator = 0;
+      updateHUD();
+    }
+    state.needsRender = true;
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Drawing
+     ──────────────────────────────────────────────────────── */
+  function eventToCell(event) {
+    const rect = worldCanvas.getBoundingClientRect();
+    const x = Math.floor((event.clientX - rect.left - state.gridX) / state.cell);
+    const y = Math.floor((event.clientY - rect.top - state.gridY) / state.cell);
+    if (x < 0 || y < 0 || x >= state.cols || y >= state.rows) return null;
+    return { x, y };
+  }
+
+  function setTool(tool) {
+    if (tool !== "draw" && tool !== "erase") return;
+    state.tool = tool;
+    updateHUD();
+    state.needsRender = true;
+  }
+
+  function updateBaselineIfPristine() {
+    if (state.generation === 0 && state.initial.length === state.board.length) {
+      state.initial.set(state.board);
+    }
+  }
+
+  function paintCell(x, y, value) {
+    if (x < 0 || y < 0 || x >= state.cols || y >= state.rows) return false;
+    const index = y * state.cols + x;
+    const current = state.board[index];
+    if (current === value) return false;
+    state.board[index] = value;
+    state.ages[index] = 0;
+    state.population += value ? 1 : -1;
+    state.needsRender = true;
+    return true;
+  }
+
+  function paintLine(from, to, value) {
+    let x = from.x;
+    let y = from.y;
+    const dx = Math.abs(to.x - x);
+    const dy = -Math.abs(to.y - y);
+    const sx = x < to.x ? 1 : -1;
+    const sy = y < to.y ? 1 : -1;
+    let err = dx + dy;
+    let changed = false;
+
+    while (true) {
+      changed = paintCell(x, y, value) || changed;
+      if (x === to.x && y === to.y) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) {
+        err += dy;
+        x += sx;
+      }
+      if (e2 <= dx) {
+        err += dx;
+        y += sy;
+      }
+    }
+
+    return changed;
+  }
+
+  function handlePointerDown(event) {
+    if (state.painting) return;
+    if (event.button !== 0 && event.button !== 2) return;
+    const cell = eventToCell(event);
+    if (!cell) return;
+
+    event.preventDefault();
+    if (!state.paused) {
+      state.paused = true;
+      state.accumulator = 0;
+      updateHUD();
+    }
+
+    state.painting = true;
+    state.pointerId = event.pointerId;
+    state.paintValue = event.button === 2 || state.tool === "erase" ? 0 : 1;
+    state.lastCell = cell;
+    state.hover = cell;
+    paintCell(cell.x, cell.y, state.paintValue);
+    updateHUD();
+    state.needsRender = true;
+
+    try {
+      worldCanvas.setPointerCapture(event.pointerId);
+    } catch (error) {
+      // Pointer capture can fail in unusual browser contexts; drawing still works.
+    }
+  }
+
+  function handlePointerMove(event) {
+    const cell = eventToCell(event);
+
+    if (cell) {
+      state.hover.x = cell.x;
+      state.hover.y = cell.y;
+    } else {
+      state.hover.x = -1;
+      state.hover.y = -1;
+    }
+
+    if (state.painting && event.pointerId === state.pointerId) {
+      if (!cell) {
+        state.lastCell = null;
+      } else {
+        const changed = state.lastCell
+          ? paintLine(state.lastCell, cell, state.paintValue)
+          : paintCell(cell.x, cell.y, state.paintValue);
+        state.lastCell = cell;
+        if (changed) updateHUD();
+      }
+    }
+
+    state.needsRender = true;
+  }
+
+  function finishPointer(event) {
+    if (!state.painting) return;
+    if (event && state.pointerId !== null && event.pointerId !== state.pointerId) return;
+
+    state.painting = false;
+    state.pointerId = null;
+    state.lastCell = null;
+    updateBaselineIfPristine();
+    updateHUD();
+    state.needsRender = true;
+
+    try {
+      if (event && worldCanvas.hasPointerCapture(event.pointerId)) {
+        worldCanvas.releasePointerCapture(event.pointerId);
+      }
+    } catch (error) {
+      // Ignore stale pointer capture.
+    }
+  }
+
+  function handlePointerLeave(event) {
+    if (state.painting && event.pointerId === state.pointerId) return;
+    state.hover.x = -1;
+    state.hover.y = -1;
+    state.needsRender = true;
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Library / help overlays
+     ──────────────────────────────────────────────────────── */
+  function buildLibrary() {
+    const fragment = document.createDocumentFragment();
+    let counter = 0;
+
+    PRESET_GROUPS.forEach((group, groupIndex) => {
+      const section = document.createElement("section");
+      section.className = "pattern-section";
+
+      const head = document.createElement("div");
+      head.className = "section-head";
+      head.innerHTML = `
+        <span class="section-index">${String(groupIndex + 1).padStart(2, "0")}</span>
+        <h3 class="section-name">${group.title}</h3>
+        <span class="section-line" aria-hidden="true"></span>
+        <span class="section-en">${group.en}</span>
+      `;
+      section.appendChild(head);
+
+      const grid = document.createElement("div");
+      grid.className = "pattern-grid";
+
+      for (const pattern of group.patterns) {
+        counter += 1;
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "pattern-card";
+        card.dataset.preset = pattern.id;
+        card.setAttribute("aria-label", `载入${pattern.name}（${pattern.en}）`);
+        card.innerHTML = `
+          <span class="pattern-thumb">
+            <canvas aria-hidden="true"></canvas>
+            <span class="thumb-badge">${pattern.data.count} 格</span>
+          </span>
+          <span class="pattern-info">
+            <span class="pattern-title-row">
+              <span class="pattern-name">${pattern.name}</span>
+              <span class="pattern-en">${pattern.en}</span>
+            </span>
+            <span class="pattern-desc">${pattern.desc}</span>
+          </span>
+        `;
+        card.addEventListener("click", () => {
+          closeOverlay({ restoreFocus: false });
+          loadPattern(pattern, { autoStart: true, silent: true });
+          showToast(`已载入「${pattern.name}」 · 正在演化`, "mint", 2100);
+          dom.presetBtn.focus({ preventScroll: true });
+        });
+        grid.appendChild(card);
+      }
+
+      section.appendChild(grid);
+      fragment.appendChild(section);
+    });
+
+    dom.librarySections.replaceChildren(fragment);
+  }
+
+  function drawThumbnail(canvas, pattern) {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = rect.width;
+    const height = rect.height;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    const context = canvas.getContext("2d");
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.clearRect(0, 0, width, height);
+
+    const data = pattern.data;
+    const padding = 13;
+    const scale = Math.max(
+      1,
+      Math.min(
+        (width - padding * 2) / data.width,
+        (height - padding * 2) / data.height,
+        9
+      )
+    );
+    const patternW = data.width * scale;
+    const patternH = data.height * scale;
+    const offsetX = (width - patternW) / 2;
+    const offsetY = (height - patternH) / 2;
+    const inset = scale > 4 ? 0.85 : 0.35;
+    const cellSize = Math.max(1, scale - inset);
+
+    context.save();
+    context.shadowColor = "rgba(94, 234, 212, 0.52)";
+    context.shadowBlur = Math.min(8, scale * 1.15);
+    context.fillStyle = "rgba(151, 255, 240, 0.92)";
+    for (const [x, y] of data.cells) {
+      roundedRectPath(
+        context,
+        offsetX + x * scale + inset / 2,
+        offsetY + y * scale + inset / 2,
+        cellSize,
+        cellSize,
+        Math.min(1.8, scale * 0.22)
+      );
+      context.fill();
+    }
+    context.restore();
+  }
+
+  function drawAllThumbnails() {
+    const cards = dom.library.querySelectorAll(".pattern-card");
+    for (const card of cards) {
+      const pattern = findPattern(card.dataset.preset);
+      if (!pattern) continue;
+      const canvas = card.querySelector("canvas");
+      if (canvas) drawThumbnail(canvas, pattern);
+    }
+  }
+
+  function findPattern(id) {
+    for (const group of PRESET_GROUPS) {
+      const found = group.patterns.find((pattern) => pattern.id === id);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  function setOverlayState(element, scrim, open) {
+    element.classList.toggle("is-open", open);
+    scrim.classList.toggle("is-open", open);
+    element.setAttribute("aria-hidden", String(!open));
+    if (open) {
+      element.removeAttribute("inert");
+    } else {
+      element.setAttribute("inert", "");
+    }
+    scrim.setAttribute("aria-hidden", String(!open));
+  }
+
+  function setBackgroundInert(inert) {
+    for (const element of [dom.hud, dom.dock, worldCanvas, gridCanvas]) {
+      if (!element) continue;
+      if (inert) {
+        element.setAttribute("inert", "");
+      } else {
+        element.removeAttribute("inert");
+      }
+    }
+  }
+
+  function openLibrary() {
+    if (overlay === "library") return;
+    closeOverlay({ restoreFocus: false, immediate: true });
+    overlay = "library";
+    state.savedFocus = document.activeElement;
+    state.hover.x = -1;
+    state.hover.y = -1;
+    state.needsRender = true;
+    setOverlayState(dom.library, dom.libraryScrim, true);
+    setBackgroundInert(true);
+    document.body.classList.add("overlay-open");
+    drawAllThumbnails();
+    window.setTimeout(() => {
+      dom.libraryClose.focus({ preventScroll: true });
+    }, 60);
+  }
+
+  function openHelp() {
+    if (overlay === "help") return;
+    closeOverlay({ restoreFocus: false, immediate: true });
+    overlay = "help";
+    state.savedFocus = document.activeElement;
+    state.hover.x = -1;
+    state.hover.y = -1;
+    state.needsRender = true;
+    setOverlayState(dom.helpModal, dom.helpScrim, true);
+    setBackgroundInert(true);
+    document.body.classList.add("overlay-open");
+    window.setTimeout(() => {
+      dom.helpClose.focus({ preventScroll: true });
+    }, 60);
+  }
+
+  function closeOverlay({ restoreFocus = true, immediate = false } = {}) {
+    if (!overlay) return;
+    const closing = overlay;
+    overlay = null;
+    document.body.classList.remove("overlay-open");
+
+    if (closing === "library") {
+      setOverlayState(dom.library, dom.libraryScrim, false);
+    } else if (closing === "help") {
+      setOverlayState(dom.helpModal, dom.helpScrim, false);
+    }
+
+    setBackgroundInert(false);
+
+    if (restoreFocus && state.savedFocus && typeof state.savedFocus.focus === "function") {
+      const target = state.savedFocus;
+      state.savedFocus = null;
+      window.setTimeout(() => target.focus({ preventScroll: true }), immediate ? 0 : 80);
+    } else if (restoreFocus) {
+      state.savedFocus = null;
+    }
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Fullscreen
+     ──────────────────────────────────────────────────────── */
+  async function toggleFullscreen() {
+    if (!document.fullscreenEnabled) {
+      showToast("当前浏览器不允许网页进入全屏", "muted", 2400);
+      return;
+    }
+
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch (error) {
+      showToast("未能进入全屏", "muted", 2200);
+    }
+  }
+
+  function syncFullscreenButton() {
+    const active = !!document.fullscreenElement;
+    const expand = dom.fullscreenBtn.querySelector(".icon-expand");
+    const compress = dom.fullscreenBtn.querySelector(".icon-compress");
+    if (expand) expand.hidden = active;
+    if (compress) compress.hidden = !active;
+    dom.fullscreenBtn.setAttribute("aria-label", active ? "退出全屏" : "进入全屏");
+    dom.fullscreenBtn.title = active ? "退出全屏 (F)" : "全屏 (F)";
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Main loop
+     ──────────────────────────────────────────────────────── */
+  function frame(now) {
+    rafId = window.requestAnimationFrame(frame);
+
+    const delta = Math.min(250, Math.max(0, now - state.lastFrame));
+    state.lastFrame = now;
+
+    if (!state.paused && state.population) {
+      state.accumulator += delta;
+      const interval = 1000 / state.speed;
+      let steps = 0;
+      while (state.accumulator >= interval && steps < 12 && !state.paused) {
+        evolve();
+        state.accumulator -= interval;
+        steps += 1;
+      }
+      if (steps > 0) updateHUD();
+    } else {
+      state.accumulator = 0;
+    }
+
+    if (state.needsRender) {
+      state.needsRender = false;
+      render();
+    }
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Events
+     ──────────────────────────────────────────────────────── */
+  function bindEvents() {
+    document.addEventListener("pointerdown", cancelOnboarding, { capture: true, passive: true });
+    document.addEventListener("keydown", cancelOnboarding, { capture: true });
+
+    worldCanvas.addEventListener("pointerdown", handlePointerDown);
+    worldCanvas.addEventListener("pointermove", handlePointerMove);
+    worldCanvas.addEventListener("pointerup", finishPointer);
+    worldCanvas.addEventListener("pointercancel", finishPointer);
+    worldCanvas.addEventListener("pointerleave", handlePointerLeave);
+    worldCanvas.addEventListener("contextmenu", (event) => event.preventDefault());
+
+    dom.playBtn.addEventListener("click", togglePlay);
+    dom.stepBtn.addEventListener("click", () => stepOnce({ manual: true }));
+    dom.resetBtn.addEventListener("click", resetToInitial);
+    dom.clearBtn.addEventListener("click", clearBoard);
+    dom.randomBtn.addEventListener("click", randomize);
+    dom.presetBtn.addEventListener("click", openLibrary);
+    dom.helpBtn.addEventListener("click", openHelp);
+    dom.libraryClose.addEventListener("click", () => closeOverlay());
+    dom.libraryScrim.addEventListener("click", () => closeOverlay());
+    dom.helpClose.addEventListener("click", () => closeOverlay());
+    dom.helpDone.addEventListener("click", () => closeOverlay());
+    dom.helpScrim.addEventListener("click", () => closeOverlay());
+    dom.fullscreenBtn.addEventListener("click", toggleFullscreen);
+
+    dom.speedSlider.addEventListener("input", (event) => {
+      setSpeed(Number(event.target.value));
+    });
+
+    for (const button of dom.toolButtons) {
+      button.addEventListener("click", () => setTool(button.dataset.tool));
+    }
+
+    document.addEventListener("fullscreenchange", syncFullscreenButton);
+
+    document.addEventListener("keydown", (event) => {
+      const target = event.target;
+      const isTextInput =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        target?.isContentEditable;
+      if (isTextInput && target?.type !== "range") return;
+
+      if (event.key === "Escape") {
+        if (overlay) {
+          event.preventDefault();
+          closeOverlay();
+        }
+        return;
+      }
+
+      if (overlay) return;
+
+      if (event.code === "Space") {
+        event.preventDefault();
+        togglePlay();
+      } else if (event.key === "s" || event.key === "S") {
+        event.preventDefault();
+        stepOnce({ manual: true });
+      } else if (event.key === "r" || event.key === "R") {
+        event.preventDefault();
+        resetToInitial();
+      } else if (event.key === "c" || event.key === "C") {
+        event.preventDefault();
+        clearBoard();
+      } else if (event.key === "g" || event.key === "G") {
+        event.preventDefault();
+        openLibrary();
+      } else if (event.key === "f" || event.key === "F") {
+        event.preventDefault();
+        toggleFullscreen();
+      } else if (event.key === "?" || event.key === "h" || event.key === "H") {
+        event.preventDefault();
+        openHelp();
+      } else if (event.key === "d" || event.key === "D") {
+        event.preventDefault();
+        setTool("draw");
+      } else if (event.key === "e" || event.key === "E") {
+        event.preventDefault();
+        setTool("erase");
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        resizeWorld();
+        drawAllThumbnails();
+      }, 100);
+    });
+
+    window.addEventListener("orientationchange", () => {
+      window.setTimeout(() => {
+        resizeWorld();
+        drawAllThumbnails();
+      }, 250);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      state.lastFrame = performance.now();
+      state.accumulator = 0;
+    });
+
+    window.addEventListener("blur", () => {
+      if (state.painting) finishPointer();
+    });
+  }
+
+  /* ────────────────────────────────────────────────────────
+     Boot
+     ──────────────────────────────────────────────────────── */
+  function init() {
+    buildLibrary();
+    resizeWorld({ seed: true });
+    bindEvents();
+    setSpeed(12);
+    updateHUD();
+    state.needsRender = true;
+    state.lastFrame = performance.now();
+    dom.library.setAttribute("inert", "");
+    dom.helpModal.setAttribute("inert", "");
+    document.body.classList.remove("overlay-open");
+    state.paused = false;
+    updateHUD();
+    state.lastFrame = performance.now();
+    if (!rafId) rafId = window.requestAnimationFrame(frame);
+    window.setTimeout(drawAllThumbnails, 60);
+    onboardingTimer = window.setTimeout(() => {
+      onboardingTimer = 0;
+      if (!overlay) showToast("拖动绘制细胞 · 打开「图形库」", "mint", 3200);
+    }, 1100);
+  }
+
+  // Wait one frame so the HUD and dock have their final responsive height.
+  window.requestAnimationFrame(init);
+})();
+</script>
+</body>
+</html>
